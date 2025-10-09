@@ -1,5 +1,6 @@
-package controller.manager;
+package controller.customer;
 
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -7,20 +8,36 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import controller.common.Controller;
+
 /**
- * Servlet implementation class tempServlet
+ * Servlet implementation class OrderController
  */
-@WebServlet("/tempServlet")
-public class tempServlet extends HttpServlet {
+@WebServlet("/order")
+public class OrderController extends HttpServlet implements Controller {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public tempServlet() {
+    public OrderController() {
         super();
         // TODO Auto-generated constructor stub
     }
+
+	/**
+	 * @see Servlet#init(ServletConfig)
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#service(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)

@@ -1,5 +1,7 @@
-package listener;
+package controller.admin;
 
+import controller.common.Controller;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -8,19 +10,33 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * Servlet implementation class tempServlet
+ * Servlet implementation class adminController
  */
-@WebServlet("/tempServlet")
-public class tempServlet extends HttpServlet {
+@WebServlet("/admin")
+public class adminController extends HttpServlet implements Controller {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public tempServlet() {
+    public adminController() {
         super();
         // TODO Auto-generated constructor stub
     }
+
+	/**
+	 * @see Servlet#init(ServletConfig)
+	 */
+	public void init(ServletConfig config) throws ServletException {
+		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * @see HttpServlet#service(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+	}
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
