@@ -2,12 +2,12 @@ package dto;
 
 import java.util.List;
 
-public class StoreTable {
+public class StoreTableDTO {
 	private int tableId;
     private int storeId;
     private String tableNo;
     String qrSrc;
-	public StoreTable(int tableId, int storeId, String tableNo, String qrSrc) {
+	public StoreTableDTO(int tableId, int storeId, String tableNo, String qrSrc) {
 		super();
 		this.tableId = tableId;
 		this.storeId = storeId;
