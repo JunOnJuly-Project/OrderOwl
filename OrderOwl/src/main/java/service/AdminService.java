@@ -96,4 +96,46 @@ public interface AdminService {
      * 매장 요청 목록 조회
      */
     List<StoreRequestDTO> getStoreRequests();
+    
+ // AdminService.java에 추가할 메서드들
+
+    /**
+     * 매장별 메뉴 목록 조회
+     */
+    List<MenuDTO> getStoreMenus(long storeId);
+
+    /**
+     * 메뉴 직접 수정 (요청 없이)
+     */
+    boolean updateMenuDirect(MenuDTO menu);
+
+    /**
+     * 메뉴 직접 삭제 (요청 없이)
+     */
+    boolean deleteMenuDirect(long menuId);
+
+    /**
+     * 메뉴 직접 추가 (요청 없이)
+     */
+    boolean addMenuDirect(MenuDTO menu);
+    
+    /**
+     * 모든 매장의 QR 정보 조회
+     */
+    List<StoreDTO> getAllStoresWithQR();
+
+    /**
+     * 매장 QR 코드 재생성
+     */
+    boolean regenerateStoreQR(long storeId);
+    
+    /**
+     * 매장 QR 경로 업데이트
+     */
+    boolean updateStoreQRPath(long storeId, String qrPath);
+    
+    /**
+     * 매장 정보 직접 수정
+     */
+    boolean updateStoreInfo(StoreDTO store);
 }
