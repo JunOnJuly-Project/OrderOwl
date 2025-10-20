@@ -12,205 +12,119 @@ const modalWindow = document.getElementById("modal-window");
 const modalContent = document.getElementById("modal-content");
 const closeButton = document.getElementById("close-button");
 const addModal = document.querySelectorAll(".addModal");
-const orderModal = document.querySelector(".orderModal");
-const listModal = document.querySelector(".listModal");
 let no = 0;
 document
   .getElementById("testFooter")
   .setAttribute("style", "visibility: hidden;");
+//작업 Test Code
 
-let orderList = [];
+// document.getElementById("test").addEventListener("click", () => {
+//   event.preventDefault();
+//   alert("제품상세페이지");
+//   no++;
+//   console.log(no);
+//   ck();
+// });
+
+// document.getElementById("testId").addEventListener("click", () => {
+//   event.preventDefault();
+//   alert("주문하기");
+//   no--;
+//   console.log(no);
+//   ck();
+// });
+
+// const ck = () => {
+//   if (no <= 0) {
+//     document
+//       .getElementById("testFooter")
+//       .setAttribute("style", "visibility: hidden;");
+//   } else {
+//     document
+//       .getElementById("testFooter")
+//       .setAttribute("style", "visibility: visible;");
+
+//     document.getElementById("testCart").innerHTML = no;
+//     document.getElementById("testText").innerHTML = no;
+//   }
+// };
+
+// 보여줄 페이지 경로 관리
+/*const pageRoutes = {
+  testId: "/OrderOwl/user/order.jsp",
+  test: "/OrderOwl/user/menu.jsp",
+};
+
+//  모달을 여는 함수
+const openModal = async (path) => {
+  try {
+    const pageUrl = pageRoutes[path];
+    if (!pageUrl) throw new Error("페이지 경로를 찾을 수 없습니다.");
+
+    const response = await fetch(pageUrl);
+    if (!response.ok) throw new Error("페이지를 불러올 수 없습니다.");
+
+    const html = await response.text();
+    modalContent.innerHTML = html;
+
+    // 오버레이와 모달 창을 보여줌
+    modalOverlay.classList.add("show");
+    modalWindow.classList.add("show");
+  } catch (error) {
+    console.error(error);
+    modalContent.innerHTML = `<p>오류: ${error.message}</p>`;
+  }
+};*/
 
 //  모달을 닫는 함수
 const closeModal = () => {
-  qua = 1;
   modalOverlay.classList.remove("show");
   modalWindow.classList.remove("show");
   modalContent.innerHTML = ""; // 내용을 비워줌
 };
 
-let qua = 1;
-let price = 0;
+//  이벤트 리스너
+/*addModal.forEach((link) => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault(); // 기본 동작(페이지 이동) 방지
+	
+	
+    const path = e.target.getAttribute("id");
+    openModal(path);
+  });
+});*/
+
 addModal.forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault(); // 기본 동작(페이지 이동) 방지
 
+ 
     const clickedButton = e.currentTarget;
 
+ 
     const menuName = clickedButton.dataset.menuname;
-    price = clickedButton.dataset.price;
+    const price = clickedButton.dataset.price;
 
     const modalHtml = `
-      <h4>메뉴 : ${menuName}</h3>
+      <img src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="${menuName}" style="width:100%;" /> <br />
+      <h3>이름 : ${menuName}</h3>
       <br />
-      <h6>설명 : 맛있는 메뉴입니다.</h3>
+      <h3>설명 : 맛있는 메뉴입니다.</h3>
       <br />
-      <h6>가격 : ${price}원</h3>
+      <h3>가격 : ${price}원</h3>
       <br />
-      <h6>옵션 : (옵션 추가 영역)</h3>
+      <h3>옵션 : (옵션 추가 영역)</h3>
       <br />
-	  <h6>갯수 : <button class="mbtn">-</button><span class="quantityElement"> ${qua} </span> <button class="pbtn">+</button></h3>
-	    <br />
-		<h6>총금액 : <span class="totalPriceElement">${qua * price}</span></h3>
-		<br />
-      <button class="abtn">추가하기</button>
+      <button>추가하기</button>
     `;
+
 
     modalContent.innerHTML = modalHtml;
 
-    document.querySelector(".mbtn").addEventListener("click", () => {
-      if (qua > 1) {
-        qua--;
-        updatePrice();
-      }
-    });
-
-    document.querySelector(".pbtn").addEventListener("click", () => {
-      qua++;
-      updatePrice();
-    });
-
-    document.querySelector(".abtn").addEventListener("click", () => {
-      orderList.push([menuName, price, qua, qua * price]);
-      console.log(orderList);
-      no++;
-      updateInfo();
-
-      closeModal();
-    });
 
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
   });
-});
-
-//오더 클릭했을때
-orderModal.addEventListener("click", (e) => {
-  e.preventDefault();
-
-  // 1. 주문 목록이 비어있는지 확인
-  if (orderList.length === 0) {
-    modalContent.innerHTML = "<h6>주문 내역이 없습니다.</h6>";
-    modalOverlay.classList.add("show");
-    modalWindow.classList.add("show");
-    return; // 함수 종료
-  }
-
-  // 2. HTML 문자열을 담을 변수를 반복문 시작 전에 초기화
-  let orderHtml = "<h4>주문 내역</h4><br/>";
-  let sum = 0;
-  // 3. 반복문을 돌면서 += 연산자로 HTML을 계속 추가
-  for (let i = 0; i < orderList.length; i++) {
-    // 각 주문 항목을 div로 감싸서 구분하기 쉽게 만듭니다.
-    orderHtml += `
-            <div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-                <h6>메뉴 : ${orderList[i][0]}</h6>
-                <h6>가격 : ${orderList[i][1].toLocaleString()}원</h6>
-                <h6>갯수 : ${orderList[i][2]} 개</h6>
-                <h6>총계 : ${orderList[i][3].toLocaleString()}원</h6>
-            </div>
-        `;
-
-    sum += orderList[i][3];
-  }
-
-  orderHtml += `
-	<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-	<h6>총금액 : ${sum}원</h6>
-	</div>
-	`;
-
-  orderHtml += `
-		<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-		<button class="obtn">주문하기</button>
-		</div>
-		`;
-
-  modalContent.innerHTML = orderHtml;
-
-  document.querySelector(".obtn").addEventListener("click", () => {
-    if (sessionStorage.getItem("list") == null) {
-      let sOrderList = [];
-      for (let i = 0; i < orderList.length; i++) {
-        sOrderList.push([
-          orderList[i][0],
-          orderList[i][1],
-          orderList[i][2],
-          orderList[i][3],
-        ]);
-      }
-      sessionStorage.setItem("list", JSON.stringify(sOrderList));
-    } else {
-      let sOrderList = JSON.parse(sessionStorage.getItem("list"));
-      for (let i = 0; i < orderList.length; i++) {
-        sOrderList.push([
-          orderList[i][0],
-          orderList[i][1],
-          orderList[i][2],
-          orderList[i][3],
-        ]);
-      }
-      sessionStorage.setItem("list", JSON.stringify(sOrderList));
-    }
-
-    orderList = 0;
-
-    orderList = [];
-
-    closeModal();
-    no = 0;
-    updateInfo();
-  });
-  // 모달창 표시
-  modalOverlay.classList.add("show");
-  modalWindow.classList.add("show");
-});
-
-//리스트 클릭했을때
-listModal.addEventListener("click", (e) => {
-  e.preventDefault();
-
-  if (sessionStorage.getItem("list").length === 0) {
-    modalContent.innerHTML = "<h6>주문 내역이 없습니다.</h6>";
-    modalOverlay.classList.add("show");
-    modalWindow.classList.add("show");
-    return;
-  }
-
-  let listHtml = "<h4>주문 내역</h4><br/>";
-  let sum = 0;
-  let sList = sessionStorage.getItem("list");
-  let myList = JSON.parse(sList);
-  console.log(myList);
-  for (let i = 0; i < myList.length; i++) {
-    listHtml += `
-            <div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-                <h6>메뉴 : ${myList[i][0]}</h6>
-                <h6>가격 : ${myList[i][1]}원</h6>
-                <h6>갯수 : ${myList[i][2]} 개</h6>
-                <h6>총계 : ${myList[i][3]}원</h6>
-            </div>
-        `;
-
-    sum += sList[i][3];
-  }
-
-  listHtml += `
-	<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-	<h6>총금액 : ${sum}원</h6>
-	</div>
-	`;
-
-  listHtml += `
-		<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-		<button>주문하기</button>
-		</div>
-		`;
-
-  modalContent.innerHTML = listHtml;
-
-  modalOverlay.classList.add("show");
-  modalWindow.classList.add("show");
 });
 
 // 닫기 버튼을 클릭했을 때
@@ -218,17 +132,6 @@ closeButton.addEventListener("click", closeModal);
 
 // 오버레이 클릭했을 때
 modalOverlay.addEventListener("click", closeModal);
-
-function updatePrice() {
-  document.querySelector(".quantityElement").textContent = qua;
-  document.querySelector(".totalPriceElement").textContent = (
-    qua * price
-  ).toLocaleString();
-}
-
-const updateInfo = () => {
-  document.querySelector("#testCart").innerHTML = no;
-};
 
 // 키보드 esc 키를 눌렀을 때
 window.addEventListener("keydown", (e) => {

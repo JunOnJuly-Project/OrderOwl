@@ -24,20 +24,12 @@
                 </a>
               
                     <form class="d-flex">
-                        <button class="btn btn-outline-dark orderModal" type="submit" id="testId">
+                        <button class="btn btn-outline-dark addModal" type="submit" id="testId">
                             <i class="bi-cart-fill me-1"></i>
                             Order
                             <span class="badge bg-dark text-white ms-1 rounded-pill" id="testCart">0</span>
                         </button>
-                        
-                          <button class="btn btn-outline-dark listModal" type="submit" id="testId">
-                            <i class="bi-cart-fill me-1"></i>
-                            list
-                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="testCart">0</span>
-                        </button>
                     </form>
-                    
-                    
                 </div>
             </div>
         </nav>
@@ -68,7 +60,7 @@
                                     <h5 class="fw-bolder">${item.menuName}
                                     </h5>
                                     <!-- Product price-->
-                                    가격 : ${item.price} 원
+                                    가격 : ${item.price}
                                 </div>
                             </div>
                             <!-- Product actions-->
