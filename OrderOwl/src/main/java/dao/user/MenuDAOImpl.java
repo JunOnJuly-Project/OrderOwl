@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Properties;
 
 import dto.MenuDTO;
-import dto.StoreDTO;
 import util.DbUtil;
 
 public class MenuDAOImpl implements MenuDAO {
