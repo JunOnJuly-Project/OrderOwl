@@ -170,7 +170,7 @@ orderModal.addEventListener("click", (e) => {
 listModal.addEventListener("click", (e) => {
   e.preventDefault();
 
-  if (sessionStorage.getItem("list").length === 0) {
+  if (sessionStorage.getItem("list") == null) {
     modalContent.innerHTML = "<h6>주문 내역이 없습니다.</h6>";
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
@@ -192,7 +192,8 @@ listModal.addEventListener("click", (e) => {
             </div>
         `;
 
-    sum += sList[i][3];
+    sum += parseInt(myList[i][3]);
+
   }
 
   listHtml += `

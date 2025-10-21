@@ -26,14 +26,14 @@
                     <form class="d-flex">
                         <button class="btn btn-outline-dark orderModal" type="submit" id="testId">
                             <i class="bi-cart-fill me-1"></i>
-                            Order
+                            장바구니
                             <span class="badge bg-dark text-white ms-1 rounded-pill" id="testCart">0</span>
                         </button>
                         
                           <button class="btn btn-outline-dark listModal" type="submit" id="testId">
                             <i class="bi-cart-fill me-1"></i>
-                            list
-                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="testCart">0</span>
+                            주문내역
+                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="testCart"></span>
                         </button>
                     </form>
                     
