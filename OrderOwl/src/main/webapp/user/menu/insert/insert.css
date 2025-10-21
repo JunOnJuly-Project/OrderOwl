@@ -1,0 +1,161 @@
+@charset "UTF-8";
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+body {
+	margin: 0;
+	background-color: black;
+}
+
+#background {
+	display: grid;
+	grid-template-columns: 10vw 10vw 60vw 20vw;
+	grid-template-rows: 10vh 85vh 5vh;
+	grid-template-areas: 
+	    "header header header header"
+	    "select subselect list list"
+	    "footer footer footer footer";
+}
+
+#header {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	grid-area: header;
+}
+
+#select {
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	
+	grid-area: select;
+}
+
+#subselect {
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	
+	grid-area: subselect;
+}
+
+#list {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: start;
+	
+	grid-area: list;
+}
+
+#footer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	grid-area: footer;
+}
+
+h1, p, h2, th, td{
+	margin:0;
+	color: white;
+}
+
+table {
+	width: 75vw;
+	margin-top: 1vh;
+	
+	border: #BB86FC solid 2px;
+	border-radius: 15px;
+	border-collapse: collapse;
+}
+
+th {
+	border-left: #BB86FC solid 2px;
+	border-right: #BB86FC solid 2px;
+}
+
+tr {
+	border-bottom: #BB86FC solid 2px;
+	border-top: #BB86FC solid 2px;
+}
+
+td, th {
+	text-align: center;
+}
+
+button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	
+	background-color: #03DAC6;
+	border: None;
+	border-radius: 5px;
+	color: white;
+	
+	margin: 1vh;
+}
+
+.selectBtn {
+	height: 5vh;
+	width: 8vw;
+}
+
+.process {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+.modal {
+	display: none;
+	
+	width: 60vw;
+	height: 60vh;
+	
+	background-color: #00000080;
+	border: #BB86FC 3px solid;
+	
+	
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);	
+}
+
+#menu, #insert {
+	border: #BB86FC 3px solid;
+}
+
+#writeForm {
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: start;
+	text-align: start;
+	
+	color: white;
+}
+
+.inputDiv {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-content: space-around;
+}

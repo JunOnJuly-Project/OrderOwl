@@ -2,28 +2,33 @@ package controller.common;
 
 public class ModelAndView {
 	private String viewName;
-	private boolean isRedirect=false;
+	private boolean redirect;
 	
-	
-	public ModelAndView(String viewName, boolean isRedirect) {
-
-		this.viewName = viewName;
-		this.isRedirect = isRedirect;
-	}
-	public ModelAndView(String viewName) {
-		this.viewName = viewName;
-	
-	}
 	public String getViewName() {
 		return viewName;
 	}
+	
 	public void setViewName(String viewName) {
 		this.viewName = viewName;
 	}
+	
 	public boolean isRedirect() {
-		return isRedirect;
+		return redirect;
 	}
-	public void setRedirect(boolean isRedirect) {
-		this.isRedirect = isRedirect;
+	
+	public void setRedirect(boolean redirect) {
+		this.redirect = redirect;
 	}
+	
+	public ModelAndView() {}
+	
+	public ModelAndView(String viewName) {
+		this.viewName = viewName;
+	}
+	
+	public ModelAndView(String viewName, boolean redirect) {
+		this.viewName = viewName;
+		this.redirect = redirect;
+	}
+	
 }
