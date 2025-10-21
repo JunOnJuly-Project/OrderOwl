@@ -19,11 +19,11 @@ public interface UserService {
 			int category1Code, int category2Code, String checkRec,
 			String orderRequest, LocalTime closeTime, String soldOut);
 	
-	void insertMenu(MenuDTO menuDTO) throws SQLException;
+	int insertMenu(MenuDTO menuDTO) throws SQLException;
 	
-	void updateMenu(MenuDTO menuDTO) throws SQLException;
+	int updateMenu(MenuDTO menuDTO) throws SQLException;
 	
-	void deleteMenu(int menuId) throws SQLException;
+	int deleteMenu(int menuId) throws SQLException;
 	
 	List<MenuDTO> selectAllMenu(int storeId) throws SQLException;
 	
@@ -34,7 +34,7 @@ public interface UserService {
 	
 	List<OrderDTO> selectOrderByState(int storeId, String state) throws SQLException;
 
-	void updateOrder(int orderId, String state) throws SQLException;
+	int updateOrder(int orderId, String state) throws SQLException;
 	
 	/*
 	 * 매장 관련
@@ -43,11 +43,11 @@ public interface UserService {
 			String address, String region, String phoneNumber,
 			String description, String imgSrc, LocalDateTime createdAt);
 	
-	void joinStore(StoreDTO storeDto) throws SQLException;
+	int joinStore(StoreDTO storeDto) throws SQLException;
 	
-	void updateStore(StoreDTO storeDto) throws SQLException;
+	int updateStore(StoreDTO storeDto) throws SQLException;
 	
-	void quitStore(int storeId) throws SQLException;
+	int quitStore(int storeId) throws SQLException;
 	
 	/*
 	 * 매출 관련

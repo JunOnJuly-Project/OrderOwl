@@ -36,18 +36,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void insertMenu(MenuDTO menuDTO) throws SQLException {
-		userDao.insertMenu(menuDTO);
+	public int insertMenu(MenuDTO menuDTO) throws SQLException {
+		return userDao.insertMenu(menuDTO);
 	}
 
 	@Override
-	public void updateMenu(MenuDTO menuDTO) throws SQLException {
-
+	public int updateMenu(MenuDTO menuDTO) throws SQLException {
+		return 0;
 	}
 
 	@Override
-	public void deleteMenu(int menuId) throws SQLException {
-
+	public int deleteMenu(int menuId) throws SQLException {
+		return userDao.deleteMenu(menuId);
 	}
 
 	@Override
@@ -70,8 +70,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void updateOrder(int orderId, String state) throws SQLException {
-
+	public int updateOrder(int orderId, String state) throws SQLException {
+		return 0;
 	}
 
 	@Override
@@ -82,18 +82,18 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void joinStore(StoreDTO storeDto) throws SQLException {
-
+	public int joinStore(StoreDTO storeDto) throws SQLException {
+		return 0;
 	}
 
 	@Override
-	public void updateStore(StoreDTO storeDto) throws SQLException {
-
+	public int updateStore(StoreDTO storeDto) throws SQLException {
+		return 0;
 	}
 
 	@Override
-	public void quitStore(int storeId) throws SQLException {
-
+	public int quitStore(int storeId) throws SQLException {
+		return 0;
 	}
 
 	@Override

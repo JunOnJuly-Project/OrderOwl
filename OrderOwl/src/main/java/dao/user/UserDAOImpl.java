@@ -61,7 +61,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(ps, con);
 		}
 		
 		return result;
@@ -95,7 +95,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(ps, con);
 		}
 		
 		return result;
@@ -119,7 +119,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(ps, con);
 		}
 		
 		return result;
@@ -165,7 +165,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps, rs);
+			DbUtil.dbClose(rs, ps, con);
 		}
 		
 		return list;
@@ -222,7 +222,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps, rs);
+			DbUtil.dbClose(rs, ps, con);
 		}
 		
 		return list;
@@ -280,7 +280,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps, rs);
+			DbUtil.dbClose(rs, ps, con);
 		}
 		
 		return list;
@@ -305,7 +305,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(ps, con);
 		}
 		
 		return result;
@@ -335,7 +335,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(ps, con);
 		}
 		
 		return result;
@@ -365,7 +365,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(ps, con);
 		}
 		
 		return result;
@@ -389,7 +389,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps);
+			DbUtil.dbClose(ps, con);
 		}
 		
 		return result;
@@ -415,7 +415,7 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		finally {
-			DbUtil.dbClose(con, ps, rs);
+			DbUtil.dbClose(rs, ps, con);
 		}
 		
 		return sales;

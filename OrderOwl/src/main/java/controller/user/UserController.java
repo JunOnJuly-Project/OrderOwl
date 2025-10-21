@@ -44,6 +44,13 @@ public class UserController extends HttpServlet implements Controller {
     	return new ModelAndView("/front?key=user&methodName=selectAllMenu");
     }
     
+    public ModelAndView deleteMenu(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	System.out.println(request.getParameter("menuId"));
+    	int result = userService.deleteMenu(Integer.parseInt(request.getParameter("menuId")));
+    	
+    	return new ModelAndView("/front?key=user&methodName=selectAllMenu");
+    }
+    
     public ModelAndView selectAllMenu(HttpServletRequest request, HttpServletResponse response) throws Exception {
     	List<MenuDTO> menus = userService.selectAllMenu(3);
     	System.out.println(menus);
