@@ -30,8 +30,6 @@ public class HandlerMappingListener implements ServletContextListener {
 			
 			application.setAttribute("clazzMap", clazzMap);
 			application.setAttribute("path", application.getContextPath());
-		
-			
 		} catch (Exception e2) {
 			e2.printStackTrace();
 		}
