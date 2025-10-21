@@ -1,58 +1,28 @@
 package controller.customer;
 
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
+import controller.common.Controller;
+import controller.common.ModelAndView;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import service.user.MenuService;
+import service.user.OrderService;
 
-import controller.common.Controller;
+public class OrderController implements Controller {
+	
+	OrderService os = new OrderService();
+	MenuService ss = new MenuService();
 
-/**
- * Servlet implementation class OrderController
- */
-@WebServlet("/order")
-public class OrderController extends HttpServlet implements Controller {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public OrderController() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
-	/**
-	 * @see Servlet#init(ServletConfig)
-	 */
-	public void init(ServletConfig config) throws ServletException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * @see HttpServlet#service(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
-
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+public ModelAndView selectByModelNum(HttpServletRequest request, HttpServletResponse response) {
+	;
+		try {
+			request.setAttribute("store",os.selectStoreByStoreId());
+			request.setAttribute("menu",ss.selectMenuByStoreId());
+		
+			return new ModelAndView("/user/order_page.jsp");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ModelAndView("/user/order_page.jsp");
+		}
 	}
 
 }
