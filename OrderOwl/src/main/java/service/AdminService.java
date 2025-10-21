@@ -1,0 +1,99 @@
+package service;
+
+import dto.AdminDTO.*;
+import java.time.LocalDate;
+import java.util.List;
+
+/**
+ * 관리자 서비스 인터페이스
+ */
+public interface AdminService {
+    
+    // ==================== 전체 관리 ====================
+    
+    /**
+     * 매장 추가
+     */
+    boolean addStore(StoreDTO store);
+    
+    /**
+     * 매장 삭제 요청 (DELETE_PENDING 상태로 변경)
+     * 실제 삭제는 approveStoreDeletion()에서 처리
+     */
+    boolean deleteStore(long storeId);
+    
+    /**
+     * 삭제 대기 매장 목록 조회
+     * DELETE_PENDING 상태인 매장들을 반환
+     */
+    List<StoreDTO> getDeletePendingStores();
+    
+    /**
+     * 삭제 대기 매장 최종 승인
+     * DELETE_PENDING 상태의 매장을 DB에서 완전히 삭제
+     */
+    boolean approveStoreDeletion(long storeId);
+    
+    /**
+     * 삭제 대기 취소
+     * DELETE_PENDING 상태를 ACTIVE로 복구
+     */
+    boolean cancelStoreDeletion(long storeId);
+    
+    /**
+     * 유저 강제 탈퇴
+     */
+    boolean forceDeleteUser(long userId, String reason);
+    
+    // ==================== 매장 관리 ====================
+    
+    /**
+     * 매장 QR 코드 생성
+     */
+    String createStoreQR(long storeId);
+    
+    /**
+     * 메뉴 추가 요청 승인
+     */
+    boolean approveMenuAddRequest(long requestId);
+    
+    /**
+     * 메뉴 수정 요청 승인
+     */
+    boolean approveMenuUpdateRequest(long requestId);
+    
+    /**
+     * 메뉴 삭제 요청 승인
+     */
+    boolean approveMenuDeleteRequest(long requestId);
+    
+    /**
+     * 매장 상세 정보 조회
+     */
+    StoreDTO getStoreInfo(long storeId);
+    
+    /**
+     * 매장 매출 정보 조회
+     */
+    SalesReportDTO getStoreSalesInfo(long storeId, LocalDate startDate, LocalDate endDate);
+    
+    /**
+     * 매장 등록 요청 승인
+     */
+    boolean approveStoreInfoAddRequest(long requestId);
+    
+    /**
+     * 매장 정보 수정 요청 승인
+     */
+    boolean approveStoreInfoUpdateRequest(long requestId);
+    
+    /**
+     * 전체 매장 목록 조회
+     */
+    List<StoreDTO> getStoreList();
+    
+    /**
+     * 매장 요청 목록 조회
+     */
+    List<StoreRequestDTO> getStoreRequests();
+}
