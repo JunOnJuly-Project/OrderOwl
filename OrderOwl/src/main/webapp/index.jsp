@@ -6,6 +6,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-<h1>Index Page</h1>
+<h1>${pageContext.request.contextPath}</h1>
+<h1><a href="${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu">list</a></h1>
 </body>
 </html>

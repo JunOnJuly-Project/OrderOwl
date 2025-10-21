@@ -13,13 +13,13 @@ import java.io.IOException;
  * Servlet implementation class MenuControler
  */
 @WebServlet("/menu")
-public class MenuControler extends HttpServlet implements Controller {
+public class MenuController extends HttpServlet implements Controller {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public MenuControler() {
+    public MenuController() {
         super();
         // TODO Auto-generated constructor stub
     }

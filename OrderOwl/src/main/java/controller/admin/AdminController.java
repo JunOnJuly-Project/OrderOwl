@@ -13,13 +13,13 @@ import java.io.IOException;
  * Servlet implementation class adminController
  */
 @WebServlet("/admin")
-public class adminController extends HttpServlet implements Controller {
+public class AdminController extends HttpServlet implements Controller {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public adminController() {
+    public AdminController() {
         super();
         // TODO Auto-generated constructor stub
     }
