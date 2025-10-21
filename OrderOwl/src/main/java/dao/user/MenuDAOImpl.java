@@ -61,7 +61,7 @@ private Properties proFile = new Properties();
 			e.printStackTrace();
 		}
 		finally {
-			DbUtil.dbClose(con, ps, rs);
+			DbUtil.dbClose(rs, ps, con);
 		}
 		return list;
 	}
@@ -92,7 +92,7 @@ private Properties proFile = new Properties();
 			e.printStackTrace();
 		}
 		finally {
-			DbUtil.dbClose(con, ps, rs);
+			DbUtil.dbClose(rs, ps, con);
 		}
 		return menu;
 	}
