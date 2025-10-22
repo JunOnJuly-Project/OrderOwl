@@ -25,45 +25,6 @@
   		</div>
 	</c:forEach>
 	
-	<div id="modalinsert" class="modal">
-		<form name="writeForm" method="post" action="${pageContext.request.contextPath}/front">
-			<input type="hidden" name="key" value = "user" />
-			<input type="hidden" name="methodName" value = "insert" /> 
-			 
-	 		<label for="name">메뉴명</label>
-	 		<input type="text" name="name" id="name">
-	 		
-	 		<label for="price">가격</label>
-	 		<input type="number" name="price" id="price">
-	 		
-	 		<label for="description">설명</label>
-	 		<input type="text" name="description" id="description">
-	 		
-	 		<label for="src">이미지</label>
-	 		<input type="url" name="src" id="src">
-	 		
-	 		<label for=category1Code>분류1</label>
-	 		<input type="radio" name="category1Code" id="category1Code">
-	 		
-	 		<label for="category2Code">분류2</label>
-	 		<input type="radio" name="category2Code" id="category2Code">
-	 		
-	 		<label for="checkRec">추천 여부</label>
-	 		<input type="radio" name="checkRec" id="checkRec">
-	 		
-	 		<label for="orderRequest">옵션</label>
-	 		<input type="checkbox" name="orderRequest" id="orderRequest">
-	 		
-	 		<label for="closeTime">마감 시간</label>
-	 		<input type="time" name="closeTime" id="closeTime">
-	 		
-	 		<label for="soldOut">마감 여부</label>
-	 		<input type="radio" name="soldOut" id="soldOut">
-	 		
-	 		<input type="submit" id="inputSubmit">
- 		</form>
-  	</div>
-	
     <div id="background">
     	<div id="header">
     		<h1>header</h1>
@@ -104,7 +65,13 @@
 								<input type="hidden" value="deleteMenu" name="methodName">
 								<button>삭제</button>
 							</form>
-							<button>수정</button>
+							
+							<form action="${pageContext.request.contextPath}/front">
+								<input type="hidden" value="user" name="key">
+								<input type="hidden" value="selectById" name="methodName">
+								<input type="hidden" value="${menu.menuId}" name="menuId">
+								<button>수정</button>
+							</form>
 						</td>
 					</tr>
 				</c:forEach>

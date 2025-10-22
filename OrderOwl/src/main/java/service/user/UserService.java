@@ -19,11 +19,18 @@ public interface UserService {
 			int category1Code, int category2Code, String checkRec,
 			String orderRequest, LocalTime closeTime, String soldOut);
 	
+	MenuDTO createMenu(int menuId, int storeId, String menuName,
+			int price, String description, String imgSrc,
+			int category1Code, int category2Code, String checkRec,
+			String orderRequest, LocalTime closeTime, String soldOut);
+	
 	int insertMenu(MenuDTO menuDTO) throws SQLException;
 	
 	int updateMenu(MenuDTO menuDTO) throws SQLException;
 	
 	int deleteMenu(int menuId) throws SQLException;
+	
+	MenuDTO selectById(int menuId) throws SQLException;
 	
 	List<MenuDTO> selectAllMenu(int storeId) throws SQLException;
 	

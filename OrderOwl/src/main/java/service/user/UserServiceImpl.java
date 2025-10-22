@@ -34,6 +34,27 @@ public class UserServiceImpl implements UserService {
 			soldOut
 		);
 	}
+	
+	@Override
+	public MenuDTO createMenu(int menuId, int storeId, String menuName, int price, String description, String imgSrc,
+			int category1Code, int category2Code, String checkRec, String orderRequest, LocalTime closeTime,
+			String soldOut) {
+		
+		return new MenuDTO(
+			menuId,
+			storeId,
+			menuName,
+			price,
+			description,
+			imgSrc,
+			category1Code,
+			category2Code,
+			checkRec,
+			orderRequest,
+			closeTime,
+			soldOut
+		);
+	}
 
 	@Override
 	public int insertMenu(MenuDTO menuDTO) throws SQLException {
@@ -42,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public int updateMenu(MenuDTO menuDTO) throws SQLException {
-		return 0;
+		return userDao.updateMenu(menuDTO);
 	}
 
 	@Override
@@ -50,6 +71,11 @@ public class UserServiceImpl implements UserService {
 		return userDao.deleteMenu(menuId);
 	}
 
+	@Override
+	public MenuDTO selectById(int menuId) throws SQLException {
+		return userDao.selectById(menuId);
+	}
+	
 	@Override
 	public List<MenuDTO> selectAllMenu(int storeId) throws SQLException {
 		List<MenuDTO> menus = userDao.selectAllMenu(storeId);
