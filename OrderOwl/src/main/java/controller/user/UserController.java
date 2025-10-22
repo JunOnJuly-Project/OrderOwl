@@ -39,8 +39,38 @@ public class UserController extends HttpServlet implements Controller {
     			LocalTime.parse(request.getParameter("closeTime"), formatter),
     			request.getParameter("soldOut")
 		);
+    	
     	System.out.println(menu);
     	userService.insertMenu(menu);
+    	return new ModelAndView("/front?key=user&methodName=selectAllMenu");
+    }
+    
+    public ModelAndView selectById(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	MenuDTO menu = userService.selectById(Integer.parseInt(request.getParameter("menuId")));
+    	request.setAttribute("menu", menu);
+    	System.out.println(menu);
+    	return new ModelAndView("user/menu/update/update.jsp");
+    }
+    
+    public ModelAndView updateMenu(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+    	
+    	MenuDTO menu = userService.createMenu(
+    			3, //임의로 삽입됨
+    			request.getParameter("name"), 
+    			Integer.parseInt(request.getParameter("price")), 
+    			request.getParameter("description"), 
+    			request.getParameter("src"), 
+    			Integer.parseInt(request.getParameter("category1Code")), 
+				Integer.parseInt(request.getParameter("category2Code")), 
+    			request.getParameter("checkRec"), 
+    			request.getParameter("orderRequest"), 
+    			LocalTime.parse(request.getParameter("closeTime"), formatter),
+    			request.getParameter("soldOut")
+		);
+    	
+    	System.out.println(menu);
+    	userService.updateMenu(menu);
     	return new ModelAndView("/front?key=user&methodName=selectAllMenu");
     }
     

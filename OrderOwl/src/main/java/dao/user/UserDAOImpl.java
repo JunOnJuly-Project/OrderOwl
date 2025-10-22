@@ -125,6 +125,49 @@ public class UserDAOImpl implements UserDAO {
 		return result;
 	}
 
+	public MenuDTO selectById(int menuId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		MenuDTO menu = null;
+		
+		String sql= proFile.getProperty("user.menu.selectById");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, menuId);
+			
+			rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				menu = new MenuDTO(
+					rs.getInt(1),
+					rs.getInt(2),
+					rs.getString(3),
+					rs.getInt(4),
+					rs.getString(5),
+					rs.getString(6),
+					rs.getInt(7),
+					rs.getInt(8),
+					rs.getString(9),
+					rs.getString(10),
+					Optional.ofNullable(rs.getTime(11))
+                    .map(Time::toLocalTime)
+                    .orElse(null),
+					rs.getString(12)
+				);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return menu;
+	}
+	
 	@Override
 	public List<MenuDTO> selectAllMenu(int storeId) throws SQLException {
 		Connection con=null;

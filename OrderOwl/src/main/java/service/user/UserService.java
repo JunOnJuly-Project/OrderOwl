@@ -25,6 +25,8 @@ public interface UserService {
 	
 	int deleteMenu(int menuId) throws SQLException;
 	
+	MenuDTO selectById(int menuId) throws SQLException;
+	
 	List<MenuDTO> selectAllMenu(int storeId) throws SQLException;
 	
 	/*

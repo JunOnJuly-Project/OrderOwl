@@ -51,6 +51,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public MenuDTO selectById(int menuId) throws SQLException {
+		return userDao.selectById(menuId);
+	}
+	
+	@Override
 	public List<MenuDTO> selectAllMenu(int storeId) throws SQLException {
 		List<MenuDTO> menus = userDao.selectAllMenu(storeId);
 		
