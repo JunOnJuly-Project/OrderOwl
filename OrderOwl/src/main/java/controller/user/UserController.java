@@ -3,6 +3,7 @@ package controller.user;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import controller.common.Controller;
 import controller.common.ModelAndView;
@@ -26,17 +27,26 @@ public class UserController extends HttpServlet implements Controller {
     public ModelAndView insertMenu(HttpServletRequest request, HttpServletResponse response) throws Exception {
     	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     	
+    	String closeTime = request.getParameter("closeTime");
+    	LocalTime closeLocalTime = closeTime.equals("") ? 
+    				LocalTime.parse("24:00", formatter) : 
+    				LocalTime.parse(closeTime, formatter);
+    	
     	MenuDTO menu = userService.createMenu(
     			3, // 임의 삽입임
     			request.getParameter("name"), 
     			Integer.parseInt(request.getParameter("price")), 
     			request.getParameter("description"), 
     			request.getParameter("src"), 
-    			Integer.parseInt(request.getParameter("category1Code")), 
-				Integer.parseInt(request.getParameter("category2Code")), 
+    			Optional.ofNullable(request.getParameter("category1Code"))
+    			.map(Integer::parseInt)
+    			.orElse(1),
+    			Optional.ofNullable(request.getParameter("category2Code"))
+    			.map(Integer::parseInt)
+    			.orElse(1),
     			request.getParameter("checkRec"), 
     			request.getParameter("orderRequest"), 
-    			LocalTime.parse(request.getParameter("closeTime"), formatter),
+    			closeLocalTime,
     			request.getParameter("soldOut")
 		);
     	
@@ -55,17 +65,27 @@ public class UserController extends HttpServlet implements Controller {
     public ModelAndView updateMenu(HttpServletRequest request, HttpServletResponse response) throws Exception {
     	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     	
+    	String closeTime = request.getParameter("closeTime");
+    	LocalTime closeLocalTime = closeTime.equals("") ? 
+    				LocalTime.parse("24:00", formatter) : 
+    				LocalTime.parse(closeTime, formatter);
+    	
     	MenuDTO menu = userService.createMenu(
-    			3, //임의로 삽입됨
+    			Integer.parseInt(request.getParameter("menuId")), 
+    			Integer.parseInt(request.getParameter("storeId")), 
     			request.getParameter("name"), 
     			Integer.parseInt(request.getParameter("price")), 
     			request.getParameter("description"), 
     			request.getParameter("src"), 
-    			Integer.parseInt(request.getParameter("category1Code")), 
-				Integer.parseInt(request.getParameter("category2Code")), 
+    			Optional.ofNullable(request.getParameter("category1Code"))
+    			.map(Integer::parseInt)
+    			.orElse(1),
+    			Optional.ofNullable(request.getParameter("category2Code"))
+    			.map(Integer::parseInt)
+    			.orElse(1),
     			request.getParameter("checkRec"), 
     			request.getParameter("orderRequest"), 
-    			LocalTime.parse(request.getParameter("closeTime"), formatter),
+    			closeLocalTime,
     			request.getParameter("soldOut")
 		);
     	

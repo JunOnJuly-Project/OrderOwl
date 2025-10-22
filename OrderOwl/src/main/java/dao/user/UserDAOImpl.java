@@ -69,6 +69,7 @@ public class UserDAOImpl implements UserDAO {
 
 	@Override
 	public int updateMenu(MenuDTO menuDto) throws SQLException {
+		System.out.println(menuDto);
 		Connection con=null;
 		PreparedStatement ps=null;
 		int result = 0;
@@ -90,6 +91,9 @@ public class UserDAOImpl implements UserDAO {
 			ps.setTime(9, Time.valueOf(menuDto.getCloseTime()));
 			ps.setString(10, menuDto.getSoldOut());
 			ps.setInt(11, menuDto.getStoreId());
+			ps.setInt(12, menuDto.getMenuId());
+			
+			System.out.println(ps.toString());
 			
 			result = ps.executeUpdate();
 		}

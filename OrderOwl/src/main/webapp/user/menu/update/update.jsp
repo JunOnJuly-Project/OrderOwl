@@ -33,6 +33,8 @@
 			<form id="writeForm" name="writeForm" method="post" action="${pageContext.request.contextPath}/front">
 				<input type="hidden" name="key" value = "user" />
 				<input type="hidden" name="methodName" value = "updateMenu" /> 
+				<input type="hidden" name="menuId" value = "${menu.menuId}" /> 
+				<input type="hidden" name="storeId" value = "${menu.storeId}" /> 
 				 
 				<div class="inputDiv">
 			 		<label for="name">메뉴명</label>
