@@ -15,6 +15,7 @@ const addModal = document.querySelectorAll(".addModal");
 const orderModal = document.querySelector(".orderModal");
 const listModal = document.querySelector(".listModal");
 let no = 0;
+
 document
   .getElementById("testFooter")
   .setAttribute("style", "visibility: hidden;");
@@ -31,15 +32,18 @@ const closeModal = () => {
 
 let qua = 1;
 let price = 0;
+let orderid= '';
 addModal.forEach((button) => {
   button.addEventListener("click", (e) => {
     e.preventDefault(); // 기본 동작(페이지 이동) 방지
-
+	
     const clickedButton = e.currentTarget;
 
     const menuName = clickedButton.dataset.menuname;
+	let menuId = clickedButton.dataset.menuid
     price = clickedButton.dataset.price;
-
+    
+	orderid = clickedButton.dataset.orderid;
     const modalHtml = `
       <h4>메뉴 : ${menuName}</h3>
       <br />
@@ -71,7 +75,7 @@ addModal.forEach((button) => {
     });
 
     document.querySelector(".abtn").addEventListener("click", () => {
-      orderList.push([menuName, price, qua, qua * price]);
+      orderList.push([menuName, price, qua, qua * price,menuId]);
       console.log(orderList);
       no++;
       updateInfo();
@@ -87,10 +91,10 @@ addModal.forEach((button) => {
 //오더 클릭했을때
 orderModal.addEventListener("click", (e) => {
   e.preventDefault();
-
+  console.log(orderid);
   // 1. 주문 목록이 비어있는지 확인
   if (orderList.length === 0) {
-    modalContent.innerHTML = "<h6>주문 내역이 없습니다.</h6>";
+    modalContent.innerHTML = "<h6>담은 메뉴가 없습니다.</h6>";
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
     return; // 함수 종료
@@ -121,14 +125,15 @@ orderModal.addEventListener("click", (e) => {
 	`;
 
   orderHtml += `
-		<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
+		<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">	
 		<button class="obtn">주문하기</button>
 		</div>
 		`;
 
   modalContent.innerHTML = orderHtml;
 
-  document.querySelector(".obtn").addEventListener("click", () => {
+  document.querySelector(".obtn").addEventListener("click", async (e) => {
+	e.preventDefault();
     if (sessionStorage.getItem("list") == null) {
       let sOrderList = [];
       for (let i = 0; i < orderList.length; i++) {
@@ -152,9 +157,30 @@ orderModal.addEventListener("click", (e) => {
       }
       sessionStorage.setItem("list", JSON.stringify(sOrderList));
     }
-
-    orderList = 0;
-
+	
+	const postData = {
+	      key: "cusOrder",
+	      methodName: "requestOrder",
+		  orderid:orderid,
+	      orders: orderList // 현재 장바구니(orderList)를 보냅니다.
+	    };
+	
+		try {
+		      await fetch("http://localhost:8080/OrderOwl/front", {
+		        method: "POST",
+		        headers: {
+		   
+		          "Content-Type": "application/json", 
+		        },
+		 
+		        body: JSON.stringify(postData), 
+		      })}
+		catch (error) {
+			        console.error("네트워크 오류:", error);
+			        alert("주문 전송에 실패했습니다. (네트워크 문제)");
+			      }
+		
+		
     orderList = [];
 
     closeModal();
@@ -202,11 +228,6 @@ listModal.addEventListener("click", (e) => {
 	</div>
 	`;
 
-  listHtml += `
-		<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-		<button>주문하기</button>
-		</div>
-		`;
 
   modalContent.innerHTML = listHtml;
 
@@ -218,7 +239,7 @@ listModal.addEventListener("click", (e) => {
 closeButton.addEventListener("click", closeModal);
 
 // 오버레이 클릭했을 때
-modalOverlay.addEventListener("click", closeModal);
+/*modalOverlay.addEventListener("click", closeModal);*/
 
 function updatePrice() {
   document.querySelector(".quantityElement").textContent = qua;

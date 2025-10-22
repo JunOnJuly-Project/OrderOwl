@@ -1,9 +1,13 @@
 package controller.common;
 
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -16,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Map<String,Controller> classMap;
- 
+	Gson gson = new Gson();
     public DispatcherServlet() {
 
     }
@@ -30,8 +34,23 @@ public class DispatcherServlet extends HttpServlet {
 		response.setContentType("application/json;charset=UTF-8");
 	String key = request.getParameter("key");
 	String methodName = request.getParameter("methodName");
-	System.out.println(key);
-	System.out.println(methodName);
+	if(key == null) {
+		
+		BufferedReader rd =  request.getReader();
+		String rawData = rd.lines().collect(Collectors.joining());
+		 Map<String, Object> map = gson.fromJson(rawData, Map.class);
+		 key =(String) map.get("key");  
+		 methodName=   (String) map.get("methodName");
+
+		 
+		 Object jsonData = map.get("orders");
+		 Object orderId = map.get("orderid");
+		   request.setAttribute("jsonData",jsonData);
+		   request.setAttribute("orderId",orderId);
+	
+	
+	}
+
 
 	try {
 		Controller con = classMap.get(key);

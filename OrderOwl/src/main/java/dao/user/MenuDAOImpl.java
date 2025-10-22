@@ -33,7 +33,7 @@ private Properties proFile = new Properties();
 	}
 
 	@Override
-	public List<MenuDTO> selectAllMenu() {
+	public List<MenuDTO> selectAllMenu(int key) {
 
 		Connection con=null;
 		PreparedStatement ps=null;
@@ -44,6 +44,7 @@ private Properties proFile = new Properties();
 		try {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
+			ps.setInt(1, key);
 			rs = ps.executeQuery();
 			while(rs.next()) {
 				

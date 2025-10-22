@@ -76,6 +76,8 @@
                                 <div class="text-center"><a class="btn btn-outline-dark mt-auto addModal" 
                        href="#"
                        data-menuname="${item.menuName}"
+                       data-menuid="${item.menuId}"
+                       data-orderid="${cusOrderId}"
                        data-price="${item.price}">추가하기</a></div>
                             </div>
                         </div>
