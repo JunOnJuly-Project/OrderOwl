@@ -82,10 +82,6 @@ public class AdminDAO {
             }
             
             queries.load(is);
-            System.out.println("✅ AdminDAO 쿼리 로드 완료: " + queries.size() + "개");
-            
-            // 디버그: 로드된 모든 키 출력
-            System.out.println("📋 로드된 쿼리 키: " + queries.keySet());
             
         } catch (IOException e) {
             System.err.println("❌ AdminDAO 쿼리 로드 실패!");
