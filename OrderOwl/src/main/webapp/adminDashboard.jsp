@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,414 +9,469 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="bg-gray-50">
-    <!-- 로딩 -->
-    <div id="loading" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-        <div class="bg-white rounded-lg p-6 shadow-xl">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-            <p class="mt-4 text-gray-700">처리중...</p>
-        </div>
-    </div>
+	<!-- 로딩 -->
+	<div id="loading"
+		class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+		<div class="bg-white rounded-lg p-6 shadow-xl">
+			<div
+				class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+			<p class="mt-4 text-gray-700">처리중...</p>
+		</div>
+	</div>
 
-    <!-- 상단 네비게이션 -->
-    <nav class="bg-white border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-4">
-            <h1 class="text-xl font-bold">🦉 OrderOwl 관리자 대시보드</h1>
-        </div>
-    </nav>
+	<!-- 상단 네비게이션 -->
+	<nav class="bg-white border-b border-gray-200">
+		<div class="max-w-7xl mx-auto px-4 py-4">
+			<h1 class="text-xl font-bold">🦉 OrderOwl 관리자 대시보드</h1>
+		</div>
+	</nav>
 
-    <div class="max-w-7xl mx-auto px-4 py-8">
-        <div class="flex gap-6">
-            <!-- 사이드바 -->
-            <aside class="w-64 bg-white rounded-xl p-4 shadow-sm">
-                <nav class="space-y-2">
-                    <button onclick="showTab('dashboard')" class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
-                        📊 대시보드
-                    </button>
-                    <button onclick="showTab('stores')" class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-                        🏪 매장 관리
-                    </button>
-                    <button onclick="showTab('menus')" class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-                        🍽️ 메뉴 관리
-                    </button>
-                    <button onclick="showTab('qr')" class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-                        📱 QR 관리
-                    </button>
-                    <button onclick="showTab('sales')" class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-                        💰 매출 정보
-                    </button>
-                </nav>
-            </aside>
+	<div class="max-w-7xl mx-auto px-4 py-8">
+		<div class="flex gap-6">
+			<!-- 사이드바 -->
+			<aside class="w-64 bg-white rounded-xl p-4 shadow-sm">
+				<nav class="space-y-2">
+					<button onclick="showTab('dashboard')"
+						class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
+						📊 대시보드</button>
+					<button onclick="showTab('stores')"
+						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+						🏪 매장 관리</button>
+					<button onclick="showTab('menus')"
+						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+						🍽️ 메뉴 관리</button>
+					<button onclick="showTab('qr')"
+						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+						📱 QR 관리</button>
+					<button onclick="showTab('sales')"
+						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+						💰 매출 정보</button>
+				</nav>
+			</aside>
 
-            <!-- 메인 컨텐츠 -->
-            <main class="flex-1">
-                <!-- 대시보드 -->
-                <div id="dashboard" class="tab-content">
-                    <h2 class="text-2xl font-bold mb-6">대시보드</h2>
-                    
-                    <!-- 통계 카드 -->
-                    <div class="grid grid-cols-4 gap-4 mb-6">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <p class="text-sm text-gray-600">전체 매장</p>
-                            <p class="text-2xl font-bold mt-2" id="statStores">0</p>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <p class="text-sm text-gray-600">전체 유저</p>
-                            <p class="text-2xl font-bold mt-2" id="statUsers">0</p>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <p class="text-sm text-gray-600">매장 대기 요청</p>
-                            <p class="text-2xl font-bold mt-2 text-orange-600" id="statStoreRequests">0</p>
-                        </div>
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <p class="text-sm text-gray-600">메뉴 대기 요청</p>
-                            <p class="text-2xl font-bold mt-2 text-orange-600" id="statMenuRequests">0</p>
-                        </div>
-                    </div>
+			<!-- 메인 컨텐츠 -->
+			<main class="flex-1">
+				<!-- 대시보드 -->
+				<div id="dashboard" class="tab-content">
+					<h2 class="text-2xl font-bold mb-6">대시보드</h2>
 
-                    <!-- 삭제 대기 매장 섹션 -->
-                    <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-                        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                            <span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium" id="statDeletePending">0</span>
-                            삭제 대기 중인 매장
-                        </h3>
-                        <div id="deletePendingStoreList"></div>
-                    </div>
+					<!-- 통계 카드 -->
+					<div class="grid grid-cols-3 gap-4 mb-6">
+						<div class="bg-white rounded-xl p-6 shadow-sm">
+							<p class="text-sm text-gray-600">전체 매장</p>
+							<p class="text-2xl font-bold mt-2" id="statStores">0</p>
+						</div>
+						<div class="bg-white rounded-xl p-6 shadow-sm">
+							<p class="text-sm text-gray-600">전체 유저</p>
+							<p class="text-2xl font-bold mt-2" id="statUsers">0</p>
+						</div>
+						<div class="bg-white rounded-xl p-6 shadow-sm">
+							<p class="text-sm text-gray-600">매장 대기 요청</p>
+							<p class="text-2xl font-bold mt-2 text-orange-600"
+								id="statStoreRequests">0</p>
+						</div>
 
-                    <!-- 매장 가입 요청 -->
-                    <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-                        <h3 class="text-lg font-semibold mb-4">대기 중인 매장 요청</h3>
-                        <div id="storeRequestList"></div>
-                    </div>
+					</div>
 
-                    <!-- 메뉴 관련 요청 -->
-                    <div class="bg-white rounded-xl p-6 shadow-sm">
-                        <h3 class="text-lg font-semibold mb-4">대기 중인 메뉴 요청</h3>
-                        <div id="menuRequestList"></div>
-                    </div>
-                </div>
+					<!-- 삭제 대기 매장 섹션 -->
+					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+						<h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+							<span
+								class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium"
+								id="statDeletePending">0</span> 삭제 대기 중인 매장
+						</h3>
+						<div id="deletePendingStoreList"></div>
+					</div>
 
-                <!-- 매장 관리 -->
-                <div id="stores" class="tab-content hidden">
-                    <h2 class="text-2xl font-bold mb-6">매장 관리</h2>
-                    
-                    <!-- 상태별 필터 버튼 -->
-                    <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-                        <div class="flex gap-2">
-                            <button onclick="filterStores('ALL')" class="filter-btn px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium">
-                                전체
-                            </button>
-                            <button onclick="filterStores('ACTIVE')" class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
-                                운영중
-                            </button>
-                            <button onclick="filterStores('PENDING')" class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
-                                승인대기
-                            </button>
-                            <button onclick="filterStores('DELETE_PENDING')" class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
-                                삭제대기
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                        <table class="w-full">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">매장명</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">업주 ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">메뉴 수</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">총 주문</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">총 매출</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">상태</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
-                                </tr>
-                            </thead>
-                            <tbody id="storeTable"></tbody>
-                        </table>
-                    </div>
-                </div>
+					<!-- 매장 가입 요청 -->
+					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+						<h3 class="text-lg font-semiboald mb-4 flex items-center gap-2">
+							<span
+								class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium"
+								id="statStoreRequestsBadge">0</span> 대기 중인 매장 요청
+						</h3>
+						<div id="storeRequestList"></div>
+					</div>
 
-                <!-- 메뉴 관리 -->
-                <div id="menus" class="tab-content hidden">
-                    <h2 class="text-2xl font-bold mb-6">메뉴 관리</h2>
-                    
-                    <!-- 매장 선택 -->
-                    <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">매장 선택</label>
-                        <select id="menuStoreSelect" onchange="loadStoreMenus()" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">매장을 선택하세요</option>
-                        </select>
-                    </div>
+					<!-- 승인/거절 히스토리 -->
+					<div class="bg-white rounded-xl p-6 shadow-sm">
+						<div class="flex justify-between items-center mb-4">
+							<h3 class="text-lg font-semibold">승인/거절 히스토리</h3>
+							<div class="flex gap-2">
+								 <select id="historyTypeFilter"
+									class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+									<option value="STORE">매장</option>
+									<!-- MENU 옵션 제거 -->
+								</select> <select id="historySortOrder"
+									class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+									<option value="DESC">최신순</option>
+									<option value="ASC">오래된순</option>
+								</select>
+								<button onclick="loadApprovalHistory()"
+									class="px-4 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">
+									조회</button>
+							</div>
+						</div>
+						<div id="approvalHistoryList"></div>
+						<div id="historyPagination" class="mt-4 flex justify-center gap-2"></div>
+					</div>
+				</div>
 
-                    <!-- 메뉴 목록 -->
-                    <div id="menuListSection" class="hidden">
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold">메뉴 목록</h3>
-                                <button onclick="showAddMenuModal()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                                    ➕ 메뉴 추가
-                                </button>
-                            </div>
-                            
-                            <div class="overflow-x-auto">
-                                <table class="w-full">
-                                    <thead class="bg-gray-50">
-                                        <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">메뉴명</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">카테고리</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">가격</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">설명</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="menuTableBody"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+				<!-- 매장 관리 -->
+				<div id="stores" class="tab-content hidden">
+					<h2 class="text-2xl font-bold mb-6">매장 관리</h2>
 
-                <!-- QR 관리 -->
-                <div id="qr" class="tab-content hidden">
-                    <h2 class="text-2xl font-bold mb-6">QR 코드 관리</h2>
-                    
-                    <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-                        <div class="flex items-center gap-2 mb-4">
-                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+					<!-- 상태별 필터 버튼 -->
+					<div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+						// 필터 버튼 UI 수정 (HTML 부분)
+						<div class="flex gap-2">
+							<button onclick="filterStores('ALL')"
+								class="filter-btn px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium">
+								전체</button>
+							<button onclick="filterStores('ACTIVE')"
+								class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
+								운영중</button>
+							<!-- PENDING 버튼 제거 -->
+							<button onclick="filterStores('DELETE_PENDING')"
+								class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
+								삭제대기</button>
+						</div>
+					</div>
+
+					<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+						<table class="w-full">
+							<thead class="bg-gray-50">
+								<tr>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">매장명</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">업주
+										ID</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">메뉴
+										수</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">총
+										주문</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">총
+										매출</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">상태</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
+								</tr>
+							</thead>
+							<tbody id="storeTable"></tbody>
+						</table>
+					</div>
+				</div>
+
+				<!-- 메뉴 관리 -->
+				<div id="menus" class="tab-content hidden">
+					<h2 class="text-2xl font-bold mb-6">메뉴 관리</h2>
+
+					<!-- 매장 선택 -->
+					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+						<label class="block text-sm font-medium text-gray-700 mb-2">매장
+							선택</label> <select id="menuStoreSelect" onchange="loadStoreMenus()"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+							<option value="">매장을 선택하세요</option>
+						</select>
+					</div>
+
+					<!-- 메뉴 목록 -->
+					<div id="menuListSection" class="hidden">
+						<div class="bg-white rounded-xl p-6 shadow-sm">
+							<div class="flex justify-between items-center mb-4">
+								<h3 class="text-lg font-semibold">메뉴 목록</h3>
+								<button onclick="showAddMenuModal()"
+									class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+									➕ 메뉴 추가</button>
+							</div>
+
+							<div class="overflow-x-auto">
+								<table class="w-full">
+									<thead class="bg-gray-50">
+										<tr>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">메뉴명</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">카테고리</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">가격</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">설명</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
+										</tr>
+									</thead>
+									<tbody id="menuTableBody"></tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- QR 관리 -->
+				<div id="qr" class="tab-content hidden">
+					<h2 class="text-2xl font-bold mb-6">QR 코드 관리</h2>
+
+					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+						<div class="flex items-center gap-2 mb-4">
+							<svg class="w-6 h-6 text-blue-500" fill="none"
+								stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round"
+									stroke-linejoin="round" stroke-width="2"
+									d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <h3 class="text-lg font-semibold">QR 코드 안내</h3>
-                        </div>
-                        <div class="text-sm text-gray-600 space-y-2">
-                            <p>• 각 매장마다 고유한 QR 코드가 생성됩니다.</p>
-                            <p>• 고객이 QR 코드를 스캔하면 해당 매장의 주문 페이지로 이동합니다.</p>
-                            <p>• QR 코드 URL: <code class="bg-gray-100 px-2 py-1 rounded">https://yourapp.com/order?store=매장ID</code></p>
-                            <p>• QR 코드 이미지를 다운로드하여 매장에 비치하세요.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="qrCodeList">
-                        <!-- QR 코드 카드들이 여기에 동적으로 생성됩니다 -->
-                    </div>
-                </div>
+							<h3 class="text-lg font-semibold">QR 코드 안내</h3>
+						</div>
+						<div class="text-sm text-gray-600 space-y-2">
+							<p>• 각 매장마다 고유한 QR 코드가 생성됩니다.</p>
+							<p>• 고객이 QR 코드를 스캔하면 해당 매장의 주문 페이지로 이동합니다.</p>
+							<p>
+								• QR 코드 URL:
+								<code class="bg-gray-100 px-2 py-1 rounded">https://yourapp.com/order?store=매장ID</code>
+							</p>
+							<p>• QR 코드 이미지를 다운로드하여 매장에 비치하세요.</p>
+						</div>
+					</div>
 
-                <!-- 매출 정보 -->
-                <div id="sales" class="tab-content hidden">
-                    <h2 class="text-2xl font-bold mb-6">매출 정보</h2>
-                    
-                    <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">매장 선택</label>
-                        <select id="salesStoreSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">매장을 선택하세요</option>
-                        </select>
-                    </div>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+						id="qrCodeList">
+						<!-- QR 코드 카드들이 여기에 동적으로 생성됩니다 -->
+					</div>
+				</div>
 
-                    <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">시작일</label>
-                                <input type="date" id="startDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">종료일</label>
-                                <input type="date" id="endDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
-                            </div>
-                        </div>
-                        <button onclick="loadStoreSales()" class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                            조회하기
-                        </button>
-                    </div>
+				<!-- 매출 정보 -->
+				<div id="sales" class="tab-content hidden">
+					<h2 class="text-2xl font-bold mb-6">매출 정보</h2>
 
-                    <div id="salesStats" class="hidden">
-                        <div class="grid grid-cols-3 gap-4 mb-6">
-                            <div class="bg-white rounded-xl p-6 shadow-sm">
-                                <p class="text-sm text-gray-600 mb-2">총 매출</p>
-                                <p class="text-3xl font-bold" id="totalSales">₩0</p>
-                            </div>
-                            <div class="bg-white rounded-xl p-6 shadow-sm">
-                                <p class="text-sm text-gray-600 mb-2">총 주문 수</p>
-                                <p class="text-3xl font-bold" id="totalOrders">0</p>
-                            </div>
-                            <div class="bg-white rounded-xl p-6 shadow-sm">
-                                <p class="text-sm text-gray-600 mb-2">평균 주문 금액</p>
-                                <p class="text-3xl font-bold" id="avgOrderAmount">₩0</p>
-                            </div>
-                        </div>
+					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+						<label class="block text-sm font-medium text-gray-700 mb-2">매장
+							선택</label> <select id="salesStoreSelect"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+							<option value="">매장을 선택하세요</option>
+						</select>
+					</div>
 
-                        <div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-                            <h3 class="text-lg font-semibold mb-4">일별 매출</h3>
-                            <div id="dailySalesList"></div>
-                        </div>
+					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+						<div class="grid grid-cols-2 gap-4">
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-2">시작일</label>
+								<input type="date" id="startDate"
+									class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+							</div>
+							<div>
+								<label class="block text-sm font-medium text-gray-700 mb-2">종료일</label>
+								<input type="date" id="endDate"
+									class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+							</div>
+						</div>
+						<button onclick="loadStoreSales()"
+							class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+							조회하기</button>
+					</div>
 
-                        <div class="bg-white rounded-xl p-6 shadow-sm">
-                            <h3 class="text-lg font-semibold mb-4">메뉴별 매출</h3>
-                            <div id="menuSalesList"></div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
-    </div>
+					<div id="salesStats" class="hidden">
+						<div class="grid grid-cols-3 gap-4 mb-6">
+							<div class="bg-white rounded-xl p-6 shadow-sm">
+								<p class="text-sm text-gray-600 mb-2">총 매출</p>
+								<p class="text-3xl font-bold" id="totalSales">₩0</p>
+							</div>
+							<div class="bg-white rounded-xl p-6 shadow-sm">
+								<p class="text-sm text-gray-600 mb-2">총 주문 수</p>
+								<p class="text-3xl font-bold" id="totalOrders">0</p>
+							</div>
+							<div class="bg-white rounded-xl p-6 shadow-sm">
+								<p class="text-sm text-gray-600 mb-2">평균 주문 금액</p>
+								<p class="text-3xl font-bold" id="avgOrderAmount">₩0</p>
+							</div>
+						</div>
 
-    <!-- 매장 상세 모달 -->
-    <div id="storeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <h3 class="text-xl font-bold mb-4" id="modalStoreTitle"></h3>
-            <div class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-600">업주 ID</p>
-                        <p class="font-medium" id="modalStoreOwner"></p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">사업자 번호</p>
-                        <p class="font-medium" id="modalBusinessNumber"></p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">주소</p>
-                        <p class="font-medium" id="modalAddress"></p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">전화번호</p>
-                        <p class="font-medium" id="modalPhone"></p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">메뉴 수</p>
-                        <p class="font-medium" id="modalMenuCount"></p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-600">총 주문</p>
-                        <p class="font-medium" id="modalTotalOrders"></p>
-                    </div>
-                    <div class="col-span-2">
-                        <p class="text-sm text-gray-600">총 매출</p>
-                        <p class="font-medium text-lg" id="modalStoreSales"></p>
-                    </div>
-                </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="viewStoreSalesModal()" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        💰 매출 상세
-                    </button>
-                    <button onclick="editStoreModal()" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-                        ✏️ 매장 수정
-                    </button>
-                    <button onclick="deleteStoreModal()" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                        🗑️ 매장 삭제
-                    </button>
-                    <button onclick="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        닫기
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+						<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
+							<h3 class="text-lg font-semibold mb-4">일별 매출</h3>
+							<div id="dailySalesList"></div>
+						</div>
 
-    <!-- 매장 수정 모달 -->
-    <div id="editStoreModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
-            <h3 class="text-xl font-bold mb-4">매장 정보 수정</h3>
-            <form id="editStoreForm">
-                <input type="hidden" id="editStoreId" name="storeId">
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">매장명 *</label>
-                        <input type="text" id="editStoreName" name="storeName" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">사업자 번호 (수정 불가)</label>
-                        <input type="text" id="editBusinessNumber" name="businessNumber" disabled
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">주소 *</label>
-                        <input type="text" id="editAddress" name="address" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">전화번호 *</label>
-                        <input type="tel" id="editPhoneNumber" name="phoneNumber" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">상태 *</label>
-                        <select id="editStatus" name="status" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="ACTIVE">운영중</option>
-                            <option value="INACTIVE">비활성</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="flex gap-3 mt-6">
-                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        저장
-                    </button>
-                    <button type="button" onclick="closeEditStoreModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        취소
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+						<div class="bg-white rounded-xl p-6 shadow-sm">
+							<h3 class="text-lg font-semibold mb-4">메뉴별 매출</h3>
+							<div id="menuSalesList"></div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
 
-    <!-- 메뉴 추가/수정 모달 -->
-    <div id="menuModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
-            <h3 class="text-xl font-bold mb-4" id="menuModalTitle">메뉴 추가</h3>
-            <form id="menuForm">
-                <input type="hidden" id="menuId" name="menuId">
-                <input type="hidden" id="menuStoreId" name="storeId">
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">메뉴명 *</label>
-                        <input type="text" id="menuName" name="menuName" required
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">카테고리 *</label>
-                        <select id="menuCategory" name="category" required
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">선택하세요</option>
-                            <option value="메인메뉴">메인메뉴</option>
-                            <option value="사이드메뉴">사이드메뉴</option>
-                            <option value="음료">음료</option>
-                            <option value="디저트">디저트</option>
-                        </select>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">가격 (원) *</label>
-                        <input type="number" id="menuPrice" name="price" required min="0"
-                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
-                        <textarea id="menuDescription" name="description" rows="3"
-                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
-                    </div>
-                </div>
-                
-                <div class="flex gap-3 mt-6">
-                    <button type="submit" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        저장
-                    </button>
-                    <button type="button" onclick="closeMenuModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        취소
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+	<!-- 매장 상세 모달 -->
+	<div id="storeModal"
+		class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div
+			class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+			<h3 class="text-xl font-bold mb-4" id="modalStoreTitle"></h3>
+			<div class="space-y-4">
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<p class="text-sm text-gray-600">업주 ID</p>
+						<p class="font-medium" id="modalStoreOwner"></p>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600">사업자 번호</p>
+						<p class="font-medium" id="modalBusinessNumber"></p>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600">주소</p>
+						<p class="font-medium" id="modalAddress"></p>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600">전화번호</p>
+						<p class="font-medium" id="modalPhone"></p>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600">메뉴 수</p>
+						<p class="font-medium" id="modalMenuCount"></p>
+					</div>
+					<div>
+						<p class="text-sm text-gray-600">총 주문</p>
+						<p class="font-medium" id="modalTotalOrders"></p>
+					</div>
+					<div class="col-span-2">
+						<p class="text-sm text-gray-600">총 매출</p>
+						<p class="font-medium text-lg" id="modalStoreSales"></p>
+					</div>
+				</div>
+				<div class="flex gap-3 mt-6">
+					<button onclick="viewStoreSalesModal()"
+						class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+						💰 매출 상세</button>
+					<button onclick="editStoreModal()"
+						class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+						✏️ 매장 수정</button>
+					<button onclick="deleteStoreModal()"
+						class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+						🗑️ 매장 삭제</button>
+					<button onclick="closeModal()"
+						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+						닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
-<script>
+	<!-- 매장 수정 모달 -->
+	<div id="editStoreModal"
+		class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
+			<h3 class="text-xl font-bold mb-4">매장 정보 수정</h3>
+			<form id="editStoreForm">
+				<input type="hidden" id="editStoreId" name="storeId">
+
+				<div class="space-y-4">
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">매장명
+							*</label> <input type="text" id="editStoreName" name="storeName" required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">사업자
+							번호 (수정 불가)</label> <input type="text" id="editBusinessNumber"
+							name="businessNumber" disabled
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">주소
+							*</label> <input type="text" id="editAddress" name="address" required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">전화번호
+							*</label> <input type="tel" id="editPhoneNumber" name="phoneNumber"
+							required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">상태
+							*</label> <select id="editStatus" name="status" required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+							<option value="ACTIVE">운영중</option>
+							<option value="INACTIVE">비활성</option>
+						</select>
+					</div>
+				</div>
+
+				<div class="flex gap-3 mt-6">
+					<button type="submit"
+						class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+						저장</button>
+					<button type="button" onclick="closeEditStoreModal()"
+						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+						취소</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- 메뉴 추가/수정 모달 -->
+	<div id="menuModal"
+		class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
+			<h3 class="text-xl font-bold mb-4" id="menuModalTitle">메뉴 추가</h3>
+			<form id="menuForm">
+				<input type="hidden" id="menuId" name="menuId"> <input
+					type="hidden" id="menuStoreId" name="storeId">
+
+				<div class="space-y-4">
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">메뉴명
+							*</label> <input type="text" id="menuName" name="menuName" required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">카테고리
+							*</label> <select id="menuCategory" name="category" required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+							<option value="">선택하세요</option>
+							<option value="메인메뉴">메인메뉴</option>
+							<option value="사이드메뉴">사이드메뉴</option>
+							<option value="음료">음료</option>
+							<option value="디저트">디저트</option>
+						</select>
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">가격
+							(원) *</label> <input type="number" id="menuPrice" name="price" required
+							min="0"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
+						<textarea id="menuDescription" name="description" rows="3"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+					</div>
+				</div>
+
+				<div class="flex gap-3 mt-6">
+					<button type="submit"
+						class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+						저장</button>
+					<button type="button" onclick="closeMenuModal()"
+						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+						취소</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<script>
 let currentStoreId = null;
 let currentMenuStoreId = null;
 let stores = [];
@@ -458,6 +514,7 @@ function showTab(tab) {
     }
 }
 
+//상태별 필터 버튼에서 PENDING 제거
 function filterStores(status) {
     currentFilter = status;
     
@@ -467,6 +524,7 @@ function filterStores(status) {
     
     displayFilteredStores();
 }
+
 
 function displayFilteredStores() {
     let filteredStores = stores;
@@ -523,7 +581,7 @@ function callAPI(methodName, params, callback) {
 function loadData() {
     console.log('📊 데이터 로딩 시작...');
     loadStoreRequests();
-    loadMenuRequests();
+    loadApprovalHistory();
     loadStores();
     loadUsers();
     loadDeletePendingStores();
@@ -584,10 +642,13 @@ function cancelStoreDeletion(storeId) {
     });
 }
 
+// ==================== 매장 요청 거절 기능 추가 ====================
+
 function loadStoreRequests() {
     callAPI('getStoreRequests', {}, function(res) {
         let requests = res && res.data ? res.data : [];
         $('#statStoreRequests').text(requests.length);
+        $('#statStoreRequestsBadge').text(requests.length);
         
         let html = '';
         if (requests.length === 0) {
@@ -599,10 +660,11 @@ function loadStoreRequests() {
                 html += '<p class="font-medium">' + (req.storeName || '-') + '</p>';
                 html += '<p class="text-sm text-gray-600">사업자번호: ' + (req.businessNumber || '-') + '</p>';
                 html += '<p class="text-sm text-gray-600">전화번호: ' + (req.phoneNumber || '-') + '</p>';
+                html += '<p class="text-sm text-gray-600">요청타입: ' + (req.requestType === 'ADD' ? '등록' : '수정') + '</p>';
                 html += '</div>';
                 html += '<div class="flex gap-2">';
-                html += '<button onclick="approveStoreRequest(' + req.requestId + ', \'ADD\')" class="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">승인</button>';
-                html += '<button onclick="rejectStoreRequest(' + req.requestId + ')" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">거절</button>';
+                html += '<button onclick="approveStoreRequest(' + req.requestId + ', \'' + req.requestType + '\')" class="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">승인</button>';
+                html += '<button onclick="rejectStoreRequest(' + req.requestId + ', \'' + req.requestType + '\')" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">거절</button>';
                 html += '</div>';
                 html += '</div>';
             });
@@ -613,14 +675,148 @@ function loadStoreRequests() {
     });
 }
 
-function loadMenuRequests() {
-    callAPI('getMenuRequests', {}, function(res) {
-        let requests = res && res.data ? res.data : [];
-        $('#statMenuRequests').text(requests.length);
-        
-        let html = '<p class="text-gray-500 text-center py-4">대기 중인 요청이 없습니다</p>';
-        $('#menuRequestList').html(html);
+function rejectStoreRequest(requestId, requestType) {
+    let reason = prompt('거절 사유를 입력해주세요:');
+    
+    if (reason === null || reason.trim() === '') {
+        alert('거절 사유를 입력해주세요.');
+        return;
+    }
+    
+    if (!confirm('정말 이 요청을 거절하시겠습니까?')) return;
+    
+    let methodName = '';
+    if (requestType === 'ADD') {
+        methodName = 'rejectStoreInfoAddRequest';
+    } else if (requestType === 'UPDATE') {
+        methodName = 'rejectStoreInfoUpdateRequest';
+    } else {
+        alert('지원하지 않는 요청 타입입니다.');
+        return;
+    }
+    
+    callAPI(methodName, {requestId: requestId, reason: reason}, function(res) {
+        alert(res.message || '처리되었습니다.');
+        if (res.success) {
+            console.log('✅ 매장 요청 거절 성공, 데이터 갱신 시작...');
+            loadStoreRequests();
+            loadApprovalHistory();
+        }
     });
+}
+
+// ========== 승인/거절 히스토리 ==========
+
+let currentHistoryPage = 1;
+const historyPageSize = 10;
+
+//히스토리 로드 함수 수정
+function loadApprovalHistory(page = 1) {
+    currentHistoryPage = page;
+    
+    // 타입을 항상 STORE로 고정
+    let type = 'STORE';
+    let sortOrder = $('#historySortOrder').val() || 'DESC';
+    
+    callAPI('getApprovalHistory', {
+        type: type,
+        sortOrder: sortOrder,
+        page: page,
+        pageSize: historyPageSize
+    }, function(res) {
+        if (res && res.success) {
+            let histories = res.data || [];
+            let totalCount = res.totalCount || 0;
+            
+            displayApprovalHistory(histories);
+            displayHistoryPagination(totalCount);
+        } else {
+            $('#approvalHistoryList').html('<p class="text-gray-500 text-center py-4">히스토리를 불러올 수 없습니다</p>');
+        }
+    });
+}
+
+function displayApprovalHistory(histories) {
+    let html = '';
+    
+    if (histories.length === 0) {
+        html = '<p class="text-gray-500 text-center py-4">승인/거절 히스토리가 없습니다</p>';
+    } else {
+        html += '<div class="space-y-3">';
+        histories.forEach(function(h) {
+            let statusClass = h.status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+            let statusText = h.status === 'APPROVED' ? '승인' : '거절';
+            let typeText = h.type === 'STORE' ? '매장' : '메뉴';
+            
+            // requestType 텍스트 변환
+            let requestTypeText = '';
+            if (h.requestType === 'ADD') requestTypeText = '등록';
+            else if (h.requestType === 'UPDATE') requestTypeText = '수정';
+            else if (h.requestType === 'DELETE') requestTypeText = '삭제';
+            
+            html += '<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">';
+            html += '<div class="flex-1">';
+            html += '<div class="flex items-center gap-2 mb-1">';
+            html += '<span class="px-2 py-0.5 text-xs font-medium rounded ' + statusClass + '">' + statusText + '</span>';
+            html += '<span class="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded">' + typeText + '</span>';
+            if (requestTypeText) {
+                html += '<span class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 rounded">' + requestTypeText + '</span>';
+            }
+            html += '</div>';
+            html += '<p class="font-medium text-sm">' + (h.name || '-') + '</p>';
+            html += '</div>';
+            html += '<div class="text-right text-xs text-gray-500">';
+            html += '<p>' + formatDateTime(h.processedAt) + '</p>';
+            html += '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    
+    $('#approvalHistoryList').html(html);
+}
+
+function displayHistoryPagination(totalCount) {
+    let totalPages = Math.ceil(totalCount / historyPageSize);
+    
+    if (totalPages <= 1) {
+        $('#historyPagination').html('');
+        return;
+    }
+    
+    let html = '';
+    
+    // 이전 버튼
+    if (currentHistoryPage > 1) {
+        html += '<button onclick="loadApprovalHistory(' + (currentHistoryPage - 1) + ')" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">이전</button>';
+    }
+    
+    // 페이지 번호
+    let startPage = Math.max(1, currentHistoryPage - 2);
+    let endPage = Math.min(totalPages, currentHistoryPage + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        let activeClass = i === currentHistoryPage ? 'bg-blue-500 text-white' : 'bg-white border border-gray-300 hover:bg-gray-50';
+        html += '<button onclick="loadApprovalHistory(' + i + ')" class="px-3 py-1 rounded ' + activeClass + '">' + i + '</button>';
+    }
+    
+    // 다음 버튼
+    if (currentHistoryPage < totalPages) {
+        html += '<button onclick="loadApprovalHistory(' + (currentHistoryPage + 1) + ')" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">다음</button>';
+    }
+    
+    $('#historyPagination').html(html);
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '-';
+    let date = new Date(dateStr);
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+    let hours = String(date.getHours()).padStart(2, '0');
+    let minutes = String(date.getMinutes()).padStart(2, '0');
+    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
 }
 
 function loadStores() {
@@ -671,6 +867,10 @@ function approveStoreRequest(requestId, requestType) {
     if (!confirm('매장 요청을 승인하시겠습니까?')) return;
     
     let methodName = 'approveStoreInfoAddRequest';
+    if (requestType === 'UPDATE') {
+        methodName = 'approveStoreInfoUpdateRequest';
+    }
+    
     callAPI(methodName, {requestId: requestId}, function(res) {
         alert(res.message || '처리되었습니다.');
         if (res.success) {
@@ -687,11 +887,6 @@ function approveStoreRequest(requestId, requestType) {
 function updateDashboardStats() {
     $('#statStores').text(stores.length);
     $('#statUsers').text(users.length);
-}
-
-function rejectStoreRequest(requestId) {
-    if (!confirm('매장 요청을 거절하시겠습니까?')) return;
-    alert('거절 기능은 구현 중입니다.');
 }
 
 function viewStoreDetail(storeId) {
@@ -753,7 +948,7 @@ function showPendingStoreModal(requestId) {
                         <button onclick="approveStoreRequest(${requestId}, 'ADD')" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
                             승인
                         </button>
-                        <button onclick="rejectStoreRequest(${requestId})" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+                        <button onclick="rejectStoreRequest(${requestId}, 'ADD')" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
                             거절
                         </button>
                         <button onclick="closePendingModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">

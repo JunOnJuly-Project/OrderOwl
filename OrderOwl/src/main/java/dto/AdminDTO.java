@@ -68,6 +68,7 @@ public class AdminDTO {
         private long userId;
         private String name;
         private String email;
+        private String role;
         private String status;
         
         public UserDTO() {}
@@ -79,6 +80,8 @@ public class AdminDTO {
         public void setName(String name) { this.name = name; }
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
         public String getStatus() { return status; }
         public void setStatus(String status) { this.status = status; }
     }
@@ -118,11 +121,13 @@ public class AdminDTO {
         private long menuId;
         private long storeId;
         private long ownerId;
+        private String requestType;  // ADD, UPDATE, DELETE
         private String menuName;
         private int price;
         private String category;
         private String description;
         private String status;
+        private String createdAt;  // 생성 날짜/시간
         
         public MenuRequestDTO() {}
         
@@ -135,6 +140,8 @@ public class AdminDTO {
         public void setStoreId(long storeId) { this.storeId = storeId; }
         public long getOwnerId() { return ownerId; }
         public void setOwnerId(long ownerId) { this.ownerId = ownerId; }
+        public String getRequestType() { return requestType; }
+        public void setRequestType(String requestType) { this.requestType = requestType; }
         public String getMenuName() { return menuName; }
         public void setMenuName(String menuName) { this.menuName = menuName; }
         public int getPrice() { return price; }
@@ -145,6 +152,8 @@ public class AdminDTO {
         public void setDescription(String description) { this.description = description; }
         public String getStatus() { return status; }
         public void setStatus(String status) { this.status = status; }
+        public String getCreatedAt() { return createdAt; }
+        public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     }
     
     // ==================== StoreRequestDTO ====================
@@ -156,7 +165,9 @@ public class AdminDTO {
         private String businessNumber;
         private String address;
         private String phoneNumber;
+        private String requestType;  // ADD, UPDATE
         private String status;
+        private String createdAt;  // 생성 날짜/시간
         
         public StoreRequestDTO() {}
         
@@ -175,8 +186,12 @@ public class AdminDTO {
         public void setAddress(String address) { this.address = address; }
         public String getPhoneNumber() { return phoneNumber; }
         public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+        public String getRequestType() { return requestType; }
+        public void setRequestType(String requestType) { this.requestType = requestType; }
         public String getStatus() { return status; }
         public void setStatus(String status) { this.status = status; }
+        public String getCreatedAt() { return createdAt; }
+        public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     }
     
     // ==================== SalesReportDTO ====================

@@ -165,16 +165,17 @@ INSERT INTO User (name, email, password, role, status) VALUES
 INSERT INTO Store (owner_id, store_name, business_number, address, phone_number, region, status, business_verified) VALUES
 (5, '청담스테이크하우스', '345-12-67890', '서울시 강남구 도산대로 211', '02-3456-1111', '서울', 'ACTIVE', TRUE),
 (6, '한남파스타', '456-23-78901', '서울시 용산구 한남대로 77', '02-4567-2222', '서울', 'ACTIVE', TRUE),
-(7, '부산오뎅마을', '567-34-89012', '부산시 남구 대연로 25', '051-567-3333', '부산', 'ACTIVE', TRUE),
-(8, '광주삼겹살타운', '678-45-90123', '광주시 북구 하서로 88', '062-678-4444', '광주', 'PENDING', FALSE),
-(9, '대전칼국수', '789-56-01234', '대전시 서구 둔산대로 155', '042-789-5555', '대전', 'PENDING', FALSE);
+(7, '부산오뎅마을', '567-34-89012', '부산시 남구 대연로 25', '051-567-3333', '부산', 'ACTIVE', TRUE);
+
 
 INSERT INTO StoreRequest (owner_id, store_name, business_number, address, phone_number, request_type, status) VALUES
 (5, '홍대커피로스터스', '567-12-34567', '서울시 마포구 와우산로 56', '02-5678-4321', 'ADD', 'PENDING'),
 (6, '건대버거하우스', '678-23-45678', '서울시 광진구 능동로 12', '02-6789-5432', 'ADD', 'PENDING'),
 (7, '부산해물찜', '789-34-56789', '부산시 해운대구 달맞이길 33', '051-789-6543', 'ADD', 'PENDING'),
+(8, '광주삼겹살타운', '678-45-90123', '광주시 북구 하서로 88', '062-678-4444', 'ADD', 'PENDING'),
+(9, '대전칼국수', '789-56-01234', '대전시 서구 둔산대로 155', '042-789-5555', 'ADD', 'PENDING'),
 (8, '전주콩나물국밥', '890-45-67890', '전주시 덕진구 백제대로 88', '063-890-7654', 'ADD', 'PENDING'),
-(9, '제주고기국수', '901-56-78901', '제주시 구좌읍 일주동로 101', '064-901-8765', 'ADD', 'PENDING');
+(9, '제주고기국수', '901-56-78901', '제주시 구좌읍일주동로 101', '064-901-8765', 'ADD', 'PENDING');
 
 INSERT INTO Menu (store_id, menu_name, price, category, description) VALUES
 (3, '스테이크 세트', 25000, '양식', '부드러운 안심 스테이크와 샐러드 세트'),
@@ -193,6 +194,3 @@ INSERT INTO MenuRequest (store_id, owner_id, request_type, menu_name, price, cat
 (5, 7, 'ADD', '오뎅볶음', 7000, '사이드', '매콤달콤한 부산식 오뎅볶음', 'PENDING'),
 (6, 8, 'ADD', '제육덮밥', 9000, '식사류', '매콤한 제육덮밥', 'PENDING'),
 (7, 9, 'ADD', '칼국수', 8000, '식사류', '시원한 멸치육수 칼국수', 'PENDING');
-
-
-

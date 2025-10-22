@@ -2,7 +2,9 @@ package service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dao.AdminDAO;
 import dto.AdminDTO.MenuDTO;
@@ -99,10 +101,10 @@ public class AdminServiceImpl implements AdminService {
 				throw new IllegalStateException("삭제 대기 상태가 아닙니다.");
 			}
 
-			int result = adminDAO.hardDeleteStore(storeId);
+			int result = adminDAO.deleteStore(storeId);
 
 			if (result > 0) {
-				sendNotification(store.getOwnerId(), "매장 삭제가 최종 승인되었습니다.");
+				sendNotification(store.getOwnerId(), "매장이 최종 삭제되었습니다.");
 			}
 
 			return result > 0;
@@ -145,15 +147,10 @@ public class AdminServiceImpl implements AdminService {
 				throw new IllegalArgumentException("존재하지 않는 유저입니다.");
 			}
 
-			if (reason == null || reason.trim().isEmpty()) {
-				throw new IllegalArgumentException("탈퇴 사유를 입력해주세요.");
-			}
-
-			adminDAO.insertForceDeleteLog(userId, reason);
 			int result = adminDAO.updateUserStatus(userId, "FORCE_DELETED");
 
 			if (result > 0) {
-				sendNotification(userId, "계정이 관리자에 의해 정지되었습니다. 사유: " + reason);
+				sendNotification(userId, "계정이 관리자에 의해 강제 탈퇴 처리되었습니다. 사유: " + reason);
 			}
 
 			return result > 0;
@@ -168,16 +165,14 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public String createStoreQR(long storeId) {
 		try {
-			StoreDTO store = adminDAO.selectStoreById(storeId);
-			if (store == null) {
+			if (!adminDAO.existsStoreById(storeId)) {
 				throw new IllegalArgumentException("존재하지 않는 매장입니다.");
 			}
 
-			String qrUrl = "https://yourapp.com/store/" + storeId;
-			String qrImagePath = generateQRCode(qrUrl, storeId);
-			adminDAO.updateStoreQR(storeId, qrImagePath);
+			String qrPath = "https://orderowl.com/order/" + storeId;
+			adminDAO.updateStoreQRPath(storeId, qrPath);
 
-			return qrImagePath;
+			return qrPath;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -340,7 +335,8 @@ public class AdminServiceImpl implements AdminService {
 				throw new IllegalArgumentException("유효하지 않은 매장 정보입니다.");
 			}
 
-			int result = adminDAO.approveStoreRequest(requestId, "APPROVED");
+			// ✅ 현지 시간으로 승인 처리
+			int result = adminDAO.updateStoreRequestWithTimestamp(requestId, "APPROVED");
 
 			if (result > 0) {
 				StoreDTO newStore = createStoreFromRequest(request);
@@ -383,10 +379,59 @@ public class AdminServiceImpl implements AdminService {
 				adminDAO.updateStore(updatedStore);
 			}
 
-			int result = adminDAO.approveStoreRequest(requestId, "APPROVED");
+			// ✅ 현지 시간으로 승인 처리
+			int result = adminDAO.updateStoreRequestWithTimestamp(requestId, "APPROVED");
 
 			if (result > 0) {
 				sendNotification(request.getOwnerId(), "매장 정보 수정이 승인되었습니다.");
+			}
+
+			return result > 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	// ==================== 매장 요청 거절 기능 ====================
+
+	@Override
+	public boolean rejectStoreInfoAddRequest(long requestId, String reason) {
+		try {
+			StoreRequestDTO request = adminDAO.selectStoreRequestById(requestId);
+			if (request == null) {
+				throw new IllegalArgumentException("존재하지 않는 요청입니다.");
+			}
+
+			// ✅ 현지 시간으로 거절 처리
+			int result = adminDAO.updateStoreRequestWithTimestamp(requestId, "REJECTED");
+
+			if (result > 0) {
+				sendNotification(request.getOwnerId(), 
+					"매장 등록 요청이 거절되었습니다. 사유: " + reason);
+			}
+
+			return result > 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	@Override
+	public boolean rejectStoreInfoUpdateRequest(long requestId, String reason) {
+		try {
+			StoreRequestDTO request = adminDAO.selectStoreRequestById(requestId);
+			if (request == null) {
+				throw new IllegalArgumentException("존재하지 않는 요청입니다.");
+			}
+
+			// ✅ 현지 시간으로 거절 처리
+			int result = adminDAO.updateStoreRequestWithTimestamp(requestId, "REJECTED");
+
+			if (result > 0) {
+				sendNotification(request.getOwnerId(), 
+					"매장 정보 수정 요청이 거절되었습니다. 사유: " + reason);
 			}
 
 			return result > 0;
@@ -415,30 +460,6 @@ public class AdminServiceImpl implements AdminService {
 			return null;
 		}
 	}
-
-	// ==================== Private Helper Methods ====================
-
-	private void sendNotification(long userId, String message) {
-		System.out.println("알림 전송 - UserId: " + userId + ", Message: " + message);
-	}
-
-	private String generateQRCode(String url, long storeId) {
-		return "/qr/store_" + storeId + ".png";
-	}
-
-	private StoreDTO createStoreFromRequest(StoreRequestDTO request) {
-		StoreDTO store = new StoreDTO();
-		store.setOwnerId(request.getOwnerId());
-		store.setStoreName(request.getStoreName());
-		store.setBusinessNumber(request.getBusinessNumber());
-		store.setAddress(request.getAddress() != null ? request.getAddress() : "");
-		store.setPhoneNumber(request.getPhoneNumber() != null ? request.getPhoneNumber() : "");
-		store.setStatus("ACTIVE");
-		store.setBusinessVerified(true);
-		return store;
-	}
-
-	// AdminServiceImpl.java에 추가할 메서드들
 
 	@Override
 	public List<MenuDTO> getStoreMenus(long storeId) {
@@ -526,22 +547,14 @@ public class AdminServiceImpl implements AdminService {
 			return result > 0;
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException(e.getMessage());
+			return false;
 		}
 	}
 
 	@Override
 	public List<StoreDTO> getAllStoresWithQR() {
 		try {
-			List<StoreDTO> stores = adminDAO.selectAllStores();
-			// PENDING 상태가 아닌 실제 매장만 필터링
-			List<StoreDTO> activeStores = new ArrayList<>();
-			for (StoreDTO store : stores) {
-				if (store.getStoreId() > 0) {
-					activeStores.add(store);
-				}
-			}
-			return activeStores;
+			return adminDAO.selectAllStores();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -551,8 +564,14 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public boolean regenerateStoreQR(long storeId) {
 		try {
-			String qrPath = createStoreQR(storeId);
-			return qrPath != null;
+			if (!adminDAO.existsStoreById(storeId)) {
+				throw new IllegalArgumentException("존재하지 않는 매장입니다.");
+			}
+
+			String qrPath = "https://orderowl.com/order/" + storeId + "?v=" + System.currentTimeMillis();
+			int result = adminDAO.updateStoreQRPath(storeId, qrPath);
+
+			return result > 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -562,17 +581,16 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public boolean updateStoreQRPath(long storeId, String qrPath) {
 		try {
+			if (!adminDAO.existsStoreById(storeId)) {
+				throw new IllegalArgumentException("존재하지 않는 매장입니다.");
+			}
+
 			if (qrPath == null || qrPath.trim().isEmpty()) {
 				throw new IllegalArgumentException("QR 경로가 유효하지 않습니다.");
 			}
 
-			StoreDTO store = adminDAO.selectStoreById(storeId);
-			if (store == null) {
-				throw new IllegalArgumentException("존재하지 않는 매장입니다.");
-			}
-
-			adminDAO.updateStoreQR(storeId, qrPath);
-			return true;
+			int result = adminDAO.updateStoreQRPath(storeId, qrPath);
+			return result > 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
@@ -582,7 +600,7 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public boolean updateStoreInfo(StoreDTO store) {
 		try {
-			if (store == null || store.getStoreName() == null || store.getStoreName().trim().isEmpty()) {
+			if (store == null) {
 				throw new IllegalArgumentException("매장 정보가 유효하지 않습니다.");
 			}
 
@@ -591,21 +609,97 @@ public class AdminServiceImpl implements AdminService {
 				throw new IllegalArgumentException("존재하지 않는 매장입니다.");
 			}
 
-			// 사업자 번호와 업주 ID는 변경 불가
-			store.setBusinessNumber(existingStore.getBusinessNumber());
-			store.setOwnerId(existingStore.getOwnerId());
-			store.setBusinessVerified(existingStore.isBusinessVerified());
-
 			int result = adminDAO.updateStore(store);
-
-			if (result > 0) {
-				sendNotification(store.getOwnerId(), "매장 정보가 수정되었습니다: " + store.getStoreName());
-			}
-
 			return result > 0;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public List<UserDTO> getUserList() {
+		try {
+			return adminDAO.selectAllUsers();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	// ==================== 승인/거절 히스토리 ====================
+
+	@Override
+	public Map<String, Object> getApprovalHistory(String type, String sortOrder, int page, int pageSize) {
+		Map<String, Object> result = new HashMap<>();
+		List<Map<String, Object>> historyList = new ArrayList<>();
+
+		try {
+			int offset = (page - 1) * pageSize;
+
+			// ✅ Store 요청 히스토리만 처리 (메뉴 부분 제거)
+			if ("STORE".equals(type)) {
+				List<StoreRequestDTO> storeRequests = adminDAO.selectStoreRequestHistory(sortOrder, offset, pageSize);
+				for (StoreRequestDTO req : storeRequests) {
+					if ("APPROVED".equals(req.getStatus()) || "REJECTED".equals(req.getStatus())) {
+						Map<String, Object> item = new HashMap<>();
+						item.put("type", "STORE");
+						item.put("name", req.getStoreName());
+						item.put("requestType", req.getRequestType());
+						item.put("status", req.getStatus());
+						item.put("createdAt", req.getCreatedAt());
+						item.put("processedAt", req.getCreatedAt()); // 실제 처리 시간 사용
+						historyList.add(item);
+					}
+				}
+			}
+
+			// ✅ 정렬
+			if ("DESC".equals(sortOrder)) {
+				historyList.sort((a, b) -> {
+					String dateA = (String) a.get("processedAt");
+					String dateB = (String) b.get("processedAt");
+					return dateB.compareTo(dateA);
+				});
+			} else {
+				historyList.sort((a, b) -> {
+					String dateA = (String) a.get("processedAt");
+					String dateB = (String) b.get("processedAt");
+					return dateA.compareTo(dateB);
+				});
+			}
+
+			// ✅ 전체 카운트 계산 (메뉴 부분 제거)
+			int totalCount = adminDAO.countStoreRequestHistory();
+
+			result.put("data", historyList);
+			result.put("totalCount", totalCount);
+			result.put("success", true);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.put("success", false);
+			result.put("message", "히스토리 조회 중 오류가 발생했습니다.");
+		}
+
+		return result;
+	}
+
+	// ==================== Helper Methods ====================
+
+	private void sendNotification(long userId, String message) {
+		System.out.println("📢 알림 전송 [User " + userId + "]: " + message);
+	}
+
+	private StoreDTO createStoreFromRequest(StoreRequestDTO request) {
+		StoreDTO store = new StoreDTO();
+		store.setOwnerId(request.getOwnerId());
+		store.setStoreName(request.getStoreName());
+		store.setBusinessNumber(request.getBusinessNumber());
+		store.setAddress(request.getAddress() != null ? request.getAddress() : "");
+		store.setPhoneNumber(request.getPhoneNumber() != null ? request.getPhoneNumber() : "");
+		store.setStatus("ACTIVE");
+		store.setBusinessVerified(true);
+		return store;
 	}
 }

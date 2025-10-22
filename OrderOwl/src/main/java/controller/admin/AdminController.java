@@ -293,6 +293,66 @@ public class AdminController implements Controller {
         return null;
     }
     
+    // ==================== 매장 요청 거절 API 추가 ====================
+    
+    /**
+     * 매장 등록 요청 거절
+     */
+    public ModelAndView rejectStoreInfoAddRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            long requestId = Long.parseLong(request.getParameter("requestId"));
+            String reason = request.getParameter("reason");
+            
+            boolean success = adminService.rejectStoreInfoAddRequest(requestId, reason);
+            
+            result.put("success", success);
+            result.put("message", success ? "매장 등록 요청이 거절되었습니다." : "거절에 실패했습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "거절 처리 중 오류가 발생했습니다.");
+        }
+        
+        out.print(gson.toJson(result));
+        out.flush();
+        
+        return null;
+    }
+    
+    /**
+     * 매장 정보 수정 요청 거절
+     */
+    public ModelAndView rejectStoreInfoUpdateRequest(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            long requestId = Long.parseLong(request.getParameter("requestId"));
+            String reason = request.getParameter("reason");
+            
+            boolean success = adminService.rejectStoreInfoUpdateRequest(requestId, reason);
+            
+            result.put("success", success);
+            result.put("message", success ? "매장 정보 수정 요청이 거절되었습니다." : "거절에 실패했습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "거절 처리 중 오류가 발생했습니다.");
+        }
+        
+        out.print(gson.toJson(result));
+        out.flush();
+        
+        return null;
+    }
+    
     /**
      * 매장 정보 직접 수정
      */
@@ -819,6 +879,46 @@ public class AdminController implements Controller {
             e.printStackTrace();
             result.put("success", false);
             result.put("message", "매출 정보 조회 중 오류가 발생했습니다.");
+        }
+        
+        out.print(gson.toJson(result));
+        out.flush();
+        
+        return null;
+    }
+    
+    /**
+     * 승인/거절 히스토리 조회
+     */
+    /**
+     * 승인/거절 히스토리 조회 - 메뉴 부분 제거
+     */
+    public ModelAndView getApprovalHistory(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            String type = request.getParameter("type");
+            String sortOrder = request.getParameter("sortOrder");
+            int page = Integer.parseInt(request.getParameter("page"));
+            int pageSize = Integer.parseInt(request.getParameter("pageSize"));
+            
+            // 기본값 설정 - 메뉴 타입 제거
+            if (type == null || type.trim().isEmpty() || "MENU".equals(type)) {
+                type = "STORE"; // 기본값을 STORE로 변경
+            }
+            if (sortOrder == null || sortOrder.trim().isEmpty()) {
+                sortOrder = "DESC";
+            }
+            
+            result = adminService.getApprovalHistory(type, sortOrder, page, pageSize);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "히스토리 조회 중 오류가 발생했습니다.");
         }
         
         out.print(gson.toJson(result));

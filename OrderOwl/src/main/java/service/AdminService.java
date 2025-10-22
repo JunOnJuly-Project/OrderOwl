@@ -3,6 +3,7 @@ package service;
 import dto.AdminDTO.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 관리자 서비스 인터페이스
@@ -88,6 +89,16 @@ public interface AdminService {
     boolean approveStoreInfoUpdateRequest(long requestId);
     
     /**
+     * 매장 등록 요청 거절
+     */
+    boolean rejectStoreInfoAddRequest(long requestId, String reason);
+    
+    /**
+     * 매장 정보 수정 요청 거절
+     */
+    boolean rejectStoreInfoUpdateRequest(long requestId, String reason);
+    
+    /**
      * 전체 매장 목록 조회
      */
     List<StoreDTO> getStoreList();
@@ -97,8 +108,6 @@ public interface AdminService {
      */
     List<StoreRequestDTO> getStoreRequests();
     
- // AdminService.java에 추가할 메서드들
-
     /**
      * 매장별 메뉴 목록 조회
      */
@@ -138,4 +147,21 @@ public interface AdminService {
      * 매장 정보 직접 수정
      */
     boolean updateStoreInfo(StoreDTO store);
+    
+    /**
+     * 전체 유저 목록 조회
+     */
+    List<UserDTO> getUserList();
+    
+    // ==================== 승인/거절 히스토리 ====================
+    
+    /**
+     * 승인/거절 히스토리 조회 (페이징 지원)
+     * @param type 타입 필터 (ALL, STORE, MENU)
+     * @param sortOrder 정렬 순서 (ASC, DESC)
+     * @param page 페이지 번호 (1부터 시작)
+     * @param pageSize 페이지 크기
+     * @return 히스토리 목록과 전체 개수
+     */
+    Map<String, Object> getApprovalHistory(String type, String sortOrder, int page, int pageSize);
 }
