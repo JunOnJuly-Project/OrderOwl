@@ -1,208 +1,28 @@
 package dao;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
-import dto.AdminDTO.DailySalesDTO;
-import dto.AdminDTO.MenuDTO;
-import dto.AdminDTO.MenuRequestDTO;
-import dto.AdminDTO.MenuSalesDTO;
-import dto.AdminDTO.StoreDTO;
-import dto.AdminDTO.StoreRequestDTO;
-import dto.AdminDTO.UserDTO;
+import dto.StoreDTO;
+import dto.UserDTO;
+import dto.MenuDTO;
 import util.DbUtil;
 
 /**
  * 관리자 DAO - 데이터베이스 접근
- * Properties 파일에서 쿼리를 로드하여 사용
+ * OrderOwl.sql 스키마 기준 리팩토링
  */
 public class AdminDAO {
     
-    private Properties queries;
-    
-    /**
-     * 생성자 - Properties 파일 로드
-     */
-    public AdminDAO() {
-        queries = new Properties();
-        loadQueries();
-    }
-    
-    /**
-     * Properties 파일에서 쿼리 로드
-     */
-    private void loadQueries() {
-        InputStream is = null;
-        
-        try {
-            // 방법 1: 클래스패스에서 로드 시도 (dbQuery.properties로 변경)
-            is = getClass().getClassLoader().getResourceAsStream("dbQuery.properties");
-            
-            // 방법 2: 실패하면 프로젝트 resources 폴더에서 로드
-            if (is == null) {
-                File file = new File("resources/dbQuery.properties");
-                if (file.exists()) {
-                    is = new FileInputStream(file);
-                    System.out.println("📂 파일 경로에서 로드: " + file.getAbsolutePath());
-                }
-            }
-            
-            // 방법 3: OrderOwl/resources에서 로드
-            if (is == null) {
-                File file = new File("OrderOwl/resources/dbQuery.properties");
-                if (file.exists()) {
-                    is = new FileInputStream(file);
-                    System.out.println("📂 파일 경로에서 로드: " + file.getAbsolutePath());
-                }
-            }
-            
-            // 방법 4: 상대 경로 ../resources
-            if (is == null) {
-                File file = new File("../OrderOwl/resources/dbQuery.properties");
-                if (file.exists()) {
-                    is = new FileInputStream(file);
-                    System.out.println("📂 파일 경로에서 로드: " + file.getAbsolutePath());
-                }
-            }
-            
-            // 방법 5: src/main/resources (Maven/Gradle 구조)
-            if (is == null) {
-                File file = new File("src/main/resources/dbQuery.properties");
-                if (file.exists()) {
-                    is = new FileInputStream(file);
-                    System.out.println("📂 파일 경로에서 로드: " + file.getAbsolutePath());
-                }
-            }
-            
-            if (is == null) {
-                throw new IOException("dbQuery.properties 파일을 찾을 수 없습니다.");
-            }
-            
-            queries.load(is);
-            System.out.println("✅ AdminDAO 쿼리 로드 완료: " + queries.size() + "개");
-            
-            // 디버그: 로드된 모든 키 출력
-            System.out.println("📋 로드된 쿼리 키: " + queries.keySet());
-            
-        } catch (IOException e) {
-            System.err.println("❌ AdminDAO 쿼리 로드 실패!");
-            e.printStackTrace();
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-    
-    /**
-     * 쿼리 가져오기
-     */
-    private String getQuery(String key) {
-        String query = queries.getProperty(key);
-        if (query == null) {
-            System.err.println("❌ 쿼리를 찾을 수 없습니다: " + key);
-            System.err.println("📋 사용 가능한 쿼리 키: " + queries.keySet());
-            throw new RuntimeException("쿼리를 찾을 수 없습니다: " + key);
-        }
-        return query;
-    }
-    
-    /**
-     * 현지 시간 문자열 반환
-     */
-    private String getCurrentLocalDateTime() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-    }
-    
-    /**
-     * 승인/거절 시 현지 시간으로 업데이트
-     */
-    public int updateStoreRequestWithTimestamp(long requestId, String status) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            
-            // 현재 시간을 문자열로 변환
-            String currentTime = getCurrentLocalDateTime();
-            
-            // processed_at 컬럼이 있으면 사용, 없으면 created_at 업데이트
-            String query;
-            try {
-                // processed_at 컬럼 존재 여부 확인
-                java.sql.DatabaseMetaData meta = conn.getMetaData();
-                java.sql.ResultSet columns = meta.getColumns(null, null, "storerequest", "processed_at");
-                boolean hasProcessedAt = columns.next();
-                columns.close();
-                
-                if (hasProcessedAt) {
-                    query = "UPDATE StoreRequest SET status = ?, processed_at = ? WHERE request_id = ?";
-                } else {
-                    query = "UPDATE StoreRequest SET status = ?, created_at = ? WHERE request_id = ?";
-                }
-            } catch (Exception e) {
-                // 에러 발생시 created_at 사용
-                query = "UPDATE StoreRequest SET status = ?, created_at = ? WHERE request_id = ?";
-            }
-            
-            pstmt = conn.prepareStatement(query);
-            pstmt.setString(1, status);
-            pstmt.setString(2, currentTime); // 현재 시간 설정
-            pstmt.setLong(3, requestId);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt);
-        }
-        return 0;
-    }
-    
     // ==================== 매장 관리 ====================
-    
-    /**
-     * 사업자번호 중복 확인
-     */
-    public boolean existsByBusinessNumber(String businessNumber) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.existsByBusinessNumber"));
-            pstmt.setString(1, businessNumber);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return false;
-    }
     
     /**
      * 매장 등록
@@ -213,25 +33,27 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.insert"));
-            pstmt.setLong(1, store.getOwnerId());
+            String sql = "INSERT INTO Store (owner_id, store_name, address, region, phone_number, description, img_src) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, store.getOwnerId());
             pstmt.setString(2, store.getStoreName());
-            pstmt.setString(3, store.getBusinessNumber());
-            pstmt.setString(4, store.getAddress());
+            pstmt.setString(3, store.getAddress());
+            pstmt.setString(4, store.getRegion());
             pstmt.setString(5, store.getPhoneNumber());
-            pstmt.setString(6, store.getStatus());
-            pstmt.setBoolean(7, store.isBusinessVerified());
+            pstmt.setString(6, store.getDescription());
+            pstmt.setString(7, store.getImgSrc());
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            return 0;
         } finally {
             DbUtil.dbClose(conn, pstmt);
         }
-        return 0;
     }
     
     /**
-     * 매장 업데이트
+     * 매장 수정
      */
     public int updateStore(StoreDTO store) {
         Connection conn = null;
@@ -239,47 +61,75 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.update"));
+            String sql = "UPDATE Store SET store_name = ?, address = ?, region = ?, " +
+                         "phone_number = ?, description = ?, img_src = ? WHERE store_id = ?";
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, store.getStoreName());
             pstmt.setString(2, store.getAddress());
-            pstmt.setString(3, store.getPhoneNumber());
-            pstmt.setString(4, store.getStatus());
-            pstmt.setBoolean(5, store.isBusinessVerified());
-            pstmt.setLong(6, store.getStoreId());
+            pstmt.setString(3, store.getRegion());
+            pstmt.setString(4, store.getPhoneNumber());
+            pstmt.setString(5, store.getDescription());
+            pstmt.setString(6, store.getImgSrc());
+            pstmt.setInt(7, store.getStoreId());
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            return 0;
         } finally {
             DbUtil.dbClose(conn, pstmt);
         }
-        return 0;
     }
     
     /**
-     * ID로 매장 조회
+     * 매장 삭제 (CASCADE로 관련 데이터 자동 삭제)
      */
-    public StoreDTO selectStoreById(long storeId) {
+    public int deleteStore(int storeId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            String sql = "DELETE FROM Store WHERE store_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            DbUtil.dbClose(conn, pstmt);
+        }
+    }
+    
+    /**
+     * 매장 ID로 조회
+     */
+    public StoreDTO selectStoreById(int storeId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.selectById"));
-            pstmt.setLong(1, storeId);
+            String sql = "SELECT * FROM Store WHERE store_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
             rs = pstmt.executeQuery();
+            
             if (rs.next()) {
-                StoreDTO store = new StoreDTO();
-                store.setStoreId(rs.getLong("store_id"));
-                store.setOwnerId(rs.getLong("owner_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setBusinessNumber(rs.getString("business_number"));
-                store.setAddress(rs.getString("address"));
-                store.setPhoneNumber(rs.getString("phone_number"));
-                store.setStatus(rs.getString("status"));
-                store.setBusinessVerified(rs.getBoolean("business_verified"));
-                store.setQrPath(rs.getString("qr_path"));
-                return store;
+                return new StoreDTO(
+                    rs.getInt("store_id"),
+                    rs.getInt("owner_id"),
+                    rs.getString("store_name"),
+                    rs.getString("address"),
+                    rs.getString("region"),
+                    rs.getString("phone_number"),
+                    rs.getString("description"),
+                    rs.getString("img_src"),
+                    rs.getTimestamp("created_at") != null ? 
+                        rs.getTimestamp("created_at").toLocalDateTime() : null,
+                    null // menu list는 별도 조회
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -300,19 +150,24 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.selectAll"));
+            String sql = "SELECT * FROM Store ORDER BY created_at DESC";
+            pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
+            
             while (rs.next()) {
-                StoreDTO store = new StoreDTO();
-                store.setStoreId(rs.getLong("store_id"));
-                store.setOwnerId(rs.getLong("owner_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setBusinessNumber(rs.getString("business_number"));
-                store.setAddress(rs.getString("address"));
-                store.setPhoneNumber(rs.getString("phone_number"));
-                store.setStatus(rs.getString("status"));
-                store.setBusinessVerified(rs.getBoolean("business_verified"));
-                store.setQrPath(rs.getString("qr_path"));
+                StoreDTO store = new StoreDTO(
+                    rs.getInt("store_id"),
+                    rs.getInt("owner_id"),
+                    rs.getString("store_name"),
+                    rs.getString("address"),
+                    rs.getString("region"),
+                    rs.getString("phone_number"),
+                    rs.getString("description"),
+                    rs.getString("img_src"),
+                    rs.getTimestamp("created_at") != null ? 
+                        rs.getTimestamp("created_at").toLocalDateTime() : null,
+                    null
+                );
                 stores.add(store);
             }
         } catch (SQLException e) {
@@ -324,9 +179,9 @@ public class AdminDAO {
     }
     
     /**
-     * 삭제 대기 매장 목록 조회
+     * 업주 ID로 매장 목록 조회
      */
-    public List<StoreDTO> selectDeletePendingStores() {
+    public List<StoreDTO> selectStoresByOwnerId(int ownerId) {
         List<StoreDTO> stores = new ArrayList<>();
         Connection conn = null;
         PreparedStatement pstmt = null;
@@ -334,18 +189,25 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String query = "SELECT * FROM Store WHERE status = 'DELETE_PENDING'";
-            pstmt = conn.prepareStatement(query);
+            String sql = "SELECT * FROM Store WHERE owner_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, ownerId);
             rs = pstmt.executeQuery();
+            
             while (rs.next()) {
-                StoreDTO store = new StoreDTO();
-                store.setStoreId(rs.getLong("store_id"));
-                store.setOwnerId(rs.getLong("owner_id"));
-                store.setStoreName(rs.getString("store_name"));
-                store.setBusinessNumber(rs.getString("business_number"));
-                store.setAddress(rs.getString("address"));
-                store.setPhoneNumber(rs.getString("phone_number"));
-                store.setStatus(rs.getString("status"));
+                StoreDTO store = new StoreDTO(
+                    rs.getInt("store_id"),
+                    rs.getInt("owner_id"),
+                    rs.getString("store_name"),
+                    rs.getString("address"),
+                    rs.getString("region"),
+                    rs.getString("phone_number"),
+                    rs.getString("description"),
+                    rs.getString("img_src"),
+                    rs.getTimestamp("created_at") != null ? 
+                        rs.getTimestamp("created_at").toLocalDateTime() : null,
+                    null
+                );
                 stores.add(store);
             }
         } catch (SQLException e) {
@@ -356,82 +218,206 @@ public class AdminDAO {
         return stores;
     }
     
+    // ==================== 메뉴 관리 ====================
+    
     /**
-     * 매장 상태 변경
+     * 메뉴 추가
      */
-    public int updateStoreStatus(long storeId, String status) {
+    public int insertMenu(MenuDTO menu) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.updateStatus"));
-            pstmt.setString(1, status);
-            pstmt.setLong(2, storeId);
+            String sql = "INSERT INTO Menu (store_id, menu_name, price, description, img_src, " +
+                         "category1_code, category2_code, check_rec, order_request, sold_out) " +
+                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, menu.getStoreId());
+            pstmt.setString(2, menu.getMenuName());
+            pstmt.setInt(3, menu.getPrice());
+            pstmt.setString(4, menu.getDescription());
+            pstmt.setString(5, menu.getImgSrc());
+            pstmt.setInt(6, menu.getCategory1Code());
+            pstmt.setInt(7, menu.getCategory2Code());
+            pstmt.setString(8, menu.getCheckRec() != null ? menu.getCheckRec() : "N");
+            pstmt.setString(9, menu.getOrderRequest());
+            pstmt.setString(10, menu.getSoldOut() != null ? menu.getSoldOut() : "N");
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            return 0;
         } finally {
             DbUtil.dbClose(conn, pstmt);
         }
-        return 0;
     }
     
     /**
-     * 매장 완전 삭제
+     * 메뉴 수정
      */
-    public int deleteStore(long storeId) {
+    public int updateMenu(MenuDTO menu) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         
         try {
             conn = DbUtil.getConnection();
-            String query = "DELETE FROM Store WHERE store_id = ?";
-            pstmt = conn.prepareStatement(query);
-            pstmt.setLong(1, storeId);
+            String sql = "UPDATE Menu SET menu_name = ?, price = ?, description = ?, img_src = ?, " +
+                         "category1_code = ?, category2_code = ?, check_rec = ?, order_request = ?, sold_out = ? " +
+                         "WHERE menu_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, menu.getMenuName());
+            pstmt.setInt(2, menu.getPrice());
+            pstmt.setString(3, menu.getDescription());
+            pstmt.setString(4, menu.getImgSrc());
+            
+            // category1_code - 0이면 NULL로 설정
+            if (menu.getCategory1Code() > 0) {
+                pstmt.setInt(5, menu.getCategory1Code());
+            } else {
+                pstmt.setNull(5, java.sql.Types.INTEGER);
+            }
+            
+            // category2_code - 0이면 NULL로 설정
+            if (menu.getCategory2Code() > 0) {
+                pstmt.setInt(6, menu.getCategory2Code());
+            } else {
+                pstmt.setNull(6, java.sql.Types.INTEGER);
+            }
+            
+            pstmt.setString(7, menu.getCheckRec() != null ? menu.getCheckRec() : "N");
+            pstmt.setString(8, menu.getOrderRequest());
+            pstmt.setString(9, menu.getSoldOut() != null ? menu.getSoldOut() : "N");
+            pstmt.setInt(10, menu.getMenuId());
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            return 0;
         } finally {
             DbUtil.dbClose(conn, pstmt);
         }
-        return 0;
     }
     
     /**
-     * 매장 QR 경로 업데이트
+     * 메뉴 삭제
      */
-    public int updateStoreQRPath(long storeId, String qrPath) {
+    public int deleteMenu(int menuId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.updateQR"));
-            pstmt.setString(1, qrPath);
-            pstmt.setLong(2, storeId);
+            String sql = "DELETE FROM Menu WHERE menu_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, menuId);
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            return 0;
         } finally {
             DbUtil.dbClose(conn, pstmt);
         }
-        return 0;
     }
     
     /**
-     * 매장 존재 여부 확인
+     * 메뉴 ID로 조회
      */
-    public boolean existsStoreById(long storeId) {
+    public MenuDTO selectMenuById(int menuId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.existsById"));
-            pstmt.setLong(1, storeId);
+            String sql = "SELECT * FROM Menu WHERE menu_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, menuId);
             rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                MenuDTO menu = new MenuDTO();
+                menu.setMenuId(rs.getInt("menu_id"));
+                menu.setStoreId(rs.getInt("store_id"));
+                menu.setMenuName(rs.getString("menu_name"));
+                menu.setPrice(rs.getInt("price"));
+                menu.setDescription(rs.getString("description"));
+                menu.setImgSrc(rs.getString("img_src"));
+                menu.setCategory1Code(rs.getInt("category1_code"));
+                menu.setCategory2Code(rs.getInt("category2_code"));
+                menu.setCheckRec(rs.getString("check_rec"));
+                menu.setOrderRequest(rs.getString("order_request"));
+                menu.setSoldOut(rs.getString("sold_out"));
+                if (rs.getTime("close_time") != null) {
+                    menu.setCloseTime(rs.getTime("close_time").toLocalTime());
+                }
+                return menu;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtil.dbClose(conn, pstmt, rs);
+        }
+        return null;
+    }
+    
+    /**
+     * 매장별 메뉴 목록 조회
+     */
+    public List<MenuDTO> selectMenusByStoreId(int storeId) {
+        List<MenuDTO> menus = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            String sql = "SELECT * FROM Menu WHERE store_id = ? ORDER BY menu_id";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
+            rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                MenuDTO menu = new MenuDTO();
+                menu.setMenuId(rs.getInt("menu_id"));
+                menu.setStoreId(rs.getInt("store_id"));
+                menu.setMenuName(rs.getString("menu_name"));
+                menu.setPrice(rs.getInt("price"));
+                menu.setDescription(rs.getString("description"));
+                menu.setImgSrc(rs.getString("img_src"));
+                menu.setCategory1Code(rs.getInt("category1_code"));
+                menu.setCategory2Code(rs.getInt("category2_code"));
+                menu.setCheckRec(rs.getString("check_rec"));
+                menu.setOrderRequest(rs.getString("order_request"));
+                menu.setSoldOut(rs.getString("sold_out"));
+                if (rs.getTime("close_time") != null) {
+                    menu.setCloseTime(rs.getTime("close_time").toLocalTime());
+                }
+                menus.add(menu);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtil.dbClose(conn, pstmt, rs);
+        }
+        return menus;
+    }
+    
+    /**
+     * 활성 주문에 포함된 메뉴인지 확인
+     */
+    public boolean isMenuInActiveOrders(int menuId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            String sql = "SELECT COUNT(*) FROM OrderDetail od " +
+                         "JOIN OrderTable ot ON od.order_id = ot.order_id " +
+                         "WHERE od.menu_id = ? AND ot.status = 'pending'";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, menuId);
+            rs = pstmt.executeQuery();
+            
             if (rs.next()) {
                 return rs.getInt(1) > 0;
             }
@@ -443,125 +429,54 @@ public class AdminDAO {
         return false;
     }
     
-    /**
-     * 매장 메뉴 개수 조회
-     */
-    public int countStoreMenus(long storeId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.countMenus"));
-            pstmt.setLong(1, storeId);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return 0;
-    }
-    
-    /**
-     * 매장 주문 개수 조회
-     */
-    public int countStoreOrders(long storeId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.countOrders"));
-            pstmt.setLong(1, storeId);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return 0;
-    }
-    
-    /**
-     * 매장 매출 합계 조회
-     */
-    public long sumStoreSales(long storeId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.sumSales"));
-            pstmt.setLong(1, storeId);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getLong(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return 0;
-    }
-    
-    /**
-     * 매장의 진행 중인 주문 개수 조회
-     */
-    public int countPendingOrders(long storeId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("store.countPendingOrders"));
-            pstmt.setLong(1, storeId);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return 0;
-    }
-    
     // ==================== 유저 관리 ====================
     
     /**
-     * ID로 유저 조회
+     * 유저 삭제
      */
-    public UserDTO selectUserById(long userId) {
+    public int deleteUser(int userId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            String sql = "DELETE FROM User WHERE user_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userId);
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            DbUtil.dbClose(conn, pstmt);
+        }
+    }
+    
+    /**
+     * 유저 ID로 조회
+     */
+    public UserDTO selectUserById(int userId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("user.selectById"));
-            pstmt.setLong(1, userId);
+            String sql = "SELECT * FROM User WHERE user_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, userId);
             rs = pstmt.executeQuery();
+            
             if (rs.next()) {
-                UserDTO user = new UserDTO();
-                user.setUserId(rs.getLong("user_id"));
-                user.setName(rs.getString("name"));
-                user.setEmail(rs.getString("email"));
-                user.setRole(rs.getString("role"));
-                user.setStatus(rs.getString("status"));
-                return user;
+                return new UserDTO(
+                    rs.getInt("user_id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("email"),
+                    rs.getString("role"),
+                    rs.getTimestamp("created_at") != null ? 
+                        rs.getTimestamp("created_at").toLocalDateTime() : null
+                );
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -582,15 +497,20 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("user.selectAll"));
+            String sql = "SELECT * FROM User ORDER BY created_at DESC";
+            pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
+            
             while (rs.next()) {
-                UserDTO user = new UserDTO();
-                user.setUserId(rs.getLong("user_id"));
-                user.setName(rs.getString("name"));
-                user.setEmail(rs.getString("email"));
-                user.setRole(rs.getString("role"));
-                user.setStatus(rs.getString("status"));
+                UserDTO user = new UserDTO(
+                    rs.getInt("user_id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("email"),
+                    rs.getString("role"),
+                    rs.getTimestamp("created_at") != null ? 
+                        rs.getTimestamp("created_at").toLocalDateTime() : null
+                );
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -601,545 +521,25 @@ public class AdminDAO {
         return users;
     }
     
-    /**
-     * 유저 상태 변경
-     */
-    public int updateUserStatus(long userId, String status) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("user.updateStatus"));
-            pstmt.setString(1, status);
-            pstmt.setLong(2, userId);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt);
-        }
-        return 0;
-    }
-    
-    // ==================== 메뉴 관리 ====================
+    // ==================== 주문/매출 관리 ====================
     
     /**
-     * 메뉴 추가
+     * 진행 중인 주문 개수
      */
-    public int insertMenu(MenuDTO menu) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menu.insert"));
-            pstmt.setLong(1, menu.getStoreId());
-            pstmt.setString(2, menu.getMenuName());
-            pstmt.setInt(3, menu.getPrice());
-            pstmt.setString(4, menu.getCategory());
-            pstmt.setString(5, menu.getDescription());
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt);
-        }
-        return 0;
-    }
-    
-    /**
-     * 메뉴 수정
-     */
-    public int updateMenu(MenuDTO menu) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menu.update"));
-            pstmt.setString(1, menu.getMenuName());
-            pstmt.setInt(2, menu.getPrice());
-            pstmt.setString(3, menu.getCategory());
-            pstmt.setString(4, menu.getDescription());
-            pstmt.setLong(5, menu.getMenuId());
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt);
-        }
-        return 0;
-    }
-    
-    /**
-     * 메뉴 삭제 (비활성화)
-     */
-    public int deleteMenu(long menuId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menu.delete"));
-            pstmt.setLong(1, menuId);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt);
-        }
-        return 0;
-    }
-    
-    /**
-     * ID로 메뉴 조회
-     */
-    public MenuDTO selectMenuById(long menuId) {
+    public int countPendingOrders(int storeId) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            String query = "SELECT * FROM Menu WHERE menu_id = ?";
-            pstmt = conn.prepareStatement(query);
-            pstmt.setLong(1, menuId);
+            String sql = "SELECT COUNT(*) FROM OrderTable WHERE store_id = ? AND status = 'pending'";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
             rs = pstmt.executeQuery();
-            if (rs.next()) {
-                MenuDTO menu = new MenuDTO();
-                menu.setMenuId(rs.getLong("menu_id"));
-                menu.setStoreId(rs.getLong("store_id"));
-                menu.setMenuName(rs.getString("menu_name"));
-                menu.setPrice(rs.getInt("price"));
-                menu.setCategory(rs.getString("category"));
-                menu.setDescription(rs.getString("description"));
-                return menu;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return null;
-    }
-    
-    /**
-     * 매장별 메뉴 목록 조회
-     */
-    public List<MenuDTO> selectMenusByStoreId(long storeId) {
-        List<MenuDTO> menus = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menu.selectByStoreId"));
-            pstmt.setLong(1, storeId);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                MenuDTO menu = new MenuDTO();
-                menu.setMenuId(rs.getLong("menu_id"));
-                menu.setStoreId(rs.getLong("store_id"));
-                menu.setMenuName(rs.getString("menu_name"));
-                menu.setPrice(rs.getInt("price"));
-                menu.setCategory(rs.getString("category"));
-                menu.setDescription(rs.getString("description"));
-                menus.add(menu);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return menus;
-    }
-    
-    /**
-     * 메뉴가 활성 주문에 포함되어 있는지 확인
-     */
-    public boolean isMenuInActiveOrders(long menuId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menuRequest.hasActiveOrders"));
-            pstmt.setLong(1, menuId);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return false;
-    }
-    
-    /**
-     * 활성 주문에 메뉴가 포함되어 있는지 확인
-     */
-    public boolean hasActiveOrdersWithMenu(long menuId) {
-        return isMenuInActiveOrders(menuId);
-    }
-    
-    // ==================== 메뉴 요청 관리 ====================
-    
-    /**
-     * ID로 메뉴 요청 조회
-     */
-    public MenuRequestDTO selectMenuRequestById(long requestId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menuRequest.selectById"));
-            pstmt.setLong(1, requestId);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                MenuRequestDTO request = new MenuRequestDTO();
-                request.setRequestId(rs.getLong("request_id"));
-                request.setMenuId(rs.getLong("menu_id"));
-                request.setStoreId(rs.getLong("store_id"));
-                request.setOwnerId(rs.getLong("owner_id"));
-                request.setRequestType(rs.getString("request_type"));
-                request.setMenuName(rs.getString("menu_name"));
-                request.setPrice(rs.getInt("price"));
-                request.setCategory(rs.getString("category"));
-                request.setDescription(rs.getString("description"));
-                request.setStatus(rs.getString("status"));
-                request.setCreatedAt(rs.getString("created_at"));
-                return request;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return null;
-    }
-    
-    /**
-     * 메뉴 요청 상태 변경
-     */
-    public int approveMenuRequest(long requestId, String status) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menuRequest.updateStatus"));
-            pstmt.setString(1, status);
-            pstmt.setLong(2, requestId);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt);
-        }
-        return 0;
-    }
-    
-    /**
-     * 대기 중인 메뉴 요청 목록 조회
-     */
-    public List<MenuRequestDTO> selectPendingMenuRequests() {
-        List<MenuRequestDTO> requests = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("menuRequest.selectPending"));
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                MenuRequestDTO request = new MenuRequestDTO();
-                request.setRequestId(rs.getLong("request_id"));
-                request.setMenuId(rs.getLong("menu_id"));
-                request.setStoreId(rs.getLong("store_id"));
-                request.setOwnerId(rs.getLong("owner_id"));
-                request.setRequestType(rs.getString("request_type"));
-                request.setMenuName(rs.getString("menu_name"));
-                request.setPrice(rs.getInt("price"));
-                request.setCategory(rs.getString("category"));
-                request.setDescription(rs.getString("description"));
-                request.setStatus(rs.getString("status"));
-                request.setCreatedAt(rs.getString("created_at"));
-                requests.add(request);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return requests;
-    }
-    
-    // ==================== 매장 요청 관리 ====================
-    
-    /**
-     * ID로 매장 요청 조회
-     */
-    public StoreRequestDTO selectStoreRequestById(long requestId) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("storeRequest.selectById"));
-            pstmt.setLong(1, requestId);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                StoreRequestDTO request = new StoreRequestDTO();
-                request.setRequestId(rs.getLong("request_id"));
-                request.setStoreId(rs.getLong("store_id"));
-                request.setOwnerId(rs.getLong("owner_id"));
-                request.setStoreName(rs.getString("store_name"));
-                request.setBusinessNumber(rs.getString("business_number"));
-                request.setAddress(rs.getString("address"));
-                request.setPhoneNumber(rs.getString("phone_number"));
-                request.setRequestType(rs.getString("request_type"));
-                request.setStatus(rs.getString("status"));
-                request.setCreatedAt(rs.getString("created_at"));
-                return request;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return null;
-    }
-    
-    /**
-     * 매장 요청 상태 변경
-     */
-    public int approveStoreRequest(long requestId, String status) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("storeRequest.updateStatus"));
-            pstmt.setString(1, status);
-            pstmt.setLong(2, requestId);
-            return pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt);
-        }
-        return 0;
-    }
-    
-    /**
-     * 대기 중인 매장 요청 목록 조회
-     */
-    public List<StoreRequestDTO> selectPendingStoreRequests() {
-        List<StoreRequestDTO> requests = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("storeRequest.selectPending"));
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                StoreRequestDTO request = new StoreRequestDTO();
-                request.setRequestId(rs.getLong("request_id"));
-                request.setStoreId(rs.getLong("store_id"));
-                request.setOwnerId(rs.getLong("owner_id"));
-                request.setStoreName(rs.getString("store_name"));
-                request.setBusinessNumber(rs.getString("business_number"));
-                request.setAddress(rs.getString("address"));
-                request.setPhoneNumber(rs.getString("phone_number"));
-                request.setRequestType(rs.getString("request_type"));
-                request.setStatus(rs.getString("status"));
-                request.setCreatedAt(rs.getString("created_at"));
-                requests.add(request);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return requests;
-    }
-    
-    // ==================== 승인/거절 히스토리 ====================
-    
-    /**
-     * Store 요청 히스토리 조회 (APPROVED, REJECTED 상태만)
-     */
-    public List<StoreRequestDTO> selectStoreRequestHistory(String sortOrder, int offset, int pageSize) {
-        List<StoreRequestDTO> requests = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            String order = "DESC".equals(sortOrder) ? "DESC" : "ASC";
             
-            // processed_at 컬럼 존재 여부에 따라 다른 쿼리 사용
-            String query;
-            try {
-                java.sql.DatabaseMetaData meta = conn.getMetaData();
-                java.sql.ResultSet columns = meta.getColumns(null, null, "storerequest", "processed_at");
-                boolean hasProcessedAt = columns.next();
-                columns.close();
-                
-                if (hasProcessedAt) {
-                    query = "SELECT *, COALESCE(processed_at, created_at) as display_time FROM StoreRequest WHERE status IN ('APPROVED', 'REJECTED') ORDER BY display_time " + order + " LIMIT ?, ?";
-                } else {
-                    query = "SELECT *, created_at as display_time FROM StoreRequest WHERE status IN ('APPROVED', 'REJECTED') ORDER BY display_time " + order + " LIMIT ?, ?";
-                }
-            } catch (Exception e) {
-                query = "SELECT *, created_at as display_time FROM StoreRequest WHERE status IN ('APPROVED', 'REJECTED') ORDER BY display_time " + order + " LIMIT ?, ?";
-            }
-            
-            pstmt = conn.prepareStatement(query);
-            pstmt.setInt(1, offset);
-            pstmt.setInt(2, pageSize);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                StoreRequestDTO request = new StoreRequestDTO();
-                request.setRequestId(rs.getLong("request_id"));
-                request.setStoreId(rs.getLong("store_id"));
-                request.setOwnerId(rs.getLong("owner_id"));
-                request.setStoreName(rs.getString("store_name"));
-                request.setBusinessNumber(rs.getString("business_number"));
-                request.setAddress(rs.getString("address"));
-                request.setPhoneNumber(rs.getString("phone_number"));
-                request.setRequestType(rs.getString("request_type"));
-                request.setStatus(rs.getString("status"));
-                request.setCreatedAt(rs.getString("display_time")); // 실제 처리 시간 사용
-                requests.add(request);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return requests;
-    }
-    
-    /**
-     * Menu 요청 히스토리 조회 (APPROVED, REJECTED 상태만)
-     */
-    public List<MenuRequestDTO> selectMenuRequestHistory(String sortOrder, int offset, int pageSize) {
-        List<MenuRequestDTO> requests = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            String order = "DESC".equals(sortOrder) ? "DESC" : "ASC";
-            String query = "SELECT * FROM MenuRequest WHERE status IN ('APPROVED', 'REJECTED') ORDER BY created_at " + order + " LIMIT ?, ?";
-            pstmt = conn.prepareStatement(query);
-            pstmt.setInt(1, offset);
-            pstmt.setInt(2, pageSize);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                MenuRequestDTO request = new MenuRequestDTO();
-                request.setRequestId(rs.getLong("request_id"));
-                request.setMenuId(rs.getLong("menu_id"));
-                request.setStoreId(rs.getLong("store_id"));
-                request.setOwnerId(rs.getLong("owner_id"));
-                request.setRequestType(rs.getString("request_type"));
-                request.setMenuName(rs.getString("menu_name"));
-                request.setPrice(rs.getInt("price"));
-                request.setCategory(rs.getString("category"));
-                request.setDescription(rs.getString("description"));
-                request.setStatus(rs.getString("status"));
-                request.setCreatedAt(rs.getString("created_at"));
-                requests.add(request);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return requests;
-    }
-    
-    /**
-     * Store 요청 히스토리 총 개수
-     */
-    public int countStoreRequestHistory() {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            String query = "SELECT COUNT(*) FROM StoreRequest WHERE status IN ('APPROVED', 'REJECTED')";
-            pstmt = conn.prepareStatement(query);
-            rs = pstmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return 0;
-    }
-    
-    /**
-     * Menu 요청 히스토리 총 개수
-     */
-    public int countMenuRequestHistory() {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            String query = "SELECT COUNT(*) FROM MenuRequest WHERE status IN ('APPROVED', 'REJECTED')";
-            pstmt = conn.prepareStatement(query);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
-        }
-        return 0;
-    }
-    
-    // ==================== 매출 정보 ====================
-    
-    /**
-     * 기간별 매출 합계
-     */
-    public long sumSalesByPeriod(long storeId, LocalDate startDate, LocalDate endDate) {
-        Connection conn = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        
-        try {
-            conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("sales.sumByPeriod"));
-            pstmt.setLong(1, storeId);
-            pstmt.setDate(2, Date.valueOf(startDate));
-            pstmt.setDate(3, Date.valueOf(endDate));
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getLong(1);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1152,18 +552,21 @@ public class AdminDAO {
     /**
      * 기간별 주문 개수
      */
-    public int countOrdersByPeriod(long storeId, LocalDate startDate, LocalDate endDate) {
+    public int countStoreOrders(int storeId, LocalDate startDate, LocalDate endDate) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("sales.countOrdersByPeriod"));
-            pstmt.setLong(1, storeId);
+            String sql = "SELECT COUNT(*) FROM OrderTable " +
+                         "WHERE store_id = ? AND DATE(order_date) BETWEEN ? AND ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
             pstmt.setDate(2, Date.valueOf(startDate));
             pstmt.setDate(3, Date.valueOf(endDate));
             rs = pstmt.executeQuery();
+            
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -1176,25 +579,59 @@ public class AdminDAO {
     }
     
     /**
-     * 일별 매출 조회
+     * 기간별 매출 합계
      */
-    public List<DailySalesDTO> selectDailySales(long storeId, LocalDate startDate, LocalDate endDate) {
-        List<DailySalesDTO> dailySales = new ArrayList<>();
+    public long sumStoreSales(int storeId, LocalDate startDate, LocalDate endDate) {
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("sales.selectDailySales"));
-            pstmt.setLong(1, storeId);
+            String sql = "SELECT IFNULL(SUM(total_price), 0) FROM OrderTable " +
+                         "WHERE store_id = ? AND DATE(order_date) BETWEEN ? AND ? AND status = 'completed'";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
             pstmt.setDate(2, Date.valueOf(startDate));
             pstmt.setDate(3, Date.valueOf(endDate));
             rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtil.dbClose(conn, pstmt, rs);
+        }
+        return 0;
+    }
+    
+    /**
+     * 일별 매출 조회
+     */
+    public List<Map<String, Object>> selectDailySales(int storeId, LocalDate startDate, LocalDate endDate) {
+        List<Map<String, Object>> dailySales = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            String sql = "SELECT DATE(order_date) as sale_date, SUM(total_price) as daily_total " +
+                         "FROM OrderTable " +
+                         "WHERE store_id = ? AND DATE(order_date) BETWEEN ? AND ? AND status = 'completed' " +
+                         "GROUP BY DATE(order_date) ORDER BY sale_date";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
+            pstmt.setDate(2, Date.valueOf(startDate));
+            pstmt.setDate(3, Date.valueOf(endDate));
+            rs = pstmt.executeQuery();
+            
             while (rs.next()) {
-                DailySalesDTO sales = new DailySalesDTO();
-                sales.setSaleDate(rs.getDate("sale_date").toLocalDate());
-                sales.setDailyTotal(rs.getLong("daily_total"));
+                Map<String, Object> sales = new HashMap<>();
+                sales.put("saleDate", rs.getDate("sale_date").toLocalDate());
+                sales.put("dailyTotal", rs.getLong("daily_total"));
                 dailySales.add(sales);
             }
         } catch (SQLException e) {
@@ -1208,24 +645,32 @@ public class AdminDAO {
     /**
      * 메뉴별 매출 조회
      */
-    public List<MenuSalesDTO> selectMenuSales(long storeId, LocalDate startDate, LocalDate endDate) {
-        List<MenuSalesDTO> menuSales = new ArrayList<>();
+    public List<Map<String, Object>> selectMenuSales(int storeId, LocalDate startDate, LocalDate endDate) {
+        List<Map<String, Object>> menuSales = new ArrayList<>();
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            pstmt = conn.prepareStatement(getQuery("sales.selectMenuSales"));
-            pstmt.setLong(1, storeId);
+            String sql = "SELECT m.menu_name, SUM(od.quantity) as total_quantity, SUM(od.price) as total_sales " +
+                         "FROM OrderDetail od " +
+                         "JOIN Menu m ON od.menu_id = m.menu_id " +
+                         "JOIN OrderTable ot ON od.order_id = ot.order_id " +
+                         "WHERE m.store_id = ? AND DATE(ot.order_date) BETWEEN ? AND ? AND ot.status = 'completed' " +
+                         "GROUP BY m.menu_id, m.menu_name " +
+                         "ORDER BY total_sales DESC";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
             pstmt.setDate(2, Date.valueOf(startDate));
             pstmt.setDate(3, Date.valueOf(endDate));
             rs = pstmt.executeQuery();
+            
             while (rs.next()) {
-                MenuSalesDTO sales = new MenuSalesDTO();
-                sales.setMenuName(rs.getString("menu_name"));
-                sales.setTotalQuantity(rs.getInt("total_quantity"));
-                sales.setTotalSales(rs.getLong("total_sales"));
+                Map<String, Object> sales = new HashMap<>();
+                sales.put("menuName", rs.getString("menu_name"));
+                sales.put("totalQuantity", rs.getInt("total_quantity"));
+                sales.put("totalSales", rs.getLong("total_sales"));
                 menuSales.add(sales);
             }
         } catch (SQLException e) {
@@ -1236,45 +681,151 @@ public class AdminDAO {
         return menuSales;
     }
     
-    // ==================== 대시보드 통계 ====================
+    // ==================== 테이블별 QR 관리 ====================
     
     /**
-     * 대시보드 통계 데이터 조회
+     * 매장 테이블 목록 조회 (QR 정보 포함)
      */
-    public Map<String, Integer> getDashboardStats() {
-        Map<String, Integer> stats = new HashMap<>();
+    public List<Map<String, Object>> selectStoreTables(int storeId) {
+        List<Map<String, Object>> tables = new ArrayList<>();
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
         
         try {
             conn = DbUtil.getConnection();
-            
-            // 전체 매장 수
-            pstmt = conn.prepareStatement(getQuery("dashboard.totalStores"));
+            String sql = "SELECT st.table_id, st.table_no, st.store_id, s.store_name, " +
+                         "q.qrcode_data, q.qr_img_src, q.created_at " +
+                         "FROM StoreTable st " +
+                         "JOIN Store s ON st.store_id = s.store_id " +
+                         "LEFT JOIN QRCode q ON st.table_id = q.table_id " +
+                         "WHERE st.store_id = ? " +
+                         "ORDER BY st.table_id";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, storeId);
             rs = pstmt.executeQuery();
-            if (rs.next()) stats.put("totalStores", rs.getInt(1));
             
-            // 전체 유저 수
-            pstmt = conn.prepareStatement(getQuery("dashboard.totalUsers"));
-            rs = pstmt.executeQuery();
-            if (rs.next()) stats.put("totalUsers", rs.getInt(1));
-            
-            // 대기 중인 매장 요청 수
-            pstmt = conn.prepareStatement(getQuery("dashboard.pendingStoreRequests"));
-            rs = pstmt.executeQuery();
-            if (rs.next()) stats.put("pendingStoreRequests", rs.getInt(1));
-            
-            // 대기 중인 메뉴 요청 수
-            pstmt = conn.prepareStatement(getQuery("dashboard.pendingMenuRequests"));
-            rs = pstmt.executeQuery();
-            if (rs.next()) stats.put("pendingMenuRequests", rs.getInt(1));
-            
+            while (rs.next()) {
+                Map<String, Object> table = new HashMap<>();
+                table.put("tableId", rs.getInt("table_id"));
+                table.put("tableNo", rs.getString("table_no"));
+                table.put("storeId", rs.getInt("store_id"));
+                table.put("storeName", rs.getString("store_name"));
+                table.put("qrcodeData", rs.getString("qrcode_data"));
+                table.put("qrImgSrc", rs.getString("qr_img_src"));
+                table.put("createdAt", rs.getTimestamp("created_at"));
+                tables.add(table);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
             DbUtil.dbClose(conn, pstmt, rs);
         }
-        return stats;
+        return tables;
+    }
+    
+    /**
+     * 테이블별 QR 코드 생성/업데이트
+     */
+    public int upsertTableQRCode(int tableId, String qrcodeData, String qrImgSrc) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            
+            // UPSERT (INSERT or UPDATE)
+            String sql = "INSERT INTO QRCode (table_id, qrcode_data, qr_img_src) " +
+                         "VALUES (?, ?, ?) " +
+                         "ON DUPLICATE KEY UPDATE " +
+                         "qrcode_data = VALUES(qrcode_data), " +
+                         "qr_img_src = VALUES(qr_img_src), " +
+                         "created_at = CURRENT_TIMESTAMP";
+            
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, tableId);
+            pstmt.setString(2, qrcodeData);
+            pstmt.setString(3, qrImgSrc);
+            
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        } finally {
+            DbUtil.dbClose(conn, pstmt);
+        }
+    }
+    
+    /**
+     * 테이블 정보 조회
+     */
+    public Map<String, Object> selectTableById(int tableId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            String sql = "SELECT st.table_id, st.table_no, st.store_id, s.store_name " +
+                         "FROM StoreTable st " +
+                         "JOIN Store s ON st.store_id = s.store_id " +
+                         "WHERE st.table_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, tableId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                Map<String, Object> table = new HashMap<>();
+                table.put("tableId", rs.getInt("table_id"));
+                table.put("tableNo", rs.getString("table_no"));
+                table.put("storeId", rs.getInt("store_id"));
+                table.put("storeName", rs.getString("store_name"));
+                return table;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtil.dbClose(conn, pstmt, rs);
+        }
+        return null;
+    }
+    
+    /**
+     * 테이블별 QR 코드 조회
+     */
+    public Map<String, Object> selectQRCodeByTableId(int tableId) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        
+        try {
+            conn = DbUtil.getConnection();
+            String sql = "SELECT q.*, st.table_no, s.store_name, s.store_id " +
+                         "FROM QRCode q " +
+                         "JOIN StoreTable st ON q.table_id = st.table_id " +
+                         "JOIN Store s ON st.store_id = s.store_id " +
+                         "WHERE q.table_id = ?";
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, tableId);
+            rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                Map<String, Object> qrCode = new HashMap<>();
+                qrCode.put("qrcodeId", rs.getInt("qrcode_id"));
+                qrCode.put("tableId", rs.getInt("table_id"));
+                qrCode.put("tableNo", rs.getString("table_no"));
+                qrCode.put("storeId", rs.getInt("store_id"));
+                qrCode.put("storeName", rs.getString("store_name"));
+                qrCode.put("qrcodeData", rs.getString("qrcode_data"));
+                qrCode.put("qrImgSrc", rs.getString("qr_img_src"));
+                qrCode.put("createdAt", rs.getTimestamp("created_at"));
+                return qrCode;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DbUtil.dbClose(conn, pstmt, rs);
+        }
+        return null;
     }
 }

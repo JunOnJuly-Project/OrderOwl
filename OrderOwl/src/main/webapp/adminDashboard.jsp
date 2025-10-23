@@ -56,7 +56,7 @@
 					<h2 class="text-2xl font-bold mb-6">대시보드</h2>
 
 					<!-- 통계 카드 -->
-					<div class="grid grid-cols-3 gap-4 mb-6">
+					<div class="grid grid-cols-2 gap-4 mb-6">
 						<div class="bg-white rounded-xl p-6 shadow-sm">
 							<p class="text-sm text-gray-600">전체 매장</p>
 							<p class="text-2xl font-bold mt-2" id="statStores">0</p>
@@ -65,78 +65,20 @@
 							<p class="text-sm text-gray-600">전체 유저</p>
 							<p class="text-2xl font-bold mt-2" id="statUsers">0</p>
 						</div>
-						<div class="bg-white rounded-xl p-6 shadow-sm">
-							<p class="text-sm text-gray-600">매장 대기 요청</p>
-							<p class="text-2xl font-bold mt-2 text-orange-600"
-								id="statStoreRequests">0</p>
-						</div>
-
 					</div>
 
-					<!-- 삭제 대기 매장 섹션 -->
-					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-						<h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-							<span
-								class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-medium"
-								id="statDeletePending">0</span> 삭제 대기 중인 매장
-						</h3>
-						<div id="deletePendingStoreList"></div>
-					</div>
-
-					<!-- 매장 가입 요청 -->
-					<div class="bg-white rounded-xl p-6 shadow-sm mb-6">
-						<h3 class="text-lg font-semiboald mb-4 flex items-center gap-2">
-							<span
-								class="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-sm font-medium"
-								id="statStoreRequestsBadge">0</span> 대기 중인 매장 요청
-						</h3>
-						<div id="storeRequestList"></div>
-					</div>
-
-					<!-- 승인/거절 히스토리 -->
+					<!-- 최근 등록 매장 -->
 					<div class="bg-white rounded-xl p-6 shadow-sm">
-						<div class="flex justify-between items-center mb-4">
-							<h3 class="text-lg font-semibold">승인/거절 히스토리</h3>
-							<div class="flex gap-2">
-								 <select id="historyTypeFilter"
-									class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
-									<option value="STORE">매장</option>
-									<!-- MENU 옵션 제거 -->
-								</select> <select id="historySortOrder"
-									class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
-									<option value="DESC">최신순</option>
-									<option value="ASC">오래된순</option>
-								</select>
-								<button onclick="loadApprovalHistory()"
-									class="px-4 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">
-									조회</button>
-							</div>
+						<h3 class="text-lg font-semibold mb-4">최근 등록된 매장</h3>
+						<div id="recentStoreList">
+							<p class="text-gray-500 text-center py-8">매장 정보를 불러오는 중...</p>
 						</div>
-						<div id="approvalHistoryList"></div>
-						<div id="historyPagination" class="mt-4 flex justify-center gap-2"></div>
 					</div>
 				</div>
 
 				<!-- 매장 관리 -->
 				<div id="stores" class="tab-content hidden">
 					<h2 class="text-2xl font-bold mb-6">매장 관리</h2>
-
-					<!-- 상태별 필터 버튼 -->
-					<div class="bg-white rounded-xl p-4 shadow-sm mb-4">
-						// 필터 버튼 UI 수정 (HTML 부분)
-						<div class="flex gap-2">
-							<button onclick="filterStores('ALL')"
-								class="filter-btn px-4 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium">
-								전체</button>
-							<button onclick="filterStores('ACTIVE')"
-								class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
-								운영중</button>
-							<!-- PENDING 버튼 제거 -->
-							<button onclick="filterStores('DELETE_PENDING')"
-								class="filter-btn px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">
-								삭제대기</button>
-						</div>
-					</div>
 
 					<div class="bg-white rounded-xl shadow-sm overflow-hidden">
 						<table class="w-full">
@@ -148,16 +90,9 @@
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">업주
 										ID</th>
 									<th
-										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">메뉴
-										수</th>
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">지역</th>
 									<th
-										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">총
-										주문</th>
-									<th
-										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">총
-										매출</th>
-									<th
-										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">상태</th>
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">전화번호</th>
 									<th
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
 								</tr>
@@ -185,9 +120,6 @@
 						<div class="bg-white rounded-xl p-6 shadow-sm">
 							<div class="flex justify-between items-center mb-4">
 								<h3 class="text-lg font-semibold">메뉴 목록</h3>
-								<button onclick="showAddMenuModal()"
-									class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-									➕ 메뉴 추가</button>
 							</div>
 
 							<div class="overflow-x-auto">
@@ -196,8 +128,6 @@
 										<tr>
 											<th
 												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">메뉴명</th>
-											<th
-												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">카테고리</th>
 											<th
 												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">가격</th>
 											<th
@@ -305,150 +235,25 @@
 		</div>
 	</div>
 
-	<!-- 매장 상세 모달 -->
-	<div id="storeModal"
-		class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-		<div
-			class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-			<h3 class="text-xl font-bold mb-4" id="modalStoreTitle"></h3>
-			<div class="space-y-4">
-				<div class="grid grid-cols-2 gap-4">
-					<div>
-						<p class="text-sm text-gray-600">업주 ID</p>
-						<p class="font-medium" id="modalStoreOwner"></p>
-					</div>
-					<div>
-						<p class="text-sm text-gray-600">사업자 번호</p>
-						<p class="font-medium" id="modalBusinessNumber"></p>
-					</div>
-					<div>
-						<p class="text-sm text-gray-600">주소</p>
-						<p class="font-medium" id="modalAddress"></p>
-					</div>
-					<div>
-						<p class="text-sm text-gray-600">전화번호</p>
-						<p class="font-medium" id="modalPhone"></p>
-					</div>
-					<div>
-						<p class="text-sm text-gray-600">메뉴 수</p>
-						<p class="font-medium" id="modalMenuCount"></p>
-					</div>
-					<div>
-						<p class="text-sm text-gray-600">총 주문</p>
-						<p class="font-medium" id="modalTotalOrders"></p>
-					</div>
-					<div class="col-span-2">
-						<p class="text-sm text-gray-600">총 매출</p>
-						<p class="font-medium text-lg" id="modalStoreSales"></p>
-					</div>
-				</div>
-				<div class="flex gap-3 mt-6">
-					<button onclick="viewStoreSalesModal()"
-						class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-						💰 매출 상세</button>
-					<button onclick="editStoreModal()"
-						class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-						✏️ 매장 수정</button>
-					<button onclick="deleteStoreModal()"
-						class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-						🗑️ 매장 삭제</button>
-					<button onclick="closeModal()"
-						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-						닫기</button>
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- 매장 수정 모달 -->
-	<div id="editStoreModal"
-		class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-		<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
-			<h3 class="text-xl font-bold mb-4">매장 정보 수정</h3>
-			<form id="editStoreForm">
-				<input type="hidden" id="editStoreId" name="storeId">
-
-				<div class="space-y-4">
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">매장명
-							*</label> <input type="text" id="editStoreName" name="storeName" required
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-					</div>
-
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">사업자
-							번호 (수정 불가)</label> <input type="text" id="editBusinessNumber"
-							name="businessNumber" disabled
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100">
-					</div>
-
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">주소
-							*</label> <input type="text" id="editAddress" name="address" required
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-					</div>
-
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">전화번호
-							*</label> <input type="tel" id="editPhoneNumber" name="phoneNumber"
-							required
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-					</div>
-
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">상태
-							*</label> <select id="editStatus" name="status" required
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-							<option value="ACTIVE">운영중</option>
-							<option value="INACTIVE">비활성</option>
-						</select>
-					</div>
-				</div>
-
-				<div class="flex gap-3 mt-6">
-					<button type="submit"
-						class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-						저장</button>
-					<button type="button" onclick="closeEditStoreModal()"
-						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-						취소</button>
-				</div>
-			</form>
-		</div>
-	</div>
-
 	<!-- 메뉴 추가/수정 모달 -->
 	<div id="menuModal"
 		class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 		<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
 			<h3 class="text-xl font-bold mb-4" id="menuModalTitle">메뉴 추가</h3>
 			<form id="menuForm">
-				<input type="hidden" id="menuId" name="menuId"> <input
-					type="hidden" id="menuStoreId" name="storeId">
+				<input type="hidden" id="menuId" name="menuId"> 
+				<input type="hidden" id="menuStoreId" name="storeId">
 
 				<div class="space-y-4">
 					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">메뉴명
-							*</label> <input type="text" id="menuName" name="menuName" required
+						<label class="block text-sm font-medium text-gray-700 mb-2">메뉴명 *</label> 
+						<input type="text" id="menuName" name="menuName" required
 							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
 					</div>
 
 					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">카테고리
-							*</label> <select id="menuCategory" name="category" required
-							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-							<option value="">선택하세요</option>
-							<option value="메인메뉴">메인메뉴</option>
-							<option value="사이드메뉴">사이드메뉴</option>
-							<option value="음료">음료</option>
-							<option value="디저트">디저트</option>
-						</select>
-					</div>
-
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">가격
-							(원) *</label> <input type="number" id="menuPrice" name="price" required
-							min="0"
+						<label class="block text-sm font-medium text-gray-700 mb-2">가격 (원) *</label> 
+						<input type="number" id="menuPrice" name="price" required min="0"
 							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
 					</div>
 
@@ -472,13 +277,11 @@
 	</div>
 
 	<script>
-let currentStoreId = null;
+// ==================== 전역 변수 ====================
 let currentMenuStoreId = null;
-let stores = [];
-let users = [];
-let currentFilter = 'ALL';
 let isEditMode = false;
 
+// ==================== 초기화 ====================
 $(document).ready(function() {
     console.log('✅ 페이지 로드 완료');
     loadData();
@@ -492,6 +295,7 @@ function initDatePickers() {
     $('#endDate').val(today);
 }
 
+// ==================== 탭 전환 ====================
 function showTab(tab) {
     $('.tab-content').addClass('hidden');
     $('#' + tab).removeClass('hidden');
@@ -500,60 +304,19 @@ function showTab(tab) {
     event.target.classList.remove('text-gray-700');
     event.target.classList.add('bg-blue-50', 'text-blue-600');
     
-    if (tab === 'sales') {
-        loadStoresForSales();
-    } else if (tab === 'menus') {
-        if (stores.length > 0) {
-            updateMenuStoreSelect();
-        } else {
-            loadStores();
-            setTimeout(updateMenuStoreSelect, 500);
-        }
+    // 탭 전환 시 데이터 로드
+    if (tab === 'stores') {
+        loadStoreList();
     } else if (tab === 'qr') {
         loadQRCodes();
+    } else if (tab === 'menus') {
+        loadStoreListForMenus();
+    } else if (tab === 'sales') {
+        loadStoreListForSales();
     }
 }
 
-//상태별 필터 버튼에서 PENDING 제거
-function filterStores(status) {
-    currentFilter = status;
-    
-    $('.filter-btn').removeClass('bg-blue-500 text-white').addClass('bg-gray-100 text-gray-700');
-    event.target.classList.remove('bg-gray-100', 'text-gray-700');
-    event.target.classList.add('bg-blue-500', 'text-white');
-    
-    displayFilteredStores();
-}
-
-
-function displayFilteredStores() {
-    let filteredStores = stores;
-    
-    if (currentFilter !== 'ALL') {
-        filteredStores = stores.filter(s => s.status === currentFilter);
-    }
-    
-    let html = '';
-    if (filteredStores.length === 0) {
-        html = '<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">해당 상태의 매장이 없습니다</td></tr>';
-    } else {
-        filteredStores.forEach(function(store) {
-            html += '<tr class="border-t hover:bg-gray-50">';
-            html += '<td class="px-6 py-4">' + (store.storeName || '-') + '</td>';
-            html += '<td class="px-6 py-4">' + (store.ownerId || '-') + '</td>';
-            html += '<td class="px-6 py-4">' + (store.menuCount || 0) + '</td>';
-            html += '<td class="px-6 py-4">' + (store.totalOrders || 0) + '</td>';
-            html += '<td class="px-6 py-4">₩' + (store.totalSales || 0).toLocaleString() + '</td>';
-            html += '<td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs font-medium ' + getStatusClass(store.status) + '">' + getStatusText(store.status) + '</span></td>';
-            html += '<td class="px-6 py-4"><button onclick="viewStoreDetail(' + store.storeId + ')" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">상세</button></td>';
-            html += '</tr>';
-        });
-    }
-    $('#storeTable').html(html);
-    
-    console.log('✅ 필터 적용: ' + currentFilter + ' (' + filteredStores.length + '개 매장)');
-}
-
+// ==================== API 호출 ====================
 function callAPI(methodName, params, callback) {
     console.log('🔵 API 호출:', methodName, params);
     $('#loading').removeClass('hidden');
@@ -573,580 +336,106 @@ function callAPI(methodName, params, callback) {
             console.error('Status:', status);
             console.error('Error:', error);
             console.error('Response:', xhr.responseText);
-            alert('서버 오류가 발생했습니다: ' + error + '\n자세한 내용은 콘솔을 확인하세요.');
+            alert('서버 오류가 발생했습니다: ' + error);
         }
     });
 }
 
+// ==================== 데이터 로딩 ====================
 function loadData() {
     console.log('📊 데이터 로딩 시작...');
-    loadStoreRequests();
-    loadApprovalHistory();
-    loadStores();
-    loadUsers();
-    loadDeletePendingStores();
+    loadDashboardStats();
 }
 
-function loadDeletePendingStores() {
-    callAPI('getDeletePendingStores', {}, function(res) {
+// ==================== 대시보드 ====================
+function loadDashboardStats() {
+    // 매장 수 조회
+    callAPI('getStoreList', {}, function(res) {
+        if (res && res.success) {
+            $('#statStores').text(res.data.length);
+            
+            // 최근 매장 표시
+            let html = '';
+            if (res.data.length === 0) {
+                html = '<p class="text-gray-500 text-center py-8">등록된 매장이 없습니다</p>';
+            } else {
+                let recentStores = res.data.slice(0, 5);
+                html = '<div class="space-y-2">';
+                recentStores.forEach(function(store) {
+                    html += '<div class="flex justify-between items-center py-3 border-b">';
+                    html += '<div>';
+                    html += '<p class="font-medium">' + store.storeName + '</p>';
+                    html += '<p class="text-sm text-gray-500">' + (store.region || '') + '</p>';
+                    html += '</div>';
+                    html += '<span class="text-sm text-gray-500">ID: ' + store.storeId + '</span>';
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+            $('#recentStoreList').html(html);
+        }
+    });
+    
+    // 유저 수 조회
+    callAPI('getUserList', {}, function(res) {
+        if (res && res.success) {
+            $('#statUsers').text(res.data.length);
+        }
+    });
+}
+
+// ==================== 매장 관리 ====================
+function loadStoreList() {
+    callAPI('getStoreList', {}, function(res) {
         if (res && res.success) {
             let stores = res.data || [];
-            $('#statDeletePending').text(stores.length);
             
             let html = '';
             if (stores.length === 0) {
-                html = '<p class="text-gray-500 text-center py-4">삭제 대기 중인 매장이 없습니다</p>';
+                html = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">등록된 매장이 없습니다</td></tr>';
             } else {
                 stores.forEach(function(store) {
-                    html += '<div class="flex items-center justify-between p-4 bg-red-50 border border-red-200 rounded-lg mb-3">';
-                    html += '<div>';
-                    html += '<p class="font-medium text-red-900">' + (store.storeName || '-') + '</p>';
-                    html += '<p class="text-sm text-red-700">사업자번호: ' + (store.businessNumber || '-') + '</p>';
-                    html += '<p class="text-sm text-red-700">전화번호: ' + (store.phoneNumber || '-') + '</p>';
-                    html += '</div>';
-                    html += '<div class="flex gap-2">';
-                    html += '<button onclick="approveStoreDeletion(' + store.storeId + ')" class="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700">최종 삭제</button>';
-                    html += '<button onclick="cancelStoreDeletion(' + store.storeId + ')" class="px-3 py-1.5 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600">취소</button>';
-                    html += '</div>';
-                    html += '</div>';
+                    html += '<tr class="border-b hover:bg-gray-50">';
+                    html += '<td class="px-6 py-4">' + store.storeName + '</td>';
+                    html += '<td class="px-6 py-4">' + store.ownerId + '</td>';
+                    html += '<td class="px-6 py-4">' + (store.region || '-') + '</td>';
+                    html += '<td class="px-6 py-4">' + (store.phoneNumber || '-') + '</td>';
+                    html += '<td class="px-6 py-4">';
+                    html += '<button onclick="deleteStore(' + store.storeId + ')" class="text-red-500 hover:text-red-700">삭제</button>';
+                    html += '</td>';
+                    html += '</tr>';
                 });
             }
-            $('#deletePendingStoreList').html(html);
+            $('#storeTable').html(html);
+            
+            console.log('✅ 매장 목록 갱신 완료: ' + stores.length + '개 매장');
         }
     });
 }
 
-function approveStoreDeletion(storeId) {
-    if (!confirm('정말 이 매장을 완전히 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
+function deleteStore(storeId) {
+    if (!confirm('이 매장을 삭제하시겠습니까?')) return;
     
-    callAPI('approveStoreDeletion', {storeId: storeId}, function(res) {
+    callAPI('deleteStore', {storeId: storeId}, function(res) {
         alert(res.message || '처리되었습니다.');
         if (res.success) {
-            loadDeletePendingStores();
-            loadStores();
-            updateDashboardStats();
+            loadStoreList();
+            loadDashboardStats();
         }
     });
 }
 
-function cancelStoreDeletion(storeId) {
-    if (!confirm('매장 삭제를 취소하고 다시 활성화하시겠습니까?')) return;
-    
-    callAPI('cancelStoreDeletion', {storeId: storeId}, function(res) {
-        alert(res.message || '처리되었습니다.');
-        if (res.success) {
-            loadDeletePendingStores();
-            loadStores();
-            updateDashboardStats();
-        }
-    });
-}
-
-// ==================== 매장 요청 거절 기능 추가 ====================
-
-function loadStoreRequests() {
-    callAPI('getStoreRequests', {}, function(res) {
-        let requests = res && res.data ? res.data : [];
-        $('#statStoreRequests').text(requests.length);
-        $('#statStoreRequestsBadge').text(requests.length);
-        
-        let html = '';
-        if (requests.length === 0) {
-            html = '<p class="text-gray-500 text-center py-4">대기 중인 요청이 없습니다</p>';
-        } else {
-            requests.forEach(function(req) {
-                html += '<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg mb-3">';
-                html += '<div>';
-                html += '<p class="font-medium">' + (req.storeName || '-') + '</p>';
-                html += '<p class="text-sm text-gray-600">사업자번호: ' + (req.businessNumber || '-') + '</p>';
-                html += '<p class="text-sm text-gray-600">전화번호: ' + (req.phoneNumber || '-') + '</p>';
-                html += '<p class="text-sm text-gray-600">요청타입: ' + (req.requestType === 'ADD' ? '등록' : '수정') + '</p>';
-                html += '</div>';
-                html += '<div class="flex gap-2">';
-                html += '<button onclick="approveStoreRequest(' + req.requestId + ', \'' + req.requestType + '\')" class="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600">승인</button>';
-                html += '<button onclick="rejectStoreRequest(' + req.requestId + ', \'' + req.requestType + '\')" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">거절</button>';
-                html += '</div>';
-                html += '</div>';
-            });
-        }
-        $('#storeRequestList').html(html);
-        
-        console.log('✅ 매장 요청 목록 갱신 완료: ' + requests.length + '개 요청');
-    });
-}
-
-function rejectStoreRequest(requestId, requestType) {
-    let reason = prompt('거절 사유를 입력해주세요:');
-    
-    if (reason === null || reason.trim() === '') {
-        alert('거절 사유를 입력해주세요.');
-        return;
-    }
-    
-    if (!confirm('정말 이 요청을 거절하시겠습니까?')) return;
-    
-    let methodName = '';
-    if (requestType === 'ADD') {
-        methodName = 'rejectStoreInfoAddRequest';
-    } else if (requestType === 'UPDATE') {
-        methodName = 'rejectStoreInfoUpdateRequest';
-    } else {
-        alert('지원하지 않는 요청 타입입니다.');
-        return;
-    }
-    
-    callAPI(methodName, {requestId: requestId, reason: reason}, function(res) {
-        alert(res.message || '처리되었습니다.');
-        if (res.success) {
-            console.log('✅ 매장 요청 거절 성공, 데이터 갱신 시작...');
-            loadStoreRequests();
-            loadApprovalHistory();
-        }
-    });
-}
-
-// ========== 승인/거절 히스토리 ==========
-
-let currentHistoryPage = 1;
-const historyPageSize = 10;
-
-//히스토리 로드 함수 수정
-function loadApprovalHistory(page = 1) {
-    currentHistoryPage = page;
-    
-    // 타입을 항상 STORE로 고정
-    let type = 'STORE';
-    let sortOrder = $('#historySortOrder').val() || 'DESC';
-    
-    callAPI('getApprovalHistory', {
-        type: type,
-        sortOrder: sortOrder,
-        page: page,
-        pageSize: historyPageSize
-    }, function(res) {
-        if (res && res.success) {
-            let histories = res.data || [];
-            let totalCount = res.totalCount || 0;
-            
-            displayApprovalHistory(histories);
-            displayHistoryPagination(totalCount);
-        } else {
-            $('#approvalHistoryList').html('<p class="text-gray-500 text-center py-4">히스토리를 불러올 수 없습니다</p>');
-        }
-    });
-}
-
-function displayApprovalHistory(histories) {
-    let html = '';
-    
-    if (histories.length === 0) {
-        html = '<p class="text-gray-500 text-center py-4">승인/거절 히스토리가 없습니다</p>';
-    } else {
-        html += '<div class="space-y-3">';
-        histories.forEach(function(h) {
-            let statusClass = h.status === 'APPROVED' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-            let statusText = h.status === 'APPROVED' ? '승인' : '거절';
-            let typeText = h.type === 'STORE' ? '매장' : '메뉴';
-            
-            // requestType 텍스트 변환
-            let requestTypeText = '';
-            if (h.requestType === 'ADD') requestTypeText = '등록';
-            else if (h.requestType === 'UPDATE') requestTypeText = '수정';
-            else if (h.requestType === 'DELETE') requestTypeText = '삭제';
-            
-            html += '<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">';
-            html += '<div class="flex-1">';
-            html += '<div class="flex items-center gap-2 mb-1">';
-            html += '<span class="px-2 py-0.5 text-xs font-medium rounded ' + statusClass + '">' + statusText + '</span>';
-            html += '<span class="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded">' + typeText + '</span>';
-            if (requestTypeText) {
-                html += '<span class="px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 rounded">' + requestTypeText + '</span>';
-            }
-            html += '</div>';
-            html += '<p class="font-medium text-sm">' + (h.name || '-') + '</p>';
-            html += '</div>';
-            html += '<div class="text-right text-xs text-gray-500">';
-            html += '<p>' + formatDateTime(h.processedAt) + '</p>';
-            html += '</div>';
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    
-    $('#approvalHistoryList').html(html);
-}
-
-function displayHistoryPagination(totalCount) {
-    let totalPages = Math.ceil(totalCount / historyPageSize);
-    
-    if (totalPages <= 1) {
-        $('#historyPagination').html('');
-        return;
-    }
-    
-    let html = '';
-    
-    // 이전 버튼
-    if (currentHistoryPage > 1) {
-        html += '<button onclick="loadApprovalHistory(' + (currentHistoryPage - 1) + ')" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">이전</button>';
-    }
-    
-    // 페이지 번호
-    let startPage = Math.max(1, currentHistoryPage - 2);
-    let endPage = Math.min(totalPages, currentHistoryPage + 2);
-    
-    for (let i = startPage; i <= endPage; i++) {
-        let activeClass = i === currentHistoryPage ? 'bg-blue-500 text-white' : 'bg-white border border-gray-300 hover:bg-gray-50';
-        html += '<button onclick="loadApprovalHistory(' + i + ')" class="px-3 py-1 rounded ' + activeClass + '">' + i + '</button>';
-    }
-    
-    // 다음 버튼
-    if (currentHistoryPage < totalPages) {
-        html += '<button onclick="loadApprovalHistory(' + (currentHistoryPage + 1) + ')" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50">다음</button>';
-    }
-    
-    $('#historyPagination').html(html);
-}
-
-function formatDateTime(dateStr) {
-    if (!dateStr) return '-';
-    let date = new Date(dateStr);
-    let year = date.getFullYear();
-    let month = String(date.getMonth() + 1).padStart(2, '0');
-    let day = String(date.getDate()).padStart(2, '0');
-    let hours = String(date.getHours()).padStart(2, '0');
-    let minutes = String(date.getMinutes()).padStart(2, '0');
-    return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
-}
-
-function loadStores() {
+//==================== 메뉴 관리 ====================
+function loadStoreListForMenus() {
     callAPI('getStoreList', {}, function(res) {
         if (res && res.success) {
-            stores = res.data ? res.data : [];
-            
-            let activeStoresCount = stores.filter(s => s.status !== 'PENDING').length;
-            $('#statStores').text(activeStoresCount);
-            
-            displayFilteredStores();
-            
-            console.log('✅ 매장 목록 갱신 완료: ' + stores.length + '개 매장 (활성: ' + activeStoresCount + '개)');
-        } else {
-            console.error('❌ 매장 목록 로드 실패:', res);
+            let html = '<option value="">매장을 선택하세요</option>';
+            res.data.forEach(function(store) {
+                html += '<option value="' + store.storeId + '">' + store.storeName + '</option>';
+            });
+            $('#menuStoreSelect').html(html);
         }
     });
-}
-
-function getStatusClass(status) {
-    switch(status) {
-        case 'ACTIVE': return 'bg-green-100 text-green-800';
-        case 'PENDING': return 'bg-yellow-100 text-yellow-800';
-        case 'DELETE_PENDING': return 'bg-red-100 text-red-800';
-        case 'INACTIVE': return 'bg-gray-100 text-gray-800';
-        default: return 'bg-gray-100 text-gray-800';
-    }
-}
-
-function getStatusText(status) {
-    switch(status) {
-        case 'ACTIVE': return '운영중';
-        case 'PENDING': return '대기중';
-        case 'DELETE_PENDING': return '삭제대기';
-        case 'INACTIVE': return '비활성';
-        default: return status;
-    }
-}
-
-function loadUsers() {
-    callAPI('getUserList', {}, function(res) {
-        users = res && res.data ? res.data : [];
-        $('#statUsers').text(users.length);
-    });
-}
-
-function approveStoreRequest(requestId, requestType) {
-    if (!confirm('매장 요청을 승인하시겠습니까?')) return;
-    
-    let methodName = 'approveStoreInfoAddRequest';
-    if (requestType === 'UPDATE') {
-        methodName = 'approveStoreInfoUpdateRequest';
-    }
-    
-    callAPI(methodName, {requestId: requestId}, function(res) {
-        alert(res.message || '처리되었습니다.');
-        if (res.success) {
-            console.log('✅ 매장 요청 승인 성공, 데이터 갱신 시작...');
-            closePendingModal();
-            loadStoreRequests();
-            loadStores();
-            updateDashboardStats();
-            updateSalesStoreSelect();
-        }
-    });
-}
-
-function updateDashboardStats() {
-    $('#statStores').text(stores.length);
-    $('#statUsers').text(users.length);
-}
-
-function viewStoreDetail(storeId) {
-    if (storeId < 0) {
-        showPendingStoreModal(-storeId);
-        return;
-    }
-    
-    callAPI('getStoreInfo', {storeId: storeId}, function(res) {
-        if (res && res.success && res.data) {
-            currentStoreId = storeId;
-            let store = res.data;
-            $('#modalStoreTitle').text((store.storeName || '매장') + ' 상세 정보');
-            $('#modalStoreOwner').text(store.ownerId || '-');
-            $('#modalBusinessNumber').text(store.businessNumber || '-');
-            $('#modalAddress').text(store.address || '-');
-            $('#modalPhone').text(store.phoneNumber || '-');
-            $('#modalMenuCount').text((store.menuCount || 0) + '개');
-            $('#modalTotalOrders').text((store.totalOrders || 0) + '건');
-            $('#modalStoreSales').text('₩' + (store.totalSales || 0).toLocaleString());
-            $('#storeModal').removeClass('hidden');
-        } else {
-            alert('매장 정보를 불러올 수 없습니다.');
-        }
-    });
-}
-
-function showPendingStoreModal(requestId) {
-    let store = stores.find(s => s.storeId === -requestId);
-    if (!store) {
-        alert('매장 요청 정보를 찾을 수 없습니다.');
-        return;
-    }
-    
-    let modalHtml = `
-        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="pendingStoreModal">
-            <div class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4">
-                <h3 class="text-xl font-bold mb-4">매장 등록 요청 - ${store.storeName}</h3>
-                <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <p class="text-sm text-gray-600">업주 ID</p>
-                            <p class="font-medium">${store.ownerId || '-'}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">사업자 번호</p>
-                            <p class="font-medium">${store.businessNumber || '-'}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">주소</p>
-                            <p class="font-medium">${store.address || '-'}</p>
-                        </div>
-                        <div>
-                            <p class="text-sm text-gray-600">전화번호</p>
-                            <p class="font-medium">${store.phoneNumber || '-'}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 mt-6">
-                        <button onclick="approveStoreRequest(${requestId}, 'ADD')" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-                            승인
-                        </button>
-                        <button onclick="rejectStoreRequest(${requestId}, 'ADD')" class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
-                            거절
-                        </button>
-                        <button onclick="closePendingModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                            닫기
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    $('body').append(modalHtml);
-}
-
-function closePendingModal() {
-    $('#pendingStoreModal').remove();
-}
-
-function editStoreModal() {
-    if (!currentStoreId) return;
-    
-    callAPI('getStoreInfo', {storeId: currentStoreId}, function(res) {
-        if (res && res.success && res.data) {
-            let store = res.data;
-            
-            // 폼에 데이터 채우기
-            $('#editStoreId').val(store.storeId);
-            $('#editStoreName').val(store.storeName);
-            $('#editBusinessNumber').val(store.businessNumber);
-            $('#editAddress').val(store.address);
-            $('#editPhoneNumber').val(store.phoneNumber);
-            $('#editStatus').val(store.status);
-            
-            // 매장 상세 모달 닫기
-            closeModal();
-            
-            // 수정 모달 열기
-            $('#editStoreModal').removeClass('hidden');
-        }
-    });
-}
-
-function closeEditStoreModal() {
-    $('#editStoreModal').addClass('hidden');
-    $('#editStoreForm')[0].reset();
-}
-
-// 매장 수정 폼 제출
-$('#editStoreForm').on('submit', function(e) {
-    e.preventDefault();
-    
-    if (!confirm('매장 정보를 수정하시겠습니까?')) return;
-    
-    let formData = {
-        storeId: $('#editStoreId').val(),
-        storeName: $('#editStoreName').val(),
-        address: $('#editAddress').val(),
-        phoneNumber: $('#editPhoneNumber').val(),
-        status: $('#editStatus').val()
-    };
-    
-    callAPI('updateStoreInfo', formData, function(res) {
-        alert(res.message || '처리되었습니다.');
-        if (res.success) {
-            closeEditStoreModal();
-            loadStores();
-            updateDashboardStats();
-        }
-    });
-});
-
-function createQRModal() {
-    if (!currentStoreId) return;
-    callAPI('createStoreQR', {storeId: currentStoreId}, function(res) {
-        alert(res.message || 'QR 코드가 생성되었습니다.');
-    });
-}
-
-function deleteStoreModal() {
-    if (!currentStoreId) return;
-    if (!confirm('이 매장의 삭제를 요청하시겠습니까?\n\n진행 중인 주문이 있는 경우 삭제 요청을 할 수 없습니다.\n삭제 요청 후 대시보드의 "삭제 대기 중인 매장"에서 최종 승인이 필요합니다.')) return;
-    
-    callAPI('deleteStore', {storeId: currentStoreId}, function(res) {
-        alert(res.message || '처리되었습니다.');
-        if (res.success) {
-            closeModal();
-            loadStores();
-            loadDeletePendingStores();
-            updateDashboardStats();
-        }
-    });
-}
-
-function viewStoreSalesModal() {
-    if (!currentStoreId) return;
-    closeModal();
-    showTab('sales');
-    $('#salesStoreSelect').val(currentStoreId);
-    loadStoreSales();
-}
-
-function closeModal() {
-    $('#storeModal').addClass('hidden');
-    currentStoreId = null;
-}
-
-function loadStoresForSales() {
-    if (stores.length > 0) {
-        updateSalesStoreSelect();
-    } else {
-        loadStores();
-        setTimeout(updateSalesStoreSelect, 500);
-    }
-}
-
-function updateSalesStoreSelect() {
-    let html = '<option value="">매장을 선택하세요</option>';
-    stores.forEach(function(store) {
-        html += '<option value="' + store.storeId + '">' + (store.storeName || '매장') + '</option>';
-    });
-    $('#salesStoreSelect').html(html);
-}
-
-function loadStoreSales() {
-    let storeId = $('#salesStoreSelect').val();
-    if (!storeId) {
-        alert('매장을 선택해주세요.');
-        return;
-    }
-    
-    let startDate = $('#startDate').val();
-    let endDate = $('#endDate').val();
-    
-    if (!startDate || !endDate) {
-        alert('기간을 선택해주세요.');
-        return;
-    }
-    
-    callAPI('getStoreSalesInfo', {
-        storeId: storeId,
-        startDate: startDate,
-        endDate: endDate
-    }, function(res) {
-        if (res && res.success && res.data) {
-            let report = res.data;
-            $('#totalSales').text('₩' + (report.totalSales || 0).toLocaleString());
-            $('#totalOrders').text((report.totalOrders || 0) + '건');
-            $('#avgOrderAmount').text('₩' + (report.averageOrderAmount || 0).toLocaleString());
-            $('#salesStats').removeClass('hidden');
-            
-            let dailyHtml = '';
-            if (report.dailySales && report.dailySales.length > 0) {
-                report.dailySales.forEach(function(daily) {
-                    dailyHtml += '<div class="flex justify-between items-center p-3 border-b">';
-                    dailyHtml += '<span>' + daily.saleDate + '</span>';
-                    dailyHtml += '<span class="font-semibold">₩' + (daily.dailyTotal || 0).toLocaleString() + '</span>';
-                    dailyHtml += '</div>';
-                });
-            } else {
-                dailyHtml = '<p class="text-gray-500 text-center py-4">일별 매출 데이터가 없습니다</p>';
-            }
-            $('#dailySalesList').html(dailyHtml);
-            
-            let menuHtml = '';
-            if (report.menuSales && report.menuSales.length > 0) {
-                report.menuSales.forEach(function(menu) {
-                    menuHtml += '<div class="flex justify-between items-center p-3 border-b">';
-                    menuHtml += '<div>';
-                    menuHtml += '<p class="font-medium">' + menu.menuName + '</p>';
-                    menuHtml += '<p class="text-sm text-gray-600">판매량: ' + (menu.totalQuantity || 0) + '개</p>';
-                    menuHtml += '</div>';
-                    menuHtml += '<span class="font-semibold">₩' + (menu.totalSales || 0).toLocaleString() + '</span>';
-                    menuHtml += '</div>';
-                });
-            } else {
-                menuHtml = '<p class="text-gray-500 text-center py-4">메뉴별 매출 데이터가 없습니다</p>';
-            }
-            $('#menuSalesList').html(menuHtml);
-        } else {
-            alert('매출 정보를 불러올 수 없습니다.');
-        }
-    });
-}
-
-// ========== 메뉴 관리 기능 ==========
-
-function updateMenuStoreSelect() {
-    let html = '<option value="">매장을 선택하세요</option>';
-    stores.filter(s => s.storeId > 0 && s.status !== 'PENDING').forEach(function(store) {
-        let statusBadge = '';
-        if (store.status === 'DELETE_PENDING') {
-            statusBadge = ' (삭제대기)';
-        } else if (store.status === 'INACTIVE') {
-            statusBadge = ' (비활성)';
-        }
-        html += '<option value="' + store.storeId + '">' + (store.storeName || '매장') + statusBadge + '</option>';
-    });
-    $('#menuStoreSelect').html(html);
 }
 
 function loadStoreMenus() {
@@ -1165,12 +454,11 @@ function loadStoreMenus() {
             
             let html = '';
             if (menus.length === 0) {
-                html = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">등록된 메뉴가 없습니다</td></tr>';
+                html = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">등록된 메뉴가 없습니다</td></tr>';
             } else {
                 menus.forEach(function(menu) {
                     html += '<tr class="border-t hover:bg-gray-50">';
                     html += '<td class="px-6 py-4 font-medium">' + (menu.menuName || '-') + '</td>';
-                    html += '<td class="px-6 py-4">' + (menu.category || '-') + '</td>';
                     html += '<td class="px-6 py-4">₩' + (menu.price || 0).toLocaleString() + '</td>';
                     html += '<td class="px-6 py-4 text-sm text-gray-600">' + (menu.description || '-') + '</td>';
                     html += '<td class="px-6 py-4">';
@@ -1189,19 +477,7 @@ function loadStoreMenus() {
     });
 }
 
-function showAddMenuModal() {
-    if (!currentMenuStoreId) {
-        alert('매장을 먼저 선택해주세요.');
-        return;
-    }
-    
-    isEditMode = false;
-    $('#menuModalTitle').text('메뉴 추가');
-    $('#menuForm')[0].reset();
-    $('#menuId').val('');
-    $('#menuStoreId').val(currentMenuStoreId);
-    $('#menuModal').removeClass('hidden');
-}
+// 메뉴 추가 모달 관련 코드 삭제
 
 function editMenu(menuId) {
     callAPI('getStoreMenus', {storeId: currentMenuStoreId}, function(res) {
@@ -1213,7 +489,6 @@ function editMenu(menuId) {
                 $('#menuId').val(menu.menuId);
                 $('#menuStoreId').val(menu.storeId);
                 $('#menuName').val(menu.menuName);
-                $('#menuCategory').val(menu.category);
                 $('#menuPrice').val(menu.price);
                 $('#menuDescription').val(menu.description);
                 $('#menuModal').removeClass('hidden');
@@ -1244,25 +519,16 @@ $('#menuForm').on('submit', function(e) {
     let formData = {
         storeId: $('#menuStoreId').val(),
         menuName: $('#menuName').val(),
-        category: $('#menuCategory').val(),
         price: $('#menuPrice').val(),
         description: $('#menuDescription').val()
     };
     
-    let methodName, message;
+    // 수정 모드만 남김
+    formData.menuId = $('#menuId').val();
     
-    if (isEditMode) {
-        formData.menuId = $('#menuId').val();
-        methodName = 'updateMenuDirect';
-        message = '메뉴를 수정하시겠습니까?';
-    } else {
-        methodName = 'addMenuDirect';
-        message = '메뉴를 추가하시겠습니까?';
-    }
+    if (!confirm('메뉴를 수정하시겠습니까?')) return;
     
-    if (!confirm(message)) return;
-    
-    callAPI(methodName, formData, function(res) {
+    callAPI('updateMenuDirect', formData, function(res) {
         alert(res.message || '처리되었습니다.');
         if (res.success) {
             closeMenuModal();
@@ -1271,10 +537,10 @@ $('#menuForm').on('submit', function(e) {
     });
 });
 
-// ========== QR 관리 기능 ==========
+//==================== 테이블별 QR 관리 ====================
 
 function loadQRCodes() {
-    callAPI('getAllStoresWithQR', {}, function(res) {
+    callAPI('getStoreList', {}, function(res) {
         if (res && res.success) {
             let stores = res.data || [];
             console.log('✅ QR 로드된 매장:', stores);
@@ -1283,33 +549,37 @@ function loadQRCodes() {
             if (stores.length === 0) {
                 html = '<div class="col-span-3 text-center py-12 text-gray-500">등록된 매장이 없습니다</div>';
             } else {
+                // 매장 선택 및 안내문
+                html += '<div class="col-span-3 bg-white rounded-xl p-6 shadow-sm mb-6">';
+                html += '<div class="flex items-center gap-2 mb-4">';
+                html += '<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">';
+                html += '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>';
+                html += '</svg>';
+                html += '<h3 class="text-lg font-semibold">테이블별 QR 코드 안내</h3>';
+                html += '</div>';
+                html += '<div class="text-sm text-gray-600 space-y-2">';
+                html += '<p>• 각 테이블마다 고유한 QR 코드가 생성됩니다.</p>';
+                html += '<p>• 고객이 QR 코드를 스캔하면 해당 테이블의 주문 페이지로 이동합니다.</p>';
+                html += '<p>• QR 코드 URL: <code class="bg-gray-100 px-2 py-1 rounded">https://yourapp.com/order?store=매장ID&table=테이블ID</code></p>';
+                html += '<p>• QR 코드 이미지를 다운로드하여 각 테이블에 비치하세요.</p>';
+                html += '</div>';
+                html += '</div>';
+                
+                // 매장 선택
+                html += '<div class="col-span-3 bg-white rounded-xl p-6 shadow-sm mb-6">';
+                html += '<label class="block text-sm font-medium text-gray-700 mb-2">매장 선택</label>';
+                html += '<select id="qrStoreSelect" onchange="loadStoreTables()" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">';
+                html += '<option value="">매장을 선택하세요</option>';
                 stores.forEach(function(store) {
-                    // DB에 저장된 qr_path 또는 기본값 사용
-                    let qrPath = store.qrPath || (window.location.origin + '/order?store=' + store.storeId);
-                    let qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(qrPath);
-                    
-                    console.log('매장 ' + store.storeId + ' QR 경로:', qrPath);
-                    
-                    html += '<div class="bg-white rounded-xl p-6 shadow-sm">';
-                    html += '<div class="flex flex-col items-center">';
-                    html += '<div class="w-48 h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center overflow-hidden">';
-                    html += '<img src="' + qrImageUrl + '" alt="QR Code" class="w-full h-full object-contain">';
-                    html += '</div>';
-                    html += '<h3 class="text-lg font-semibold mb-2">' + (store.storeName || '매장') + '</h3>';
-                    html += '<p class="text-sm text-gray-600 mb-1">매장 ID: ' + store.storeId + '</p>';
-                    
-                    // QR 경로 표시
-                    html += '<div class="w-full mb-4">';
-                    html += '<div id="qrPath-' + store.storeId + '" class="text-xs text-gray-500 text-center break-all px-4 py-2 bg-gray-50 rounded" title="' + qrPath + '">' + qrPath + '</div>';
-                    html += '</div>';
-                    
-                    html += '<div class="flex flex-col gap-2 w-full">';
-                    html += '<button onclick="editQRPath(' + store.storeId + ', \'' + qrPath.replace(/'/g, "\\'") + '\')" class="w-full px-4 py-2 bg-purple-500 text-white rounded-lg text-sm hover:bg-purple-600">✏️ 주소 편집</button>';
-                    html += '<button onclick="downloadQR(' + store.storeId + ', \'' + (store.storeName || '매장').replace(/'/g, "\\'") + '\', \'' + qrPath.replace(/'/g, "\\'") + '\')" class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">💾 QR 다운로드</button>';
-                    html += '</div>';
-                    html += '</div>';
-                    html += '</div>';
+                    html += '<option value="' + store.storeId + '">' + store.storeName + ' (ID: ' + store.storeId + ')</option>';
                 });
+                html += '</select>';
+                html += '</div>';
+                
+                // 테이블 QR 목록 영역
+                html += '<div id="tableQRList" class="col-span-3">';
+                html += '<div class="text-center py-12 text-gray-500">매장을 선택하면 테이블 목록이 표시됩니다</div>';
+                html += '</div>';
             }
             
             $('#qrCodeList').html(html);
@@ -1317,69 +587,205 @@ function loadQRCodes() {
     });
 }
 
-function editQRPath(storeId, currentPath) {
-    console.log('편집 시작 - 매장ID:', storeId, '현재 경로:', currentPath);
+function loadStoreTables() {
+    let storeId = $('#qrStoreSelect').val();
     
-    let newPath = prompt('QR 코드 주소를 입력하세요:', currentPath);
-    
-    if (newPath === null) {
-        console.log('편집 취소됨');
-        return; // 취소
-    }
-    
-    if (!newPath || newPath.trim() === '') {
-        alert('주소를 입력해주세요.');
+    if (!storeId) {
+        $('#tableQRList').html('<div class="text-center py-12 text-gray-500">매장을 선택하면 테이블 목록이 표시됩니다</div>');
         return;
     }
     
-    newPath = newPath.trim();
-    
-    // URL 유효성 검사 (기본)
-    if (!newPath.startsWith('http://') && !newPath.startsWith('https://') && !newPath.startsWith('/')) {
-        if (!confirm('http:// 또는 https://로 시작하지 않는 주소입니다.\n그대로 저장하시겠습니까?')) {
-            return;
-        }
-    }
-    
-    console.log('새 경로:', newPath);
-    
-    callAPI('updateStoreQRPath', {storeId: storeId, qrPath: newPath}, function(res) {
-        console.log('업데이트 결과:', res);
-        
-        if (res.success) {
-            alert('QR 경로가 업데이트되었습니다!');
-            // 전체 QR 목록 새로고침
-            loadQRCodes();
-        } else {
-            alert('업데이트 실패: ' + (res.message || '알 수 없는 오류'));
+    callAPI('getStoreTables', {storeId: storeId}, function(res) {
+        if (res && res.success) {
+            let tables = res.data || [];
+            console.log('✅ 테이블 목록:', tables);
+            
+            let html = '';
+            if (tables.length === 0) {
+                html = '<div class="text-center py-12 text-gray-500">등록된 테이블이 없습니다</div>';
+            } else {
+                html += '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">';
+                
+                tables.forEach(function(table) {
+                    // QR 코드 데이터 설정
+                    let hasQR = table.qrcodeData && table.qrImgSrc;
+                    let qrPath = hasQR ? table.qrcodeData : 
+                                 ('https://yourapp.com/order?store=' + table.storeId + '&table=' + table.tableId);
+                    
+                    // URL 인코딩 함수 (재귀 문제 해결)
+                    let encodedQRPath = encodeURIComponentSafe(qrPath);
+                    let qrImageUrl = hasQR ? table.qrImgSrc : 
+                                     ('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodedQRPath);
+                    
+                    html += '<div class="bg-white rounded-xl p-6 shadow-sm border">';
+                    html += '<div class="flex flex-col items-center">';
+                    
+                    // QR 코드 이미지
+                    html += '<div class="w-48 h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center overflow-hidden border-2 ' + (hasQR ? 'border-green-200' : 'border-red-200') + '">';
+                    html += '<img src="' + qrImageUrl + '" alt="QR Code" class="w-full h-full object-contain" ';
+                    html += 'onerror="this.src=\'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodedQRPath + '\'">';
+                    html += '</div>';
+                    
+                    // 테이블 정보
+                    html += '<h3 class="text-lg font-semibold mb-1 text-center">' + (table.storeName || '매장') + '</h3>';
+                    html += '<p class="text-sm text-gray-600 mb-1">테이블: <span class="font-medium">' + (table.tableNo || '-') + '</span></p>';
+                    html += '<p class="text-xs text-gray-500 mb-2">테이블 ID: ' + table.tableId + '</p>';
+                    
+                    // QR 상태 표시
+                    if (hasQR) {
+                        html += '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full mb-3">✓ QR 생성됨</span>';
+                    } else {
+                        html += '<span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full mb-3">⚠ QR 미생성</span>';
+                    }
+                    
+                    // QR 경로 표시
+                    html += '<div class="w-full mb-4">';
+                    html += '<div class="text-xs text-gray-500 text-center break-all px-2 py-1 bg-gray-50 rounded border" title="' + qrPath + '">';
+                    html += qrPath.length > 40 ? qrPath.substring(0, 40) + '...' : qrPath;
+                    html += '</div>';
+                    html += '</div>';
+                    
+                    // 액션 버튼
+                    html += '<div class="flex flex-col gap-2 w-full">';
+                    if (!hasQR) {
+                        html += '<button onclick="generateTableQR(' + table.tableId + ')" class="w-full px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition-colors">';
+                        html += '🔄 QR 생성하기';
+                        html += '</button>';
+                    }
+                    html += '<button onclick="downloadTableQR(' + table.tableId + ', \'' + escapeQuotes(table.storeName) + '\', \'' + escapeQuotes(table.tableNo) + '\', \'' + escapeQuotes(qrPath) + '\')" ';
+                    html += 'class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors ' + (hasQR ? '' : 'opacity-50 cursor-not-allowed') + '" ';
+                    html += (hasQR ? '' : 'disabled') + '>';
+                    html += '💾 QR 다운로드';
+                    html += '</button>';
+                    html += '</div>';
+                    
+                    html += '</div>';
+                    html += '</div>';
+                });
+                
+                html += '</div>';
+            }
+            
+            $('#tableQRList').html(html);
         }
     });
 }
 
-function downloadQR(storeId, storeName, qrPath) {
-    console.log('다운로드 - 매장:', storeName, 'QR 경로:', qrPath);
+function generateTableQR(tableId) {
+    if (!confirm('이 테이블의 QR 코드를 생성하시겠습니까?')) return;
     
-    let qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=' + encodeURIComponent(qrPath);
+    callAPI('generateTableQR', {tableId: tableId}, function(res) {
+        alert(res.message || '처리되었습니다.');
+        if (res.success) {
+            // 현재 선택된 매장의 테이블 목록 다시 로드
+            let storeId = $('#qrStoreSelect').val();
+            if (storeId) {
+                loadStoreTables();
+            }
+        }
+    });
+}
+
+function downloadTableQR(tableId, storeName, tableNo, qrPath) {
+    console.log('테이블 QR 다운로드 - 매장:', storeName, '테이블:', tableNo, 'QR 경로:', qrPath);
     
-    // 다운로드 트리거
+    let encodedQRPath = encodeURIComponentSafe(qrPath);
+    let qrImageUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=' + encodedQRPath;
+    
     let link = document.createElement('a');
     link.href = qrImageUrl;
-    link.download = 'QR_' + storeName + '_' + storeId + '.png';
+    link.download = 'QR_' + storeName + '_테이블_' + tableNo + '_' + tableId + '.png';
     link.target = '_blank';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     
-    alert('QR 코드 다운로드가 시작되었습니다.');
+    alert('QR 코드 다운로드가 시작되었습니다: ' + storeName + ' - 테이블 ' + tableNo);
 }
 
-function regenerateQR(storeId) {
-    if (!confirm('QR 코드를 재생성하시겠습니까?')) return;
+// Helper functions
+function escapeQuotes(str) {
+    return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+// 재귀 문제를 해결한 URL 인코딩 함수
+function encodeURIComponentSafe(component) {
+    // 기본 encodeURIComponent 사용 (재귀 방지)
+    return encodeURIComponent(component);
+}
+
+// ==================== 매출 정보 ====================
+function loadStoreListForSales() {
+    callAPI('getStoreList', {}, function(res) {
+        if (res && res.success) {
+            let html = '<option value="">매장을 선택하세요</option>';
+            res.data.forEach(function(store) {
+                html += '<option value="' + store.storeId + '">' + store.storeName + '</option>';
+            });
+            $('#salesStoreSelect').html(html);
+        }
+    });
+}
+
+function loadStoreSales() {
+    let storeId = $('#salesStoreSelect').val();
+    let startDate = $('#startDate').val();
+    let endDate = $('#endDate').val();
     
-    callAPI('regenerateStoreQR', {storeId: storeId}, function(res) {
-        alert(res.message || '처리되었습니다.');
-        if (res.success) {
-            loadQRCodes();
+    if (!storeId) {
+        alert('매장을 선택해주세요.');
+        return;
+    }
+    
+    if (!startDate || !endDate) {
+        alert('날짜를 선택해주세요.');
+        return;
+    }
+    
+    callAPI('getStoreSalesInfo', {
+        storeId: storeId,
+        startDate: startDate,
+        endDate: endDate
+    }, function(res) {
+        if (res && res.success) {
+            let report = res.data;
+            
+            $('#totalSales').text('₩' + (report.totalSales || 0).toLocaleString());
+            $('#totalOrders').text((report.totalOrders || 0).toLocaleString());
+            $('#avgOrderAmount').text('₩' + (report.averageOrderAmount || 0).toLocaleString());
+            
+            let dailyHtml = '';
+            if (report.dailySales && report.dailySales.length > 0) {
+                report.dailySales.forEach(function(daily) {
+                    dailyHtml += '<div class="flex justify-between items-center p-3 border-b">';
+                    dailyHtml += '<span>' + daily.saleDate + '</span>';
+                    dailyHtml += '<span class="font-semibold">₩' + (daily.dailyTotal || 0).toLocaleString() + '</span>';
+                    dailyHtml += '</div>';
+                });
+            } else {
+                dailyHtml = '<p class="text-gray-500 text-center py-4">일별 매출 데이터가 없습니다</p>';
+            }
+            $('#dailySalesList').html(dailyHtml);
+            
+            let menuHtml = '';
+            if (report.menuSales && report.menuSales.length > 0) {
+                report.menuSales.forEach(function(menu) {
+                    menuHtml += '<div class="flex justify-between items-center p-3 border-b">';
+                    menuHtml += '<div>';
+                    menuHtml += '<p class="font-medium">' + menu.menuName + '</p>';
+                    menuHtml += '<p class="text-sm text-gray-600">판매량: ' + (menu.totalQuantity || 0) + '개</p>';
+                    menuHtml += '</div>';
+                    menuHtml += '<span class="font-semibold">₩' + (menu.totalSales || 0).toLocaleString() + '</span>';
+                    menuHtml += '</div>';
+                });
+            } else {
+                menuHtml = '<p class="text-gray-500 text-center py-4">메뉴별 매출 데이터가 없습니다</p>';
+            }
+            $('#menuSalesList').html(menuHtml);
+            
+            $('#salesStats').removeClass('hidden');
+        } else {
+            alert('매출 정보를 불러올 수 없습니다.');
         }
     });
 }

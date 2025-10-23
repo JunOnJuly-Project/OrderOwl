@@ -1,196 +1,237 @@
--- 데이터베이스 생성
-CREATE DATABASE IF NOT EXISTS orderowl;
-USE orderowl;
+-- OrderOwl 데이터베이스 생성 및 사용
+CREATE DATABASE OrderOwl;
+USE OrderOwl;
 
--- User 테이블
-CREATE TABLE IF NOT EXISTS User (
-    user_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('CUSTOMER', 'OWNER', 'ADMIN') DEFAULT 'CUSTOMER',
-    status ENUM('ACTIVE', 'INACTIVE', 'FORCE_DELETED') DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- 1. User 테이블 생성
+CREATE TABLE User (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(20) NOT NULL,
+    password VARCHAR(30) NOT NULL,
+    email VARCHAR(50) NOT NULL UNIQUE,
+    role VARCHAR(50) NOT NULL DEFAULT 'owner',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Store 테이블
-CREATE TABLE IF NOT EXISTS Store (
-    store_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    owner_id BIGINT NOT NULL,
-    store_name VARCHAR(255) NOT NULL,
-    business_number VARCHAR(20) UNIQUE NOT NULL,
-    address TEXT,
+-- 2. Store 테이블 생성
+CREATE TABLE Store (
+    store_id INT PRIMARY KEY AUTO_INCREMENT,
+    owner_id INT NOT NULL,
+    store_name VARCHAR(50) NOT NULL,
+    address VARCHAR(70),
+    region VARCHAR(30),
     phone_number VARCHAR(20),
-    region VARCHAR(100),
     description TEXT,
-    img_src VARCHAR(500),
-    qr_path VARCHAR(500),
-    status ENUM('PENDING', 'ACTIVE', 'INACTIVE', 'DELETE_PENDING') DEFAULT 'PENDING',
-    business_verified BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    img_src VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (owner_id) REFERENCES User(user_id) ON DELETE CASCADE
 );
 
--- StoreRequest 테이블 (매장 등록/수정 요청)
-CREATE TABLE IF NOT EXISTS StoreRequest (
-    request_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    store_id BIGINT NULL, -- 수정 요청인 경우만
-    owner_id BIGINT NOT NULL,
-    store_name VARCHAR(255) NOT NULL,
-    business_number VARCHAR(20) NOT NULL,
-    address TEXT,
-    phone_number VARCHAR(20),
-    request_type ENUM('ADD', 'UPDATE') DEFAULT 'ADD',
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (owner_id) REFERENCES User(user_id) ON DELETE CASCADE,
+-- 3. StoreTable 테이블 생성
+CREATE TABLE StoreTable (
+    table_id INT PRIMARY KEY AUTO_INCREMENT,
+    store_id INT NOT NULL,
+    table_no VARCHAR(50) NOT NULL,
     FOREIGN KEY (store_id) REFERENCES Store(store_id) ON DELETE CASCADE
 );
 
--- Menu 테이블
-CREATE TABLE IF NOT EXISTS Menu (
-    menu_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    store_id BIGINT NOT NULL,
-    menu_name VARCHAR(255) NOT NULL,
+-- 4. Category1 테이블 생성
+CREATE TABLE Category1 (
+    category1_code INT PRIMARY KEY AUTO_INCREMENT,
+    category1_name VARCHAR(20)
+);
+
+-- 5. Category2 테이블 생성
+CREATE TABLE Category2 (
+    category2_code INT PRIMARY KEY AUTO_INCREMENT,
+    category2_name VARCHAR(20)
+);
+
+-- 6. Menu 테이블 생성
+CREATE TABLE Menu (
+    menu_id INT PRIMARY KEY AUTO_INCREMENT,
+    store_id INT NOT NULL,
+    menu_name VARCHAR(100) NOT NULL,
     price INT NOT NULL,
-    category VARCHAR(100),
     description TEXT,
-    img_src VARCHAR(500),
-    status ENUM('ACTIVE', 'INACTIVE') DEFAULT 'ACTIVE',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (store_id) REFERENCES Store(store_id) ON DELETE CASCADE
-);
-
--- MenuRequest 테이블 (메뉴 등록/수정/삭제 요청)
-CREATE TABLE IF NOT EXISTS MenuRequest (
-    request_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    menu_id BIGINT NULL, -- 삭제/수정 요청인 경우
-    store_id BIGINT NOT NULL,
-    owner_id BIGINT NOT NULL,
-    request_type ENUM('ADD', 'UPDATE', 'DELETE') DEFAULT 'ADD',
-    menu_name VARCHAR(255),
-    price INT,
-    category VARCHAR(100),
-    description TEXT,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (menu_id) REFERENCES Menu(menu_id) ON DELETE CASCADE,
+    img_src VARCHAR(255),
+    category1_code INT,
+    category2_code INT,
+    check_rec VARCHAR(1) DEFAULT 'N',
+    order_request VARCHAR(50) DEFAULT NULL,
+    close_time TIME,
+    sold_out VARCHAR(1) DEFAULT 'N',
     FOREIGN KEY (store_id) REFERENCES Store(store_id) ON DELETE CASCADE,
-    FOREIGN KEY (owner_id) REFERENCES User(user_id) ON DELETE CASCADE
+    FOREIGN KEY (category1_code) REFERENCES Category1(category1_code),
+    FOREIGN KEY (category2_code) REFERENCES Category2(category2_code)
 );
 
--- OrderTable 테이블
-CREATE TABLE IF NOT EXISTS OrderTable (
-    order_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    store_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
-    total_amount INT NOT NULL,
-    status ENUM('PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'COMPLETED', 'CANCELLED') DEFAULT 'PENDING',
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+-- 7. OrderTable 테이블 생성
+CREATE TABLE OrderTable (
+    order_id INT PRIMARY KEY AUTO_INCREMENT,
+    store_id INT NOT NULL,
+    table_id INT NOT NULL,
+    order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) NOT NULL DEFAULT 'pending' COMMENT '주문 상태 (pending, completed, cancelled)',
+    total_price INT NOT NULL DEFAULT 0,
+    min_price INT DEFAULT 0,
+    table_status VARCHAR(1) DEFAULT 'N' COMMENT '테이블 주문 상태 (Y,N)',
     FOREIGN KEY (store_id) REFERENCES Store(store_id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
+    FOREIGN KEY (table_id) REFERENCES StoreTable(table_id)
 );
 
--- OrderDetail 테이블
-CREATE TABLE IF NOT EXISTS OrderDetail (
-    order_detail_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    order_id BIGINT NOT NULL,
-    menu_id BIGINT NOT NULL,
+-- 8. OrderDetail 테이블 생성
+CREATE TABLE OrderDetail (
+    order_detail_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    menu_id INT NOT NULL,
     quantity INT NOT NULL,
     price INT NOT NULL,
     FOREIGN KEY (order_id) REFERENCES OrderTable(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (menu_id) REFERENCES Menu(menu_id) ON DELETE CASCADE
+    FOREIGN KEY (menu_id) REFERENCES Menu(menu_id)
 );
 
--- Payment 테이블
-CREATE TABLE IF NOT EXISTS Payment (
-    payment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    order_id BIGINT NOT NULL,
-    store_id BIGINT NOT NULL,
-    total_amount INT NOT NULL,
-    payment_method VARCHAR(50),
-    payment_status ENUM('PENDING', 'COMPLETED', 'FAILED', 'REFUNDED') DEFAULT 'PENDING',
-    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES OrderTable(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (store_id) REFERENCES Store(store_id) ON DELETE CASCADE
+-- 9. Payment 테이블 생성
+CREATE TABLE Payment (
+    payment_id INT PRIMARY KEY AUTO_INCREMENT,
+    order_id INT NOT NULL,
+    payment_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    amount INT NOT NULL COMMENT '결제 금액',
+    status VARCHAR(50) NOT NULL COMMENT '결제 상태 (paid, unpaid, refunded)',
+    FOREIGN KEY (order_id) REFERENCES OrderTable(order_id)
 );
 
--- ForceDeleteLog 테이블
-CREATE TABLE IF NOT EXISTS ForceDeleteLog (
-    log_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT NOT NULL,
-    reason TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE
+-- 10. QRCode 테이블 생성
+CREATE TABLE QRCode (
+    qrcode_id INT PRIMARY KEY AUTO_INCREMENT,
+    table_id INT NOT NULL UNIQUE,
+    qrcode_data VARCHAR(255) NOT NULL,
+    qr_img_src VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (table_id) REFERENCES StoreTable(table_id) ON DELETE CASCADE
 );
 
--- 샘플 데이터 삽입
-INSERT INTO User (name, email, password, role, status) VALUES
-('관리자', 'admin@orderowl.com', 'admin123', 'ADMIN', 'ACTIVE'),
-('김사장', 'owner1@orderowl.com', 'owner123', 'OWNER', 'ACTIVE'),
-('이사장', 'owner2@orderowl.com', 'owner123', 'OWNER', 'ACTIVE'),
-('홍길동', 'customer1@orderowl.com', 'customer123', 'CUSTOMER', 'ACTIVE');
+-- ==================== 더미 데이터 삽입 ====================
 
-INSERT INTO Store (owner_id, store_name, business_number, address, phone_number, status, business_verified) VALUES
-(2, '맛있는 김밥', '123-45-67890', '서울시 강남구 테헤란로 123', '02-1234-5678', 'ACTIVE', TRUE),
-(3, '착한 떡볶이', '234-56-78901', '서울시 서초구 반포대로 456', '02-2345-6789', 'ACTIVE', TRUE);
+-- 1. User 테이블 더미 데이터
+INSERT INTO User (username, password, email, role) VALUES
+('owner1', 'password123', 'owner1@orderowl.com', 'owner'),
+('owner2', 'password456', 'owner2@orderowl.com', 'owner'),
+('manager1', 'password789', 'manager1@orderowl.com', 'manager'),
+('staff1', 'password000', 'staff1@orderowl.com', 'staff'),
+('owner3', 'password111', 'owner3@orderowl.com', 'owner');
 
-INSERT INTO StoreRequest (owner_id, store_name, business_number, address, phone_number, request_type, status) VALUES
-(2, '새로운 매장', '345-67-89012', '서울시 송파구 올림픽로 789', '02-3456-7890', 'ADD', 'PENDING'),
-(3, '두번째 매장', '456-78-90123', '서울시 영등포구 여의대로 101', '02-4567-8901', 'ADD', 'PENDING');
-
-INSERT INTO Menu (store_id, menu_name, price, category, description) VALUES
-(1, '김밥', 3000, '분식', '맛있는 기본 김밥'),
-(1, '떡볶이', 5000, '분식', '매콤한 떡볶이'),
-(2, '치즈떡볶이', 7000, '분식', '치즈가 듬뿍 들어간 떡볶이'),
-(2, '순대', 4000, '분식', '쫄깃한 순대');
-
-INSERT INTO MenuRequest (store_id, owner_id, request_type, menu_name, price, category, status) VALUES
-(1, 2, 'ADD', '라면', 4000, '분식', 'PENDING'),
-(2, 3, 'ADD', '튀김', 3000, '분식', 'PENDING');
-
--- 샘플 데이터 추가삽입
-
-INSERT INTO User (name, email, password, role, status) VALUES
-('박사장', 'owner4@orderowl.com', 'owner123', 'OWNER', 'ACTIVE'),
-('최사장', 'owner5@orderowl.com', 'owner123', 'OWNER', 'ACTIVE'),
-('윤사장', 'owner6@orderowl.com', 'owner123', 'OWNER', 'ACTIVE'),
-('조고객', 'customer2@orderowl.com', 'customer123', 'CUSTOMER', 'ACTIVE'),
-('강고객', 'customer3@orderowl.com', 'customer123', 'CUSTOMER', 'ACTIVE'),
-('신고객', 'customer4@orderowl.com', 'customer123', 'CUSTOMER', 'ACTIVE');
-
-INSERT INTO Store (owner_id, store_name, business_number, address, phone_number, region, status, business_verified) VALUES
-(5, '청담스테이크하우스', '345-12-67890', '서울시 강남구 도산대로 211', '02-3456-1111', '서울', 'ACTIVE', TRUE),
-(6, '한남파스타', '456-23-78901', '서울시 용산구 한남대로 77', '02-4567-2222', '서울', 'ACTIVE', TRUE),
-(7, '부산오뎅마을', '567-34-89012', '부산시 남구 대연로 25', '051-567-3333', '부산', 'ACTIVE', TRUE);
+-- 2. Store 테이블 더미 데이터
+INSERT INTO Store (owner_id, store_name, address, region, phone_number, description, img_src) VALUES
+(1, '맛있는 한식당', '서울시 강남구 테헤란로 123', '강남구', '02-1234-5678', '전통 한식을 현대적으로 재해석한 레스토랑', '/images/store1.jpg'),
+(2, '이탈리안 파스타 하우스', '서울시 마포구 홍익로 456', '마포구', '02-2345-6789', '이탈리안 정통 파스타와 피자 전문점', '/images/store2.jpg'),
+(1, '스시 마스터', '서울시 서초구 반포대로 789', '서초구', '02-3456-7890', '신선한 재료로 만드는 일식 전문점', '/images/store3.jpg'),
+(3, '버거 앤 프라이즈', '서울시 종로구 종로 101', '종로구', '02-4567-8901', '수제버거와 감자튀김 전문 패스트푸드점', '/images/store4.jpg');
 
 
-INSERT INTO StoreRequest (owner_id, store_name, business_number, address, phone_number, request_type, status) VALUES
-(5, '홍대커피로스터스', '567-12-34567', '서울시 마포구 와우산로 56', '02-5678-4321', 'ADD', 'PENDING'),
-(6, '건대버거하우스', '678-23-45678', '서울시 광진구 능동로 12', '02-6789-5432', 'ADD', 'PENDING'),
-(7, '부산해물찜', '789-34-56789', '부산시 해운대구 달맞이길 33', '051-789-6543', 'ADD', 'PENDING'),
-(8, '광주삼겹살타운', '678-45-90123', '광주시 북구 하서로 88', '062-678-4444', 'ADD', 'PENDING'),
-(9, '대전칼국수', '789-56-01234', '대전시 서구 둔산대로 155', '042-789-5555', 'ADD', 'PENDING'),
-(8, '전주콩나물국밥', '890-45-67890', '전주시 덕진구 백제대로 88', '063-890-7654', 'ADD', 'PENDING'),
-(9, '제주고기국수', '901-56-78901', '제주시 구좌읍일주동로 101', '064-901-8765', 'ADD', 'PENDING');
+-- 3. StoreTable 테이블 더미 데이터
+INSERT INTO StoreTable (store_id, table_no) VALUES
+-- 한식당 (store_id: 1)
+(1, 'A1'), (1, 'A2'), (1, 'A3'), (1, 'B1'), (1, 'B2'),
+-- 이탈리안 (store_id: 2)
+(2, '1번'), (2, '2번'), (2, '3번'), (2, '4번'),
+-- 일식당 (store_id: 3)
+(3, '카운터1'), (3, '카운터2'), (3, '룸1'), (3, '룸2'),
+-- 버거샵 (store_id: 4)
+(4, 'T1'), (4, 'T2'), (4, 'T3'), (4, 'T4'), (4, 'T5');
 
-INSERT INTO Menu (store_id, menu_name, price, category, description) VALUES
-(3, '스테이크 세트', 25000, '양식', '부드러운 안심 스테이크와 샐러드 세트'),
-(3, '감자튀김', 5000, '사이드', '바삭한 감자튀김'),
-(4, '까르보나라', 12000, '파스타', '진한 크림 소스의 파스타'),
-(4, '토마토 파스타', 11000, '파스타', '신선한 토마토 소스 파스타'),
-(5, '부산오뎅탕', 8000, '국물요리', '따뜻하고 시원한 오뎅탕'),
-(5, '오뎅꼬치', 2000, '사이드', '간편한 꼬치 오뎅'),
-(6, '삼겹살 1인분', 15000, '고기', '국내산 삼겹살'),
-(6, '된장찌개', 6000, '식사류', '진한 된장 맛');
+-- 4. Category1 테이블 더미 데이터 (대분류)
+INSERT INTO Category1 (category1_name) VALUES
+('메인요리'), ('사이드'), ('음료'), ('디저트'), ('세트메뉴');
 
+-- 5. Category2 테이블 더미 데이터 (중분류) - 수정됨
+INSERT INTO Category2 (category2_name) VALUES
+('한식'), ('중식'), ('일식'), ('양식'), ('분식'),
+('커피'), ('차'), ('주스'), ('스무디'),
+('케이크'), ('아이스크림'), ('와플');
 
-INSERT INTO MenuRequest (store_id, owner_id, request_type, menu_name, price, category, description, status) VALUES
-(3, 5, 'ADD', '스테이크샐러드', 13000, '샐러드', '신선한 채소와 스테이크 조합', 'PENDING'),
-(4, 6, 'ADD', '알리오올리오', 11000, '파스타', '마늘 향이 가득한 오일 파스타', 'PENDING'),
-(5, 7, 'ADD', '오뎅볶음', 7000, '사이드', '매콤달콤한 부산식 오뎅볶음', 'PENDING'),
-(6, 8, 'ADD', '제육덮밥', 9000, '식사류', '매콤한 제육덮밥', 'PENDING'),
-(7, 9, 'ADD', '칼국수', 8000, '식사류', '시원한 멸치육수 칼국수', 'PENDING');
+-- 6. Menu 테이블 더미 데이터
+-- 한식당 메뉴 (store_id: 1)
+INSERT INTO Menu (store_id, menu_name, price, description, img_src, category1_code, category2_code, check_rec, order_request, sold_out) VALUES
+(1, '된장찌개', 8000, '집에서 먹는 듯한 정성된 된장찌개', '/images/menu1.jpg', 1, 1, 'Y', '맵기조절', 'N'),
+(1, '김치찌개', 9000, '입맛 돋우는 시원한 김치찌개', '/images/menu2.jpg', 1, 1, 'Y', '맵기조절', 'N'),
+(1, '불고기', 15000, '부드러운 국내산 소고기 불고기', '/images/menu3.jpg', 1, 1, 'N', NULL, 'N'),
+(1, '비빔밥', 11000, '신선한 채소와 고추장이 어우러진 비빔밥', '/images/menu4.jpg', 1, 1, 'Y', NULL, 'N'),
+(1, '콜라', 2000, '시원한 탄산음료', '/images/drink1.jpg', 3, 8, 'N', NULL, 'N');
+
+-- 이탈리안 레스토랑 메뉴 (store_id: 2)
+INSERT INTO Menu (store_id, menu_name, price, description, img_src, category1_code, category2_code, check_rec, order_request, sold_out) VALUES
+(2, '까르보나라', 12000, '크림소스와 베이컨의 조화', '/images/menu5.jpg', 1, 4, 'Y', NULL, 'N'),
+(2, '토마토 파스타', 11000, '신선한 토마토 소스 파스타', '/images/menu6.jpg', 1, 4, 'N', NULL, 'N'),
+(2, '마르게리타 피자', 18000, '모짜렐라 치즈와 바질의 클래식 피자', '/images/menu7.jpg', 1, 4, 'Y', NULL, 'N'),
+(2, '카프레제 샐러드', 8000, '신선한 토마토와 모짜렐라 치즈 샐러드', '/images/menu8.jpg', 2, 4, 'N', NULL, 'N'),
+(2, '레몬에이드', 4000, '상큼한 레몬에이드', '/images/drink2.jpg', 3, 8, 'N', NULL, 'N');
+
+-- 일식당 메뉴 (store_id: 3)
+INSERT INTO Menu (store_id, menu_name, price, description, img_src, category1_code, category2_code, check_rec, order_request, sold_out) VALUES
+(3, '연어초밥', 18000, '신선한 노르웨이 연어 초밥', '/images/menu9.jpg', 1, 3, 'Y', NULL, 'N'),
+(3, '광어초밥', 22000, '싱싱한 광어 초밥', '/images/menu10.jpg', 1, 3, 'N', NULL, 'N'),
+(3, '우동', 7000, '따뜻한 국물 우동', '/images/menu11.jpg', 1, 3, 'N', NULL, 'N'),
+(3, '가츠동', 9000, '바삭한 돈까스 덮밥', '/images/menu12.jpg', 1, 3, 'Y', NULL, 'N'),
+(3, '녹차', 3000, '향긋한 일본 녹차', '/images/drink3.jpg', 3, 7, 'N', NULL, 'N');
+
+-- 버거샵 메뉴 (store_id: 4)
+INSERT INTO Menu (store_id, menu_name, price, description, img_src, category1_code, category2_code, check_rec, order_request, sold_out) VALUES
+(4, '치즈버거', 6000, '신선한 패티와 치즈의 조화', '/images/menu13.jpg', 1, 4, 'Y', NULL, 'N'),
+(4, '베이컨버거', 7500, '바삭한 베이컨이 들어간 버거', '/images/menu14.jpg', 1, 4, 'N', NULL, 'N'),
+(4, '감자튀김', 3000, '바삭한 감자튀김', '/images/menu15.jpg', 2, 4, 'Y', NULL, 'N'),
+(4, '치킨너겟', 4000, '바삭바삭 치킨너겟', '/images/menu16.jpg', 2, 4, 'N', NULL, 'N'),
+(4, '아메리카노', 3500, '신선한 원두 커피', '/images/drink4.jpg', 3, 6, 'N', NULL, 'N');
+
+-- 7. OrderTable 테이블 더미 데이터
+INSERT INTO OrderTable (store_id, table_id, total_price, min_price, table_status, status) VALUES
+(1, 1, 25000, 15000, 'Y', 'pending'),
+(1, 2, 18000, 15000, 'N', 'completed'),
+(2, 6, 35000, 20000, 'Y', 'pending'),
+(3, 11, 42000, 25000, 'Y', 'pending'),
+(4, 14, 14000, 10000, 'N', 'completed');
+
+-- 8. OrderDetail 테이블 더미 데이터
+INSERT INTO OrderDetail (order_id, menu_id, quantity, price) VALUES
+-- 주문 1
+(1, 1, 1, 8000),
+(1, 3, 1, 15000),
+(1, 5, 1, 2000),
+-- 주문 2
+(2, 2, 1, 9000),
+(2, 4, 1, 11000),
+-- 주문 3
+(3, 6, 2, 12000),
+(3, 10, 1, 4000),
+(3, 9, 1, 8000),
+-- 주문 4
+(4, 11, 1, 18000),
+(4, 12, 1, 22000),
+(4, 15, 1, 3000),
+-- 주문 5
+(5, 17, 2, 6000),
+(5, 19, 1, 3000);
+
+-- 9. Payment 테이블 더미 데이터
+INSERT INTO Payment (order_id, amount, status) VALUES
+(1, 25000, 'unpaid'),
+(2, 18000, 'paid'),
+(3, 35000, 'unpaid'),
+(4, 42000, 'unpaid'),
+(5, 14000, 'paid');
+
+-- 10. QRCode 테이블 더미 데이터
+INSERT INTO QRCode (table_id, qrcode_data, qr_img_src) VALUES
+(1, 'store1_table_a1_qrcode_12345', '/qrcodes/store1_a1.png'),
+(2, 'store1_table_a2_qrcode_12346', '/qrcodes/store1_a2.png'),
+(3, 'store1_table_a3_qrcode_12347', '/qrcodes/store1_a3.png'),
+(4, 'store1_table_b1_qrcode_12348', '/qrcodes/store1_b1.png'),
+(5, 'store1_table_b2_qrcode_12349', '/qrcodes/store1_b2.png'),
+(6, 'store2_table_1_qrcode_23456', '/qrcodes/store2_1.png'),
+(7, 'store2_table_2_qrcode_23457', '/qrcodes/store2_2.png'),
+(8, 'store2_table_3_qrcode_23458', '/qrcodes/store2_3.png'),
+(9, 'store2_table_4_qrcode_23459', '/qrcodes/store2_4.png'),
+(11, 'store3_table_counter1_qrcode_34567', '/qrcodes/store3_counter1.png'),
+(12, 'store3_table_counter2_qrcode_34568', '/qrcodes/store3_counter2.png'),
+(13, 'store3_table_room1_qrcode_34569', '/qrcodes/store3_room1.png'),
+(14, 'store4_table_t1_qrcode_45678', '/qrcodes/store4_t1.png'),
+(15, 'store4_table_t2_qrcode_45679', '/qrcodes/store4_t2.png');
