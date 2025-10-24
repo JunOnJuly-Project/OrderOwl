@@ -15,6 +15,7 @@ public class MenuDTO {
 	    private String orderRequest;
 	    private LocalTime closeTime;
 	    private String soldOut;
+	    
 		public MenuDTO(int menuId, int storeId, String menuName, int price, String description, String imgSrc,
 				int category1Code, int category2Code, String checkRec, String orderRequest, LocalTime closeTime,
 				String soldOut) {

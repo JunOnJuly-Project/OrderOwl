@@ -17,6 +17,7 @@ import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.OrderDetailDTO;
 import dto.StoreDTO;
+import dto.UserDTO;
 import util.DbUtil;
 
 public class UserDAOImpl implements UserDAO {
@@ -173,7 +174,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 	
 	@Override
-	public List<MenuDTO> selectAllMenu(int storeId) throws SQLException {
+	public List<MenuDTO> selectAllMenu(int userId) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -185,7 +186,7 @@ public class UserDAOImpl implements UserDAO {
 			con = DbUtil.getConnection();
 			
 			ps = con.prepareStatement(sql);
-			ps.setInt(1, storeId);
+			ps.setInt(1, userId);
 			
 			rs = ps.executeQuery();
 			
@@ -219,7 +220,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public List<OrderDTO> selectAllOrder(int storeId) throws SQLException {
+	public List<OrderDTO> selectAllOrder(int ownerId) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -232,8 +233,8 @@ public class UserDAOImpl implements UserDAO {
 			con = DbUtil.getConnection();
 			
 			ps = con.prepareStatement(sql);
-			ps.setInt(1, storeId);
-			
+			ps.setInt(1, ownerId);
+			System.out.println(ps.toString());
 			rs = ps.executeQuery();
 			
 			while(rs.next()) {
@@ -248,11 +249,12 @@ public class UserDAOImpl implements UserDAO {
 					rs.getString(8)
 				);
 				
-				if (curOrder.equals(orderDto) == false) {
-					if (curOrder != null) {
-						list.add(curOrder);
-					}
-					
+				if (curOrder == null) {
+					curOrder = orderDto;
+				}
+				
+				else if (curOrder.equals(orderDto) == false) {
+					list.add(curOrder);
 					curOrder = orderDto;
 				}
 				
@@ -276,7 +278,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public List<OrderDTO> selectOrderByState(int storeId, String state) throws SQLException {
+	public List<OrderDTO> selectOrderByState(int ownerId, String state) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -289,7 +291,7 @@ public class UserDAOImpl implements UserDAO {
 			con = DbUtil.getConnection();
 			
 			ps = con.prepareStatement(sql);
-			ps.setInt(1, storeId);
+			ps.setInt(1, ownerId);
 			ps.setString(2, state);
 			
 			rs = ps.executeQuery();
@@ -408,10 +410,13 @@ public class UserDAOImpl implements UserDAO {
 			ps.setString(6, storeDto.getImgSrc());
 			ps.setInt(7, storeDto.getStoreId());
 			
+			System.out.println(ps.toString());
+			
 			result = ps.executeUpdate();
 		}
 		
 		finally {
+			System.out.println(result);
 			DbUtil.dbClose(ps, con);
 		}
 		
@@ -419,7 +424,7 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public int quitStore(int storeId) throws SQLException {
+	public int quitStore(int userId) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
 		int result = 0;
@@ -430,7 +435,7 @@ public class UserDAOImpl implements UserDAO {
 			con = DbUtil.getConnection();
 			
 			ps = con.prepareStatement(sql);
-			ps.setInt(1, storeId);
+			ps.setInt(1, userId);
 			
 			result = ps.executeUpdate();
 		}
@@ -443,17 +448,20 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public Map<Integer, Integer> selectSales(int storeId, String state) throws SQLException {
+	public Map<Integer, Integer> selectSales(int ownerId, String state) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
 		Map<Integer, Integer> sales = new HashMap<>();
 		
 		String sql= proFile.getProperty("user.sales.select." + state);
-		
+		System.out.println(sql);
 		try {
 			con = DbUtil.getConnection();
+			
 			ps = con.prepareStatement(sql);
+			ps.setInt(1, ownerId);
+			
 			rs = ps.executeQuery();
 			
 			while(rs.next()) {
@@ -466,5 +474,152 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		return sales;
+	}
+	
+	@Override
+	public int account(UserDTO user) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		int result = 0;
+		
+		String sql= proFile.getProperty("user.auth.account");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			
+			ps.setString(1, user.getUsername());
+			ps.setString(2, user.getPassword());
+			ps.setString(3, user.getEmail());	
+			ps.setString(4, user.getRole());
+	
+			result = ps.executeUpdate();
+		}
+		
+		finally {
+			DbUtil.dbClose(ps, con);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public StoreDTO auth(int ownerId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		StoreDTO store = null;
+		
+		String sql= proFile.getProperty("user.auth");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, ownerId);
+			
+			rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				store = new StoreDTO(
+					rs.getInt(1),
+					rs.getInt(2),
+					rs.getString(3),
+					rs.getString(4),
+					rs.getString(5),
+					rs.getString(6),
+					rs.getString(7),
+					rs.getString(8),
+					rs.getTimestamp(9).toLocalDateTime(),
+					null
+				);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return store;
+	}
+
+	@Override
+	public UserDTO login(String userEmail, String password) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		UserDTO user = null;
+		
+		String sql= proFile.getProperty("user.auth.login");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setString(1, userEmail);
+			ps.setString(2, password);
+			
+			rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				user = new UserDTO(
+					rs.getInt(1),
+					rs.getString(2),
+					rs.getString(3),
+					rs.getString(4),
+					rs.getString(5),
+					rs.getTimestamp(6).toLocalDateTime()
+				);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return user;
+	}
+
+	@Override
+	public StoreDTO selectStore(int ownerId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		StoreDTO store = null;
+		
+		String sql= proFile.getProperty("user.store.select");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, ownerId);
+			
+			System.out.println(ps.toString());
+			
+			rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				store = new StoreDTO(
+					rs.getInt(1),
+					rs.getInt(2),
+					rs.getString(3),
+					rs.getString(4),
+					rs.getString(5),
+					rs.getString(6),
+					rs.getString(7),
+					rs.getString(8),
+					rs.getTimestamp(9).toLocalDateTime()
+				);
+			}
+		}
+		
+		finally {
+			System.out.println(store);
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return store;
 	}
 }

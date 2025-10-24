@@ -9,6 +9,7 @@ import java.util.Map;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.StoreDTO;
+import dto.UserDTO;
 
 public interface UserService {
 	/*
@@ -32,7 +33,7 @@ public interface UserService {
 	
 	MenuDTO selectById(int menuId) throws SQLException;
 	
-	List<MenuDTO> selectAllMenu(int storeId) throws SQLException;
+	List<MenuDTO> selectAllMenu(int userId) throws SQLException;
 	
 	/*
 	 * 주문 관련
@@ -56,13 +57,24 @@ public interface UserService {
 	
 	int quitStore(int storeId) throws SQLException;
 	
+	StoreDTO selectStore(int userId) throws SQLException;
 	/*
 	 * 매출 관련
 	 */
-	Map<Integer, Integer> selectSales(int storeId, String state) throws SQLException;
+	Map<Integer, Integer> selectSales(int ownerId, String state) throws SQLException;
 	
 	/*
 	 * 인증
 	 */
-	boolean authUser(int storeId, int ownerId) throws SQLException;
+	boolean auth(int storeId, int ownerId) throws SQLException;
+	
+	UserDTO login(String userEmail, String password) throws SQLException;
+	
+	UserDTO account(UserDTO user) throws SQLException;
+	
+	UserDTO createUser(
+			String username,
+			String password,
+			String email, 
+			String role) throws SQLException;
 }
