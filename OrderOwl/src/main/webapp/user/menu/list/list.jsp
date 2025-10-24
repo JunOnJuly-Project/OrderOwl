@@ -78,7 +78,7 @@
 	    
 	    <div id="subselect">
 	    	<h2>
-				<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu'"id="menus" class="selectBtn">목록</button>
+				<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu'" id="menus" class="selectBtn">목록</button>
 				<button onclick="location.href='${pageContext.request.contextPath}/user/menu/insert/insert.jsp'" id="insert" class="selectBtn">추가</button>
 			</h2>	    
 	    </div>
@@ -98,7 +98,12 @@
 					    <td>${menu.price}</td>
 					    <td>${menu.description}</td>
 						<td class="process">
-							<button>삭제</button>
+							<form action="${pageContext.request.contextPath}/front">
+								<input type="hidden" value="${menu.menuId}" name="menuId">
+								<input type="hidden" value="user" name="key">
+								<input type="hidden" value="deleteMenu" name="methodName">
+								<button>삭제</button>
+							</form>
 							<button>수정</button>
 						</td>
 					</tr>
