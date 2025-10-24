@@ -24,7 +24,7 @@ public class DbUtil {
 		try {
 		  Context initContext = new InitialContext();
 		  ds = (DataSource)initContext.lookup("java:/comp/env/jdbc/mySql");
-		  
+		  System.out.println(ds.getConnection());
 		}catch (Exception e) {
 			e.printStackTrace();
 		}

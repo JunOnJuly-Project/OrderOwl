@@ -88,30 +88,34 @@ addModal.forEach((button) => {
   });
 });
 
+
+
+
 //오더 클릭했을때
 orderModal.addEventListener("click", (e) => {
   e.preventDefault();
-  console.log(orderid);
-  // 1. 주문 목록이 비어있는지 확인
+
+
   if (orderList.length === 0) {
     modalContent.innerHTML = "<h6>담은 메뉴가 없습니다.</h6>";
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
-    return; // 함수 종료
+    return; 
   }
 
-  // 2. HTML 문자열을 담을 변수를 반복문 시작 전에 초기화
+
   let orderHtml = "<h4>주문 내역</h4><br/>";
   let sum = 0;
-  // 3. 반복문을 돌면서 += 연산자로 HTML을 계속 추가
+
   for (let i = 0; i < orderList.length; i++) {
-    // 각 주문 항목을 div로 감싸서 구분하기 쉽게 만듭니다.
+ 
     orderHtml += `
             <div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
                 <h6>메뉴 : ${orderList[i][0]}</h6>
                 <h6>가격 : ${orderList[i][1].toLocaleString()}원</h6>
                 <h6>갯수 : ${orderList[i][2]} 개</h6>
                 <h6>총계 : ${orderList[i][3].toLocaleString()}원</h6>
+				<button class="delMenu">삭제하기</button>
             </div>
         `;
 
@@ -120,7 +124,7 @@ orderModal.addEventListener("click", (e) => {
 
   orderHtml += `
 	<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-	<h6>총금액 : ${sum}원</h6>
+	<h6 class="setPrice">총금액 : ${sum}원</h6>
 	</div>
 	`;
 
@@ -187,14 +191,75 @@ orderModal.addEventListener("click", (e) => {
     no = 0;
     updateInfo();
   });
+  
+  //삭제 버튼 눌렀을때
+  document.querySelectorAll(".delMenu").forEach((delbtn) => {
+      
+      delbtn.addEventListener('click', (e) => {
+          
+          const delButton = Array.from(document.querySelectorAll(".delMenu"));
+          
+          const index = delButton.indexOf(e.target);
+
+          
+          no--;
+          console.log(orderList.length);
+          
+          sum -= parseInt(orderList[index][3]); 
+          
+          updateInfo();
+          document.querySelector(".setPrice").innerHTML = `총금액 : ${sum}원</h6>`;
+          
+          orderList.splice(index, 1);
+          console.log(orderList);
+          
+          e.target.parentElement.remove();
+		  
+		  if(orderList.length ===0){
+			
+			
+			closeModal();
+		  }
+      });
+  });
+  
   // 모달창 표시
   modalOverlay.classList.add("show");
   modalWindow.classList.add("show");
 });
 
 //리스트 클릭했을때
-listModal.addEventListener("click", (e) => {
+listModal.addEventListener("click", async (e) => {
   e.preventDefault();
+  
+  // 리스트 비동기 처리 로직
+  const postData = {
+  	      key: "cusOrder",
+  	      methodName: "requestOrderData",
+  		  orderid:orderid,
+  	    };
+  	    let orderDetailList=[];
+  		try {
+  		     const response =  await fetch("http://localhost:8080/OrderOwl/front", {
+  		        method: "POST",
+  		        headers: {
+  		   
+  		          "Content-Type": "application/json", 
+  		        },
+  		 
+  		        body: JSON.stringify(postData), 
+  		      })
+			  
+			  orderDetailList = await response.json();
+	
+			  }
+  		catch (error) {
+  			        console.error("네트워크 오류:", error);
+  			        alert("주문 전송에 실패했습니다. (네트워크 문제)");
+  			      }
+  			console.log(orderDetailList);
+	
+  
 
   if (sessionStorage.getItem("list") == null) {
     modalContent.innerHTML = "<h6>주문 내역이 없습니다.</h6>";
@@ -251,6 +316,7 @@ function updatePrice() {
 const updateInfo = () => {
   document.querySelector("#testCart").innerHTML = no;
 };
+
 
 // 키보드 esc 키를 눌렀을 때
 window.addEventListener("keydown", (e) => {

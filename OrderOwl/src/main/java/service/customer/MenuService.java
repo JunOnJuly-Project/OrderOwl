@@ -1,9 +1,9 @@
-package service.user;
+package service.customer;
 
 
 import java.util.List;
 
-import dao.user.MenuDAOImpl;
+import dao.customer.MenuDAOImpl;
 import dto.MenuDTO;
 
 public class MenuService {

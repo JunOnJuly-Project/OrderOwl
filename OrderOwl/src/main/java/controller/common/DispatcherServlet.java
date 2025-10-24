@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +34,7 @@ public class DispatcherServlet extends HttpServlet {
 		response.setContentType("application/json;charset=UTF-8");
 	String key = request.getParameter("key");
 	String methodName = request.getParameter("methodName");
+	Object orderId = null;
 	if(key == null) {
 		
 		BufferedReader rd =  request.getReader();
@@ -43,16 +43,41 @@ public class DispatcherServlet extends HttpServlet {
 		 key =(String) map.get("key");  
 		 methodName=   (String) map.get("methodName");
 
-		 
+		 System.out.println(map);
 		 Object jsonData = map.get("orders");
-		 Object orderId = map.get("orderid");
+		 orderId = map.get("orderid");
 		   request.setAttribute("jsonData",jsonData);
 		   request.setAttribute("orderId",orderId);
 	
-	
 	}
 
-
+	if(methodName.equals("requestOrderData")) {
+		try {
+			
+			Controller controller = classMap.get(key);
+			Class<?> clz = controller.getClass();
+			
+			Method method = clz.getMethod(methodName, HttpServletRequest.class , HttpServletResponse.class);
+			
+			Object obj = method.invoke(controller, request , response);
+			
+			
+			Gson gson = new Gson();
+			String data = gson.toJson(obj);
+		
+			
+			response.getWriter().print(data);
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+		
+		
+		
+	}
+	
+	else {
 	try {
 		Controller con = classMap.get(key);
 		Class<?> className = con.getClass();
@@ -69,6 +94,6 @@ public class DispatcherServlet extends HttpServlet {
 		e.printStackTrace();
 	}
 	}
-
+	}
 }
 

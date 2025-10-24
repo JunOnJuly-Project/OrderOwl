@@ -1,4 +1,4 @@
-package dao.user;
+package dao.customer;
 
 import java.util.List;
 

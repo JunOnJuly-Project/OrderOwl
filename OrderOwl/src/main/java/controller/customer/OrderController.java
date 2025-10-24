@@ -1,14 +1,19 @@
 package controller.customer;
 
+import java.sql.SQLException;
 import java.util.List;
+
+import com.google.gson.Gson;
 
 import controller.common.Controller;
 import controller.common.ModelAndView;
+import dao.customer.TransferJsonDTO;
+import dto.OrderDetailDTO;
 import dto.StoreDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.user.MenuService;
-import service.user.OrderService;
+import service.customer.MenuService;
+import service.customer.OrderService;
 
 public class OrderController implements Controller {
 	
@@ -52,4 +57,22 @@ public ModelAndView requestOrder(HttpServletRequest request, HttpServletResponse
 		}
 	}
 
+public Object requestOrderData(HttpServletRequest request, HttpServletResponse response) {
+	
+		int orderId = Integer.parseInt(request.getAttribute("orderId").toString());
+		List<TransferJsonDTO> list = null;
+		try {
+			list = os.requestOrderData(orderId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return list;
+
 }
+	
+	
+}
+
+
+
