@@ -1,4 +1,4 @@
-package dao.user;
+package dao.customer;
 
 import java.io.InputStream;
 import java.sql.Connection;
@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import dto.CategoryDTO;
 import dto.MenuDTO;
 import dto.StoreDTO;
 import util.DbUtil;
@@ -24,7 +25,6 @@ private Properties proFile = new Properties();
 		InputStream is = getClass().getClassLoader().getResourceAsStream("dbQuery.properties");
 		proFile.load(is);
 		
-		System.out.println("query.select = " +proFile.getProperty("query.order.selectBystoreId"));
 	}catch (Exception e) {
 		e.printStackTrace();
 	}
@@ -68,7 +68,7 @@ private Properties proFile = new Properties();
 	}
 
 	@Override
-	public MenuDTO selectMenuById() {
+	public MenuDTO selectMenuById(int key) {
 	
 		Connection con=null;
 		PreparedStatement ps=null;
@@ -78,6 +78,7 @@ private Properties proFile = new Properties();
 		try {
 			con = DbUtil.getConnection();
 			ps = con.prepareStatement(sql);
+			ps.setInt(1, key);
 			rs = ps.executeQuery();
 			if(rs.next()) {
 				
@@ -96,6 +97,33 @@ private Properties proFile = new Properties();
 			DbUtil.dbClose(rs, ps, con);
 		}
 		return menu;
+	}
+	
+	public String menuListByCategory(int key) {
+		
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		String menuList = null;
+		String sql= proFile.getProperty("query.order.selectMenuListByCategoryId");
+		try {
+			con = DbUtil.getConnection();
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, key);
+			rs = ps.executeQuery();
+			if(rs.next()) {
+				
+				menuList = rs.getString(1);
+			
+		}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		return menuList;
 	}
 
 }

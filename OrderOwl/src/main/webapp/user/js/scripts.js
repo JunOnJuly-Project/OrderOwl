@@ -16,12 +16,34 @@ const orderModal = document.querySelector(".orderModal");
 const listModal = document.querySelector(".listModal");
 let no = 0;
 
+window.onload = () =>{
+	
+	calCartNum();
+	updateInfo();
+}
+const calCartNum = () =>{
+if(sessionStorage.getItem("list") == null){
+	no = 0;
+
+}
+else {
+	no =  JSON.parse(sessionStorage.getItem("list")).length;
+	
+}
+}
 document
   .getElementById("testFooter")
   .setAttribute("style", "visibility: hidden;");
 
-let orderList = [];
+let orderList = []
 
+if(JSON.parse(sessionStorage.getItem("list")) !== null){
+	
+	orderList =  JSON.parse(sessionStorage.getItem("list"));
+	
+}
+
+calCartNum();
 //  모달을 닫는 함수
 const closeModal = () => {
   qua = 1;
@@ -76,8 +98,9 @@ addModal.forEach((button) => {
 
     document.querySelector(".abtn").addEventListener("click", () => {
       orderList.push([menuName, price, qua, qua * price,menuId]);
+	  sessionStorage.setItem("list", JSON.stringify(orderList));
       console.log(orderList);
-      no++;
+     calCartNum();
       updateInfo();
 
       closeModal();
@@ -88,39 +111,43 @@ addModal.forEach((button) => {
   });
 });
 
+
+
+
 //오더 클릭했을때
 orderModal.addEventListener("click", (e) => {
   e.preventDefault();
-  console.log(orderid);
-  // 1. 주문 목록이 비어있는지 확인
-  if (orderList.length === 0) {
+	let ssOrderList = JSON.parse(sessionStorage.getItem("list"));
+	console.log(ssOrderList);
+  if (ssOrderList == null) {
     modalContent.innerHTML = "<h6>담은 메뉴가 없습니다.</h6>";
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
-    return; // 함수 종료
+    return; 
   }
 
-  // 2. HTML 문자열을 담을 변수를 반복문 시작 전에 초기화
+
   let orderHtml = "<h4>주문 내역</h4><br/>";
   let sum = 0;
-  // 3. 반복문을 돌면서 += 연산자로 HTML을 계속 추가
-  for (let i = 0; i < orderList.length; i++) {
-    // 각 주문 항목을 div로 감싸서 구분하기 쉽게 만듭니다.
+
+  for (let i = 0; i < ssOrderList.length; i++) {
+ 
     orderHtml += `
             <div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-                <h6>메뉴 : ${orderList[i][0]}</h6>
-                <h6>가격 : ${orderList[i][1].toLocaleString()}원</h6>
-                <h6>갯수 : ${orderList[i][2]} 개</h6>
-                <h6>총계 : ${orderList[i][3].toLocaleString()}원</h6>
+                <h6>메뉴 : ${ssOrderList[i][0]}</h6>
+                <h6>가격 : ${ssOrderList[i][1].toLocaleString()}원</h6>
+                <h6>갯수 : ${ssOrderList[i][2]} 개</h6>
+                <h6>총계 : ${ssOrderList[i][3].toLocaleString()}원</h6>
+				<button class="delMenu">삭제하기</button>
             </div>
         `;
 
-    sum += orderList[i][3];
+    sum += ssOrderList[i][3];
   }
 
   orderHtml += `
 	<div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-	<h6>총금액 : ${sum}원</h6>
+	<h6 class="setPrice">총금액 : ${sum}원</h6>
 	</div>
 	`;
 
@@ -134,7 +161,7 @@ orderModal.addEventListener("click", (e) => {
 
   document.querySelector(".obtn").addEventListener("click", async (e) => {
 	e.preventDefault();
-    if (sessionStorage.getItem("list") == null) {
+   /* if (sessionStorage.getItem("list") == null) {
       let sOrderList = [];
       for (let i = 0; i < orderList.length; i++) {
         sOrderList.push([
@@ -155,14 +182,13 @@ orderModal.addEventListener("click", (e) => {
           orderList[i][3],
         ]);
       }
-      sessionStorage.setItem("list", JSON.stringify(sOrderList));
-    }
+    }*/
 	
 	const postData = {
 	      key: "cusOrder",
 	      methodName: "requestOrder",
 		  orderid:orderid,
-	      orders: orderList // 현재 장바구니(orderList)를 보냅니다.
+	      orders: ssOrderList // 현재 장바구니(orderList)를 보냅니다.
 	    };
 	
 		try {
@@ -180,23 +206,92 @@ orderModal.addEventListener("click", (e) => {
 			        alert("주문 전송에 실패했습니다. (네트워크 문제)");
 			      }
 		
-		
+	sessionStorage.removeItem("list")
     orderList = [];
 
     closeModal();
-    no = 0;
+    calCartNum();
+	
+	
+	
+	
     updateInfo();
   });
+  
+  //삭제 버튼 눌렀을때
+  document.querySelectorAll(".delMenu").forEach((delbtn) => {
+      
+      delbtn.addEventListener('click', (e) => {
+          
+          const delButton = Array.from(document.querySelectorAll(".delMenu"));
+          
+          const index = delButton.indexOf(e.target);
+
+          
+          
+          console.log(ssOrderList.length);
+          
+          sum -= parseInt(ssOrderList[index][3]); 
+          
+          document.querySelector(".setPrice").innerHTML = `총금액 : ${sum}원</h6>`;
+          
+          ssOrderList.splice(index, 1);
+		  orderList.splice(index, 1);
+          console.log(ssOrderList);
+          
+          e.target.parentElement.remove();
+		  sessionStorage.setItem("list",JSON.stringify(ssOrderList));
+		  calCartNum();
+		  console.log(ssOrderList.length);
+		  if(ssOrderList.length ===0){
+			
+			
+			closeModal();
+			
+		  }
+		  updateInfo();
+      });
+  });
+  
   // 모달창 표시
   modalOverlay.classList.add("show");
   modalWindow.classList.add("show");
 });
 
 //리스트 클릭했을때
-listModal.addEventListener("click", (e) => {
+listModal.addEventListener("click", async (e) => {
   e.preventDefault();
+  
+  // 리스트 비동기 처리 로직
+  const postData = {
+  	      key: "cusOrder",
+  	      methodName: "requestOrderData",
+  		  orderid:orderid,
+  	    };
+  	    let orderDetailList=[];
+  		try {
+  		     const response =  await fetch("http://localhost:8080/OrderOwl/front", {
+  		        method: "POST",
+  		        headers: {
+  		   
+  		          "Content-Type": "application/json", 
+  		        },
+  		 
+  		        body: JSON.stringify(postData), 
+  		      })
+			  
+			  orderDetailList = await response.json();
+	
+			  }
+  		catch (error) {
+  			        console.error("네트워크 오류:", error);
+  			        alert("주문 전송에 실패했습니다. (네트워크 문제)");
+  			      }
+  		
+	
+  
 
-  if (sessionStorage.getItem("list") == null) {
+  if (orderDetailList == null) {
     modalContent.innerHTML = "<h6>주문 내역이 없습니다.</h6>";
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
@@ -205,20 +300,22 @@ listModal.addEventListener("click", (e) => {
 
   let listHtml = "<h4>주문 내역</h4><br/>";
   let sum = 0;
-  let sList = sessionStorage.getItem("list");
+/*  let sList = sessionStorage.getItem("list");
   let myList = JSON.parse(sList);
-  console.log(myList);
-  for (let i = 0; i < myList.length; i++) {
+  console.log(myList);*/
+  
+ console.log(orderDetailList[0]);
+  for (let i = 0; i < orderDetailList.length; i++) {
     listHtml += `
             <div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-                <h6>메뉴 : ${myList[i][0]}</h6>
-                <h6>가격 : ${myList[i][1]}원</h6>
-                <h6>갯수 : ${myList[i][2]} 개</h6>
-                <h6>총계 : ${myList[i][3]}원</h6>
+                <h6>메뉴 : ${orderDetailList[i].menuName}</h6>
+                <h6>가격 : ${orderDetailList[i].price}원</h6>
+                <h6>갯수 : ${orderDetailList[i].quantity} 개</h6>
+                <h6>총계 : ${orderDetailList[i].price * orderDetailList[i].quantity}원</h6>
             </div>
         `;
 
-    sum += parseInt(myList[i][3]);
+    sum += parseInt(orderDetailList[i].price * orderDetailList[i].quantity);
 
   }
 
@@ -251,6 +348,7 @@ function updatePrice() {
 const updateInfo = () => {
   document.querySelector("#testCart").innerHTML = no;
 };
+
 
 // 키보드 esc 키를 눌렀을 때
 window.addEventListener("keydown", (e) => {
