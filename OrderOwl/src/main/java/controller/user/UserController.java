@@ -38,7 +38,7 @@ public class UserController extends HttpServlet implements Controller {
     				LocalTime.parse(closeTime, formatter);
     	
     	MenuDTO menu = userService.createMenu(
-    			((UserDTO) request.getSession().getAttribute("user")).getUserId(),
+    			((StoreDTO) request.getSession().getAttribute("store")).getStoreId(),
     			request.getParameter("name"), 
     			Integer.parseInt(request.getParameter("price")), 
     			request.getParameter("description"), 
@@ -232,8 +232,11 @@ public class UserController extends HttpServlet implements Controller {
     		return new ModelAndView("user/auth/login/login.jsp");
     	}
     	
+    	StoreDTO store = userService.selectStore(user.getUserId());
+    	
     	HttpSession session = request.getSession();
     	session.setAttribute("user", user);
+    	session.setAttribute("store", store);
     	
     	return new ModelAndView("/front?key=user&methodName=selectAllMenu");
     }
