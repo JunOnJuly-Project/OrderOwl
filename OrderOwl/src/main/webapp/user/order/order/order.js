@@ -30,7 +30,6 @@ const closeModal = () => {
 	openedModal = ""
 }
 
-
 let modalBtns = document.querySelectorAll(".modalBtn")
 modalBtns.forEach((btn) => {
 	btn.addEventListener("click", openModal)
@@ -42,4 +41,3 @@ modals.forEach((m) => {
 })
 
 document.querySelector("html").addEventListener("click", closeModal)
-document.querySelector("#insert").addEventListener("click", openModal)

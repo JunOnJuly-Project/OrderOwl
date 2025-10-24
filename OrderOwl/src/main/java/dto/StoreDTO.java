@@ -28,6 +28,45 @@ public class StoreDTO {
 			this.createdAt = createdAt;
 			this.menu = menu;
 		}
+		
+		public StoreDTO(int storeId, String storeName, String address, String region, String phoneNumber,
+				String description, String imgSrc) {
+			super();
+			this.storeId = storeId;
+			this.storeName = storeName;
+			this.address = address;
+			this.region = region;
+			this.phoneNumber = phoneNumber;
+			this.description = description;
+			this.imgSrc = imgSrc;
+		}
+		
+		public StoreDTO(int storeId, int ownerId, String storeName, String address, String region, String phoneNumber,
+				String description, String imgSrc, LocalDateTime createdAt) {
+			super();
+			this.storeId = storeId;
+			this.ownerId = ownerId;
+			this.storeName = storeName;
+			this.address = address;
+			this.region = region;
+			this.phoneNumber = phoneNumber;
+			this.description = description;
+			this.imgSrc = imgSrc;
+			this.createdAt = createdAt;
+		}
+		
+		public StoreDTO(int ownerId, String storeName, String address, String region, String phoneNumber,
+				String description, String imgSrc, boolean type) {
+			super();
+			this.ownerId = ownerId;
+			this.storeName = storeName;
+			this.address = address;
+			this.region = region;
+			this.phoneNumber = phoneNumber;
+			this.description = description;
+			this.imgSrc = imgSrc;
+		}
+		
 		public int getStoreId() {
 			return storeId;
 		}

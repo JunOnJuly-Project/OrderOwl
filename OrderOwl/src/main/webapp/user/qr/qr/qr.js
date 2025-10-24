@@ -1,5 +1,3 @@
-let openedModal = ""
-
 const openModal = (e) => {
 	e.stopPropagation()
 	
@@ -30,6 +28,7 @@ const closeModal = () => {
 	openedModal = ""
 }
 
+let openedModal = ""
 
 let modalBtns = document.querySelectorAll(".modalBtn")
 modalBtns.forEach((btn) => {

@@ -4,9 +4,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import dto.UserDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.StoreDTO;
+import dto.StoreTableDTO;
 
 public interface UserDAO {
 	/*
@@ -20,14 +22,14 @@ public interface UserDAO {
 	
 	MenuDTO selectById(int menuId) throws SQLException;
 	
-	List<MenuDTO> selectAllMenu(int storeId) throws SQLException;
+	List<MenuDTO> selectAllMenu(int userId) throws SQLException;
 	
 	/*
 	 * 주문 관련
 	 */
-	List<OrderDTO> selectAllOrder(int storeId) throws SQLException;
+	List<OrderDTO> selectAllOrder(int ownerId) throws SQLException;
 	
-	List<OrderDTO> selectOrderByState(int storeId, String state) throws SQLException;
+	List<OrderDTO> selectOrderByState(int ownerId, String state) throws SQLException;
 	
 	int updateOrder(int orderId, String state) throws SQLException;
 	
@@ -38,10 +40,27 @@ public interface UserDAO {
 	
 	int updateStore(StoreDTO storeDto) throws SQLException;
 	
-	int quitStore(int storeId) throws SQLException;
+	int quitStore(int userId) throws SQLException;
 	
+	StoreDTO selectStore(int ownerId) throws SQLException;
 	/*
 	 * 매출 관련
 	 */
-	Map<Integer, Integer> selectSales(int storeId, String state) throws SQLException;
+	Map<Integer, Integer> selectSales(int ownerId, String state) throws SQLException;
+	
+	/*
+	 * 인증 관련
+	 */
+	StoreDTO auth(int ownerId) throws SQLException;
+	
+	int account(UserDTO user) throws SQLException;
+	
+	UserDTO login(String userEmail, String password) throws SQLException;
+	
+	/*
+	 * 테이블 관련
+	 */
+	int createTable(int store_id, int table_no) throws SQLException;
+	
+	int countTable(int store_id) throws SQLException;
 }

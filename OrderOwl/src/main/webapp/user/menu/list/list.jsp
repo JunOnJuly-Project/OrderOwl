@@ -27,14 +27,14 @@
 	
     <div id="background">
     	<div id="header">
-    		<h1>header</h1>
+    		<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=logout'" id="logOut" class="selectBtn">로그아웃</button>
     	</div>
     	
 	    <div id="select">
-	    	<button id="menu" class="selectBtn">메뉴</button>
-	    	<button id="inform" class="selectBtn">정보</button>
+	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu'" id="menu" class="selectBtn">메뉴</button>
+	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectSales&state=hour'" id="inform" class="selectBtn">정보</button>
 	    	<button id="qr" class="selectBtn">QR</button>
-	    	<button id="order" class="selectBtn">주문</button>
+	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllOrder'" id="order" class="selectBtn">주문</button>
 	    </div>
 	    
 	    <div id="subselect">

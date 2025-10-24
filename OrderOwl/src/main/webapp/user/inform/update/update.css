@@ -1,0 +1,144 @@
+@charset "UTF-8";
+
+* {
+	box-sizing: border-box;
+}
+
+html {
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+body {
+	margin: 0;
+	background-color: black;
+}
+
+#background {
+	display: grid;
+	grid-template-columns: 10vw 10vw 60vw 20vw;
+	grid-template-rows: 10vh 85vh 5vh;
+	grid-template-areas: 
+	    "header header header header"
+	    "select list list list"
+	    "footer footer footer footer";
+}
+
+#header {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	grid-area: header;
+}
+
+#select {
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	
+	grid-area: select;
+}
+
+#subselect {
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	
+	grid-area: subselect;
+}
+
+#list {
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+	
+	grid-area: list;
+}
+
+#footer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	grid-area: footer;
+}
+
+h1, p, h2, th, td{
+	margin:0;
+	color: white;
+}
+
+#informMain {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	flex-grow: 1;
+	
+	width: 85vw;
+	height: 80vh;
+	margin-top: 1vh;
+	
+	border: #BB86FC solid 2px;
+	border-radius: 15px;
+	border-collapse: collapse;
+}
+
+button {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	
+	background-color: #03DAC6;
+	border: None;
+	border-radius: 5px;
+	color: white;
+	
+	margin: 1vh;
+}
+
+.selectBtn {
+	height: 5vh;
+	width: 8vw;
+}
+
+.process {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+#inform, #informUpdate {
+	border: #BB86FC 3px solid;
+}
+
+#informs {
+	display: flex;
+	justify-content: space-between;	
+}
+
+#informText {
+	margin-left: 5%;
+	margin-top: 2%;
+}
+
+#informBtn {
+	display: flex;
+	justify-content: space-between;
+	height: 20%;
+}
+
+.mainText {
+	font-size: 300%;
+}
+
+.subText {
+	font-size: 100%;
+}

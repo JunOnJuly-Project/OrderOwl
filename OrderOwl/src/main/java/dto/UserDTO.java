@@ -18,6 +18,14 @@ public class UserDTO {
 		this.role = role;
 		this.createdAt = createdAt;
 	}
+	
+	public UserDTO(String username, String password, String email) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.email = email;
+	}
+	
 	public int getUserId() {
 		return userId;
 	}
