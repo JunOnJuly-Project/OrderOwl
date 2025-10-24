@@ -54,6 +54,19 @@ public class StoreDTO {
 			this.imgSrc = imgSrc;
 			this.createdAt = createdAt;
 		}
+		
+		public StoreDTO(int ownerId, String storeName, String address, String region, String phoneNumber,
+				String description, String imgSrc, boolean type) {
+			super();
+			this.ownerId = ownerId;
+			this.storeName = storeName;
+			this.address = address;
+			this.region = region;
+			this.phoneNumber = phoneNumber;
+			this.description = description;
+			this.imgSrc = imgSrc;
+		}
+		
 		public int getStoreId() {
 			return storeId;
 		}

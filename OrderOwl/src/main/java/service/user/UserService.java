@@ -51,7 +51,7 @@ public interface UserService {
 			String address, String region, String phoneNumber,
 			String description, String imgSrc, LocalDateTime createdAt);
 	
-	int joinStore(StoreDTO storeDto) throws SQLException;
+	StoreDTO joinStore(StoreDTO storeDto) throws SQLException;
 	
 	int updateStore(StoreDTO storeDto) throws SQLException;
 	
@@ -75,6 +75,5 @@ public interface UserService {
 	UserDTO createUser(
 			String username,
 			String password,
-			String email, 
-			String role) throws SQLException;
+			String email) throws SQLException;
 }

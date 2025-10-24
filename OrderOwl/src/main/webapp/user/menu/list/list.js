@@ -20,8 +20,6 @@ const openModal = (e) => {
 			document.querySelector("#modal" + btn.id).style.display = "none"
 		}
 	})
-	
-	document.querySelector("#modalUpdate").style.display = "none"
 }
 
 const closeModal = () => {
@@ -41,17 +39,6 @@ modalBtns.forEach((btn) => {
 let modals = document.querySelectorAll(".modal")
 modals.forEach((m) => {
 	m.addEventListener("click", e => e.stopPropagation())
-})
-
-let updateModalBtn = document.querySelector("#updateBtn")
-updateModalBtn.addEventListener("click", () => {
-	console.log("?");
-	document.querySelector("#modalupdate").style.display = "block"
-	openedModal = "#modalupdate"
-	
-	modalBtns.forEach(btn => {
-		document.querySelector("#modal" + btn.id).style.display = "none"
-	})
 })
 
 document.querySelector("html").addEventListener("click", closeModal)

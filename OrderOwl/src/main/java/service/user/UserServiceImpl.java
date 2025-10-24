@@ -109,8 +109,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public int joinStore(StoreDTO storeDto) throws SQLException {
-		return 0;
+	public StoreDTO joinStore(StoreDTO storeDto) throws SQLException {
+		int result = userDao.joinStore(storeDto);
+		
+		return result == 1 ? selectStore(storeDto.getOwnerId()) : null;
 	}
 
 	@Override
@@ -145,17 +147,16 @@ public class UserServiceImpl implements UserService {
 		System.out.println(user);
 		int result = userDao.account(user);
 		
-		return result == 1 ? user : null;
+		return result == 1 ? login(user.getEmail(), user.getPassword()) : null;
 	}
 
 	@Override
-	public UserDTO createUser(String username, String password, String email, String role)
+	public UserDTO createUser(String username, String password, String email)
 			throws SQLException {
 		return new UserDTO(
 			username,
 			password,
-			email,
-			role
+			email
 		);
 	}
 

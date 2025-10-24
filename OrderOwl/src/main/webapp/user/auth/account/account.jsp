@@ -15,23 +15,58 @@
 		
 		<div id="main">
 			<h1>
-				<form id="loginForm" action="${pageContext.request.contextPath}/front">
-					<input type="hidden" value="login" name="methodName">
+				<form id="accountForm" action="${pageContext.request.contextPath}/front">
+					<input type="hidden" value="account" name="methodName">
 					<input type="hidden" value="user" name="key">
 					
 					<div class="formDiv">
-						<label for="userEmail">email</label>
-						<input type="text" id="userEmail" name="userEmail">
+						<label for="storeName">매장명</label>
+						<input type="text" id="storeName" name="storeName">
 					 </div>
-					 
-					 <div class="formDiv">
-						<label for="password">password</label>
+					<div class="formDiv">
+						<label for="userName">사업자명</label>
+						<input type="text" id="userName" name="username">
+					 </div>
+					<div class="formDiv">
+						<label for="password">비밀번호</label>
 						<input type="password" id="password" name="password">
-					</div>
+					 </div>
+					<div class="formDiv">
+						<label for="confirmPassword">비밀번호 확인</label>
+						<input type="password" id="confirmPassword" name="confirmPassword">
+				 	</div>	
+					<div class="formDiv">
+						<label for="email">이메일</label>
+						<input type="text" id="email" name="email">
+					 </div>
+					<div class="phoneNumber">
+						<label for="phoneNumber">매장 번호</label>
+						<input type="text" id="phoneNumber" name="phoneNumber">
+					 </div>
+					<div class="formDiv">
+						<label for="description">매장 정보</label>
+						<input type="text" id="description" name="description">
+					 </div>
+					<div class="formDiv">
+						<label for="region">지역</label>
+						<input type="text" id="region" name="region">
+					 </div>
+					<div class="formDiv">
+						<label for="address">매장 주소</label>
+						<input type="text" id="address" name="address">
+					 </div>
+					<div class="formDiv">
+						<label for="storeNum">사업자 번호</label>
+						<input type="text" id="storeNum" name="storeNum">
+					 </div>
+					<div class="formDiv">
+						<label for="imgSrc">대표 이미지</label>
+						<input type="text" id="imgSrc" name="imgSrc">
+					 </div>
 					
 					<div id="buttonDiv">
-						<button>Login</button>
-						<button>Account</button>
+						<button type="button">취소</button>
+						<button>가입 요청</button>
 					</div>
 				</form>
 			

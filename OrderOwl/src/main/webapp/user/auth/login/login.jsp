@@ -31,7 +31,7 @@
 					
 					<div id="buttonDiv">
 						<button>Login</button>
-						<button>Account</button>
+						<button onclick="location.href='${pageContext.request.contextPath}/user/auth/account/account.jsp'" id="account" class="accountBtn" type="button" >Account</button>
 					</div>
 				</form>
 			

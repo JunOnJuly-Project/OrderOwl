@@ -17,6 +17,7 @@ import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.OrderDetailDTO;
 import dto.StoreDTO;
+import dto.StoreTableDTO;
 import dto.UserDTO;
 import util.DbUtil;
 
@@ -492,7 +493,6 @@ public class UserDAOImpl implements UserDAO {
 			ps.setString(1, user.getUsername());
 			ps.setString(2, user.getPassword());
 			ps.setString(3, user.getEmail());	
-			ps.setString(4, user.getRole());
 	
 			result = ps.executeUpdate();
 		}
@@ -621,5 +621,60 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		return store;
+	}
+
+	@Override
+	public int createTable(int store_id, int table_no) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		int result = 0;
+		StoreTableDTO table = null;
+		
+		String sql= proFile.getProperty("user.table.create");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, store_id);
+			ps.setInt(2, table_no);
+			
+			result = ps.executeUpdate();
+		}
+		
+		finally {
+			DbUtil.dbClose(ps, con);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public int countTable(int store_id) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		int result = 0;
+		
+		String sql= proFile.getProperty("user.table.count");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, store_id);
+			
+			rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return result;
 	}
 }

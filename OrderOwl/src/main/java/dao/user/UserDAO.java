@@ -8,6 +8,7 @@ import dto.UserDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.StoreDTO;
+import dto.StoreTableDTO;
 
 public interface UserDAO {
 	/*
@@ -55,4 +56,11 @@ public interface UserDAO {
 	int account(UserDTO user) throws SQLException;
 	
 	UserDTO login(String userEmail, String password) throws SQLException;
+	
+	/*
+	 * 테이블 관련
+	 */
+	int createTable(int store_id, int table_no) throws SQLException;
+	
+	int countTable(int store_id) throws SQLException;
 }

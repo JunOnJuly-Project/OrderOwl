@@ -19,12 +19,11 @@ public class UserDTO {
 		this.createdAt = createdAt;
 	}
 	
-	public UserDTO(String username, String password, String email, String role) {
+	public UserDTO(String username, String password, String email) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.email = email;
-		this.role = role;
 	}
 	
 	public int getUserId() {

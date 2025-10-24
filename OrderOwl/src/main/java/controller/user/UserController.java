@@ -166,21 +166,53 @@ public class UserController extends HttpServlet implements Controller {
     	return selectAllOrder(request, response);
     }
     
+    public StoreDTO createStore(int ownerId, String storeName, String address,
+    		String region, String phoneNumber,String description, String imgSrc
+		) {
+    	return new StoreDTO(
+    		ownerId,
+    		storeName,
+    		address,
+    		region,
+    		phoneNumber,
+    		description,
+    		imgSrc,
+    		true
+		);
+    }
+    
     public ModelAndView account(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	System.out.println("?");
+    	System.out.println(request.getParameter("password"));
+    	System.out.println(request.getParameter("confirmPassword"));
+    	if (request.getParameter("password")
+			.equals(request.getParameter("confirmPassword")) == false) {
+    		return new ModelAndView("user/auth/account/account.jsp");
+    	}
+    	
+    	System.out.println("?");
     	UserDTO user = userService.createUser(
 			request.getParameter("username"), 
 			request.getParameter("password"), 
-			request.getParameter("email"), 
-			request.getParameter("role")
+			request.getParameter("email")
 		);
     	
-    	UserDTO accountUser = userService.account(user);
-    	if (accountUser == null) {
-    		return new ModelAndView("user/auth/login/login.jsp");
-    	}
+    	user = userService.account(user);
+    	StoreDTO store = createStore(
+			user.getUserId(),
+			request.getParameter("storeName"),
+			request.getParameter("address"),
+			request.getParameter("region"),
+			request.getParameter("phoneNumber"),
+			request.getParameter("description"),
+			request.getParameter("imgSrc")
+		);
     	
+    	store = userService.joinStore(store);
+    			
     	HttpSession session = request.getSession();
-    	session.setAttribute("user", accountUser);
+    	session.setAttribute("user", user);
+    	session.setAttribute("store", store);
     	
     	return new ModelAndView("user/menu/list/list.jsp");
     }
@@ -248,4 +280,6 @@ public class UserController extends HttpServlet implements Controller {
     	
     	return new ModelAndView("user/auth/login/login.jsp");
     }
+    
+    
 }
