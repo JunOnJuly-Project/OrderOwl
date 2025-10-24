@@ -38,7 +38,7 @@ public class UserController extends HttpServlet implements Controller {
     				LocalTime.parse(closeTime, formatter);
     	
     	MenuDTO menu = userService.createMenu(
-    			((UserDTO) request.getSession().getAttribute("user")).getUserId(),
+    			((StoreDTO) request.getSession().getAttribute("store")).getStoreId(),
     			request.getParameter("name"), 
     			Integer.parseInt(request.getParameter("price")), 
     			request.getParameter("description"), 
