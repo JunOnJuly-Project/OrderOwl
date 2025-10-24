@@ -89,6 +89,22 @@ public class MenuDTO {
 			this.soldOut = soldOut;
 		}
 		
+		public MenuDTO(int storeId, String menuName, int price, String description, String imgSrc,
+				int category1Code, int category2Code, String checkRec, String orderRequest, LocalTime closeTime,
+				String soldOut) {
+			super();
+			this.storeId = storeId;
+			this.menuName = menuName;
+			this.price = price;
+			this.description = description;
+			this.imgSrc = imgSrc;
+			this.category1Code = category2Code;
+			this.category2Code = category2Code;
+			this.checkRec = checkRec;
+			this.orderRequest = orderRequest;
+			this.closeTime = closeTime;
+			this.soldOut = soldOut;
+		}
 		
 		public int getMenuId() {
 			return menuId;
