@@ -16,12 +16,34 @@ const orderModal = document.querySelector(".orderModal");
 const listModal = document.querySelector(".listModal");
 let no = 0;
 
+window.onload = () =>{
+	
+	calCartNum();
+	updateInfo();
+}
+const calCartNum = () =>{
+if(sessionStorage.getItem("list") == null){
+	no = 0;
+
+}
+else {
+	no =  JSON.parse(sessionStorage.getItem("list")).length;
+	
+}
+}
 document
   .getElementById("testFooter")
   .setAttribute("style", "visibility: hidden;");
 
-let orderList = [];
+let orderList = []
 
+if(JSON.parse(sessionStorage.getItem("list")) !== null){
+	
+	orderList =  JSON.parse(sessionStorage.getItem("list"));
+	
+}
+
+calCartNum();
 //  모달을 닫는 함수
 const closeModal = () => {
   qua = 1;
@@ -76,8 +98,9 @@ addModal.forEach((button) => {
 
     document.querySelector(".abtn").addEventListener("click", () => {
       orderList.push([menuName, price, qua, qua * price,menuId]);
+	  sessionStorage.setItem("list", JSON.stringify(orderList));
       console.log(orderList);
-      no++;
+     calCartNum();
       updateInfo();
 
       closeModal();
@@ -94,9 +117,9 @@ addModal.forEach((button) => {
 //오더 클릭했을때
 orderModal.addEventListener("click", (e) => {
   e.preventDefault();
-
-
-  if (orderList.length === 0) {
+	let ssOrderList = JSON.parse(sessionStorage.getItem("list"));
+	console.log(ssOrderList);
+  if (ssOrderList == null) {
     modalContent.innerHTML = "<h6>담은 메뉴가 없습니다.</h6>";
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
@@ -107,19 +130,19 @@ orderModal.addEventListener("click", (e) => {
   let orderHtml = "<h4>주문 내역</h4><br/>";
   let sum = 0;
 
-  for (let i = 0; i < orderList.length; i++) {
+  for (let i = 0; i < ssOrderList.length; i++) {
  
     orderHtml += `
             <div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-                <h6>메뉴 : ${orderList[i][0]}</h6>
-                <h6>가격 : ${orderList[i][1].toLocaleString()}원</h6>
-                <h6>갯수 : ${orderList[i][2]} 개</h6>
-                <h6>총계 : ${orderList[i][3].toLocaleString()}원</h6>
+                <h6>메뉴 : ${ssOrderList[i][0]}</h6>
+                <h6>가격 : ${ssOrderList[i][1].toLocaleString()}원</h6>
+                <h6>갯수 : ${ssOrderList[i][2]} 개</h6>
+                <h6>총계 : ${ssOrderList[i][3].toLocaleString()}원</h6>
 				<button class="delMenu">삭제하기</button>
             </div>
         `;
 
-    sum += orderList[i][3];
+    sum += ssOrderList[i][3];
   }
 
   orderHtml += `
@@ -138,7 +161,7 @@ orderModal.addEventListener("click", (e) => {
 
   document.querySelector(".obtn").addEventListener("click", async (e) => {
 	e.preventDefault();
-    if (sessionStorage.getItem("list") == null) {
+   /* if (sessionStorage.getItem("list") == null) {
       let sOrderList = [];
       for (let i = 0; i < orderList.length; i++) {
         sOrderList.push([
@@ -159,14 +182,13 @@ orderModal.addEventListener("click", (e) => {
           orderList[i][3],
         ]);
       }
-      sessionStorage.setItem("list", JSON.stringify(sOrderList));
-    }
+    }*/
 	
 	const postData = {
 	      key: "cusOrder",
 	      methodName: "requestOrder",
 		  orderid:orderid,
-	      orders: orderList // 현재 장바구니(orderList)를 보냅니다.
+	      orders: ssOrderList // 현재 장바구니(orderList)를 보냅니다.
 	    };
 	
 		try {
@@ -184,11 +206,15 @@ orderModal.addEventListener("click", (e) => {
 			        alert("주문 전송에 실패했습니다. (네트워크 문제)");
 			      }
 		
-		
+	sessionStorage.removeItem("list")
     orderList = [];
 
     closeModal();
-    no = 0;
+    calCartNum();
+	
+	
+	
+	
     updateInfo();
   });
   
@@ -202,24 +228,28 @@ orderModal.addEventListener("click", (e) => {
           const index = delButton.indexOf(e.target);
 
           
-          no--;
-          console.log(orderList.length);
           
-          sum -= parseInt(orderList[index][3]); 
+          console.log(ssOrderList.length);
           
-          updateInfo();
+          sum -= parseInt(ssOrderList[index][3]); 
+          
           document.querySelector(".setPrice").innerHTML = `총금액 : ${sum}원</h6>`;
           
-          orderList.splice(index, 1);
-          console.log(orderList);
+          ssOrderList.splice(index, 1);
+		  orderList.splice(index, 1);
+          console.log(ssOrderList);
           
           e.target.parentElement.remove();
-		  
-		  if(orderList.length ===0){
+		  sessionStorage.setItem("list",JSON.stringify(ssOrderList));
+		  calCartNum();
+		  console.log(ssOrderList.length);
+		  if(ssOrderList.length ===0){
 			
 			
 			closeModal();
+			
 		  }
+		  updateInfo();
       });
   });
   
@@ -257,11 +287,11 @@ listModal.addEventListener("click", async (e) => {
   			        console.error("네트워크 오류:", error);
   			        alert("주문 전송에 실패했습니다. (네트워크 문제)");
   			      }
-  			console.log(orderDetailList);
+  		
 	
   
 
-  if (sessionStorage.getItem("list") == null) {
+  if (orderDetailList == null) {
     modalContent.innerHTML = "<h6>주문 내역이 없습니다.</h6>";
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
@@ -270,20 +300,22 @@ listModal.addEventListener("click", async (e) => {
 
   let listHtml = "<h4>주문 내역</h4><br/>";
   let sum = 0;
-  let sList = sessionStorage.getItem("list");
+/*  let sList = sessionStorage.getItem("list");
   let myList = JSON.parse(sList);
-  console.log(myList);
-  for (let i = 0; i < myList.length; i++) {
+  console.log(myList);*/
+  
+ console.log(orderDetailList[0]);
+  for (let i = 0; i < orderDetailList.length; i++) {
     listHtml += `
             <div style="border-bottom: 1px solid #ccc; margin-bottom: 10px; padding-bottom: 10px;">
-                <h6>메뉴 : ${myList[i][0]}</h6>
-                <h6>가격 : ${myList[i][1]}원</h6>
-                <h6>갯수 : ${myList[i][2]} 개</h6>
-                <h6>총계 : ${myList[i][3]}원</h6>
+                <h6>메뉴 : ${orderDetailList[i].menuName}</h6>
+                <h6>가격 : ${orderDetailList[i].price}원</h6>
+                <h6>갯수 : ${orderDetailList[i].quantity} 개</h6>
+                <h6>총계 : ${orderDetailList[i].price * orderDetailList[i].quantity}원</h6>
             </div>
         `;
 
-    sum += parseInt(myList[i][3]);
+    sum += parseInt(orderDetailList[i].price * orderDetailList[i].quantity);
 
   }
 

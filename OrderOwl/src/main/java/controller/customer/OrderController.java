@@ -26,9 +26,9 @@ public ModelAndView selectByModelNum(HttpServletRequest request, HttpServletResp
 			int tableNo =  Integer.parseInt(request.getParameter("tableNo"));
 			StoreDTO store =  os.selectStoreByStoreId(tableNo);
 			int storeId = store.getStoreId();
-
+			
 			int orderId = os.canOrderCheck(tableNo,storeId);
-
+			System.out.println(ss.selectMenuByCategory(3));
 			request.setAttribute("cusOrderId",orderId);
 			request.setAttribute("store",store);
 			request.setAttribute("menu",ss.selectMenuByStoreId(tableNo));

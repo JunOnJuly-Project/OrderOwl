@@ -46,7 +46,9 @@ public class DispatcherServlet extends HttpServlet {
 		 System.out.println(map);
 		 Object jsonData = map.get("orders");
 		 orderId = map.get("orderid");
-		   request.setAttribute("jsonData",jsonData);
+		 	if(methodName.equals("requestOrder"))
+		 	{ request.setAttribute("jsonData",jsonData);}
+		 	
 		   request.setAttribute("orderId",orderId);
 	
 	}
