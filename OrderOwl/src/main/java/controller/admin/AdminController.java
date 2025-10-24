@@ -126,6 +126,38 @@ public class AdminController implements Controller {
     }
     
     /**
+     * 매장 정보 수정 폼 데이터 조회
+     */
+    public ModelAndView getStoreForEdit(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            int storeId = Integer.parseInt(request.getParameter("storeId"));
+            StoreDTO store = adminService.getStoreInfo(storeId);
+            
+            if (store != null) {
+                result.put("success", true);
+                result.put("data", store);
+            } else {
+                result.put("success", false);
+                result.put("message", "매장 정보를 찾을 수 없습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "매장 정보를 불러오는데 실패했습니다.");
+        }
+        
+        out.print(gson.toJson(result));
+        out.flush();
+        
+        return null;
+    }
+    
+    /**
      * 매장 추가
      */
     public ModelAndView addStore(HttpServletRequest request, HttpServletResponse response) throws Exception {

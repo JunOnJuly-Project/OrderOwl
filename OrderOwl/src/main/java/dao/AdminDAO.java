@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.io.InputStream;
 
 import dto.StoreDTO;
 import dto.UserDTO;
@@ -19,8 +21,42 @@ import util.DbUtil;
 /**
  * 관리자 DAO - 데이터베이스 접근
  * OrderOwl.sql 스키마 기준 리팩토링
+ * SQL 쿼리 properties 파일에서 관리
  */
 public class AdminDAO {
+    
+    private Properties queryProps;
+    
+    public AdminDAO() {
+        queryProps = loadQueryProperties();
+    }
+    
+    /**
+     * 쿼리 프로퍼티 파일 로드
+     */
+    private Properties loadQueryProperties() {
+        Properties props = new Properties();
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("dbQuery.properties")) {
+            if (input == null) {
+                System.out.println("⚠️ dbQuery.properties 파일을 찾을 수 없습니다. 기본 SQL을 사용합니다.");
+                return props;
+            }
+            props.load(input);
+            System.out.println("✅ dbQuery.properties 로드 성공!");
+        } catch (Exception ex) {
+            System.out.println("❌ dbQuery.properties 로드 실패: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return props;
+    }
+    
+    private String getQuery(String key) {
+        String query = queryProps.getProperty(key);
+        if (query == null) {
+            System.err.println("⚠️ 쿼리 키를 찾을 수 없음: " + key);
+        }
+        return query;
+    }
     
     // ==================== 매장 관리 ====================
     
@@ -33,8 +69,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "INSERT INTO Store (owner_id, store_name, address, region, phone_number, description, img_src) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sql = getQuery("store.insert");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, store.getOwnerId());
             pstmt.setString(2, store.getStoreName());
@@ -61,8 +96,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "UPDATE Store SET store_name = ?, address = ?, region = ?, " +
-                         "phone_number = ?, description = ?, img_src = ? WHERE store_id = ?";
+            String sql = getQuery("store.update");
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, store.getStoreName());
             pstmt.setString(2, store.getAddress());
@@ -89,7 +123,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "DELETE FROM Store WHERE store_id = ?";
+            String sql = getQuery("store.delete");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             return pstmt.executeUpdate();
@@ -111,7 +145,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT * FROM Store WHERE store_id = ?";
+            String sql = getQuery("store.selectById");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             rs = pstmt.executeQuery();
@@ -150,7 +184,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT * FROM Store ORDER BY created_at DESC";
+            String sql = getQuery("store.selectAll");
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             
@@ -189,7 +223,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT * FROM Store WHERE owner_id = ?";
+            String sql = getQuery("store.selectByOwnerId");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, ownerId);
             rs = pstmt.executeQuery();
@@ -229,9 +263,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "INSERT INTO Menu (store_id, menu_name, price, description, img_src, " +
-                         "category1_code, category2_code, check_rec, order_request, sold_out) " +
-                         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = getQuery("menu.insert");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, menu.getStoreId());
             pstmt.setString(2, menu.getMenuName());
@@ -261,9 +293,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "UPDATE Menu SET menu_name = ?, price = ?, description = ?, img_src = ?, " +
-                         "category1_code = ?, category2_code = ?, check_rec = ?, order_request = ?, sold_out = ? " +
-                         "WHERE menu_id = ?";
+            String sql = getQuery("menu.update");
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, menu.getMenuName());
             pstmt.setInt(2, menu.getPrice());
@@ -306,7 +336,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "DELETE FROM Menu WHERE menu_id = ?";
+            String sql = getQuery("menu.delete");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, menuId);
             return pstmt.executeUpdate();
@@ -328,7 +358,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT * FROM Menu WHERE menu_id = ?";
+            String sql = getQuery("menu.selectById");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, menuId);
             rs = pstmt.executeQuery();
@@ -370,7 +400,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT * FROM Menu WHERE store_id = ? ORDER BY menu_id";
+            String sql = getQuery("menu.selectByStoreId");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             rs = pstmt.executeQuery();
@@ -411,9 +441,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT COUNT(*) FROM OrderDetail od " +
-                         "JOIN OrderTable ot ON od.order_id = ot.order_id " +
-                         "WHERE od.menu_id = ? AND ot.status = 'pending'";
+            String sql = getQuery("menu.checkActiveOrders");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, menuId);
             rs = pstmt.executeQuery();
@@ -440,7 +468,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "DELETE FROM User WHERE user_id = ?";
+            String sql = getQuery("user.delete");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, userId);
             return pstmt.executeUpdate();
@@ -462,7 +490,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT * FROM User WHERE user_id = ?";
+            String sql = getQuery("user.selectById");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, userId);
             rs = pstmt.executeQuery();
@@ -497,7 +525,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT * FROM User ORDER BY created_at DESC";
+            String sql = getQuery("user.selectAll");
             pstmt = conn.prepareStatement(sql);
             rs = pstmt.executeQuery();
             
@@ -533,7 +561,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT COUNT(*) FROM OrderTable WHERE store_id = ? AND status = 'pending'";
+            String sql = getQuery("order.countPending");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             rs = pstmt.executeQuery();
@@ -559,8 +587,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT COUNT(*) FROM OrderTable " +
-                         "WHERE store_id = ? AND DATE(order_date) BETWEEN ? AND ?";
+            String sql = getQuery("order.countByPeriod");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             pstmt.setDate(2, Date.valueOf(startDate));
@@ -588,8 +615,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT IFNULL(SUM(total_price), 0) FROM OrderTable " +
-                         "WHERE store_id = ? AND DATE(order_date) BETWEEN ? AND ? AND status = 'completed'";
+            String sql = getQuery("sales.sumByPeriod");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             pstmt.setDate(2, Date.valueOf(startDate));
@@ -618,10 +644,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT DATE(order_date) as sale_date, SUM(total_price) as daily_total " +
-                         "FROM OrderTable " +
-                         "WHERE store_id = ? AND DATE(order_date) BETWEEN ? AND ? AND status = 'completed' " +
-                         "GROUP BY DATE(order_date) ORDER BY sale_date";
+            String sql = getQuery("sales.dailySales");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             pstmt.setDate(2, Date.valueOf(startDate));
@@ -653,13 +676,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT m.menu_name, SUM(od.quantity) as total_quantity, SUM(od.price) as total_sales " +
-                         "FROM OrderDetail od " +
-                         "JOIN Menu m ON od.menu_id = m.menu_id " +
-                         "JOIN OrderTable ot ON od.order_id = ot.order_id " +
-                         "WHERE m.store_id = ? AND DATE(ot.order_date) BETWEEN ? AND ? AND ot.status = 'completed' " +
-                         "GROUP BY m.menu_id, m.menu_name " +
-                         "ORDER BY total_sales DESC";
+            String sql = getQuery("sales.menuSales");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             pstmt.setDate(2, Date.valueOf(startDate));
@@ -694,13 +711,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT st.table_id, st.table_no, st.store_id, s.store_name, " +
-                         "q.qrcode_data, q.qr_img_src, q.created_at " +
-                         "FROM StoreTable st " +
-                         "JOIN Store s ON st.store_id = s.store_id " +
-                         "LEFT JOIN QRCode q ON st.table_id = q.table_id " +
-                         "WHERE st.store_id = ? " +
-                         "ORDER BY st.table_id";
+            String sql = getQuery("table.selectStoreTables");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, storeId);
             rs = pstmt.executeQuery();
@@ -733,15 +744,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            
-            // UPSERT (INSERT or UPDATE)
-            String sql = "INSERT INTO QRCode (table_id, qrcode_data, qr_img_src) " +
-                         "VALUES (?, ?, ?) " +
-                         "ON DUPLICATE KEY UPDATE " +
-                         "qrcode_data = VALUES(qrcode_data), " +
-                         "qr_img_src = VALUES(qr_img_src), " +
-                         "created_at = CURRENT_TIMESTAMP";
-            
+            String sql = getQuery("table.upsertQR");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, tableId);
             pstmt.setString(2, qrcodeData);
@@ -766,10 +769,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT st.table_id, st.table_no, st.store_id, s.store_name " +
-                         "FROM StoreTable st " +
-                         "JOIN Store s ON st.store_id = s.store_id " +
-                         "WHERE st.table_id = ?";
+            String sql = getQuery("table.selectById");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, tableId);
             rs = pstmt.executeQuery();
@@ -800,11 +800,7 @@ public class AdminDAO {
         
         try {
             conn = DbUtil.getConnection();
-            String sql = "SELECT q.*, st.table_no, s.store_name, s.store_id " +
-                         "FROM QRCode q " +
-                         "JOIN StoreTable st ON q.table_id = st.table_id " +
-                         "JOIN Store s ON st.store_id = s.store_id " +
-                         "WHERE q.table_id = ?";
+            String sql = getQuery("table.selectQRByTableId");
             pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, tableId);
             rs = pstmt.executeQuery();

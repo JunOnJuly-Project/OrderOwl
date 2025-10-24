@@ -235,11 +235,71 @@
 		</div>
 	</div>
 
+	<!-- 매장 수정 모달 -->
+	<div id="storeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
+			<h3 class="text-xl font-bold mb-4" id="storeModalTitle">매장 수정</h3>
+			<form id="storeForm">
+				<input type="hidden" id="storeId" name="storeId">
+				<input type="hidden" id="ownerId" name="ownerId">
+				
+				<div class="space-y-4">
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">매장명 *</label>
+						<input type="text" id="storeName" name="storeName" required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">주소</label>
+						<input type="text" id="address" name="address"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">지역</label>
+						<input type="text" id="region" name="region"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">전화번호</label>
+						<input type="text" id="phoneNumber" name="phoneNumber"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
+						<textarea id="description" name="description" rows="3"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">이미지 URL</label>
+						<input type="text" id="imgSrc" name="imgSrc"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+				</div>
+				
+				<div class="flex gap-3 mt-6">
+					<button type="submit"
+						class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+						저장
+					</button>
+					<button type="button" onclick="closeStoreModal()"
+						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+						취소
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
 	<!-- 메뉴 추가/수정 모달 -->
 	<div id="menuModal"
 		class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 		<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
-			<h3 class="text-xl font-bold mb-4" id="menuModalTitle">메뉴 추가</h3>
+			<h3 class="text-xl font-bold mb-4" id="menuModalTitle">메뉴 수정</h3>
 			<form id="menuForm">
 				<input type="hidden" id="menuId" name="menuId"> 
 				<input type="hidden" id="menuStoreId" name="storeId">
@@ -396,12 +456,15 @@ function loadStoreList() {
             } else {
                 stores.forEach(function(store) {
                     html += '<tr class="border-b hover:bg-gray-50">';
-                    html += '<td class="px-6 py-4">' + store.storeName + '</td>';
+                    html += '<td class="px-6 py-4 font-medium">' + store.storeName + '</td>';
                     html += '<td class="px-6 py-4">' + store.ownerId + '</td>';
                     html += '<td class="px-6 py-4">' + (store.region || '-') + '</td>';
                     html += '<td class="px-6 py-4">' + (store.phoneNumber || '-') + '</td>';
                     html += '<td class="px-6 py-4">';
-                    html += '<button onclick="deleteStore(' + store.storeId + ')" class="text-red-500 hover:text-red-700">삭제</button>';
+                    html += '<div class="flex gap-2">';
+                    html += '<button onclick="editStore(' + store.storeId + ')" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">수정</button>';
+                    html += '<button onclick="deleteStore(' + store.storeId + ')" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">삭제</button>';
+                    html += '</div>';
                     html += '</td>';
                     html += '</tr>';
                 });
@@ -413,8 +476,62 @@ function loadStoreList() {
     });
 }
 
+function editStore(storeId) {
+    callAPI('getStoreForEdit', {storeId: storeId}, function(res) {
+        if (res && res.success) {
+            let store = res.data;
+            
+            $('#storeModalTitle').text('매장 수정');
+            $('#storeId').val(store.storeId);
+            $('#ownerId').val(store.ownerId);
+            $('#storeName').val(store.storeName || '');
+            $('#address').val(store.address || '');
+            $('#region').val(store.region || '');
+            $('#phoneNumber').val(store.phoneNumber || '');
+            $('#description').val(store.description || '');
+            $('#imgSrc').val(store.imgSrc || '');
+            
+            $('#storeModal').removeClass('hidden');
+        } else {
+            alert('매장 정보를 불러오는데 실패했습니다.');
+        }
+    });
+}
+
+function closeStoreModal() {
+    $('#storeModal').addClass('hidden');
+    $('#storeForm')[0].reset();
+}
+
+// 매장 폼 제출 처리
+$('#storeForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    let formData = {
+        storeId: $('#storeId').val(),
+        ownerId: $('#ownerId').val(),
+        storeName: $('#storeName').val(),
+        address: $('#address').val(),
+        region: $('#region').val(),
+        phoneNumber: $('#phoneNumber').val(),
+        description: $('#description').val(),
+        imgSrc: $('#imgSrc').val()
+    };
+    
+    if (!confirm('매장 정보를 수정하시겠습니까?')) return;
+    
+    callAPI('updateStoreInfo', formData, function(res) {
+        alert(res.message || '처리되었습니다.');
+        if (res.success) {
+            closeStoreModal();
+            loadStoreList();
+            loadDashboardStats();
+        }
+    });
+});
+
 function deleteStore(storeId) {
-    if (!confirm('이 매장을 삭제하시겠습니까?')) return;
+    if (!confirm('이 매장을 삭제하시겠습니까?\n\n진행 중인 주문이 있는 매장은 삭제할 수 없습니다.')) return;
     
     callAPI('deleteStore', {storeId: storeId}, function(res) {
         alert(res.message || '처리되었습니다.');
@@ -476,8 +593,6 @@ function loadStoreMenus() {
         }
     });
 }
-
-// 메뉴 추가 모달 관련 코드 삭제
 
 function editMenu(menuId) {
     callAPI('getStoreMenus', {storeId: currentMenuStoreId}, function(res) {
