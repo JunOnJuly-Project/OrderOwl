@@ -1,10 +1,11 @@
-package dao.user;
+package dao.customer;
 
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -22,8 +23,7 @@ public class OrderDAOImpl implements OrderDAO {
 		
 		InputStream is = getClass().getClassLoader().getResourceAsStream("dbQuery.properties");
 		proFile.load(is);
-		
-		System.out.println("query.select = " +proFile.getProperty("query.order.selectBystoreId"));
+	
 	}catch (Exception e) {
 		e.printStackTrace();
 	}
@@ -255,8 +255,40 @@ public void updateOrderTotalPrice(int totalPrice, int orderId) throws SQLExcepti
 }
 
 
+@Override
+public List<TransferJsonDTO> selectOrderAllOrderByOrderId(int orderId) throws SQLException {
 
+	Connection con=null;
+	PreparedStatement ps=null;
+	ResultSet rs=null;
+	List<TransferJsonDTO> list = new ArrayList<TransferJsonDTO>();
+	TransferJsonDTO orderDetail = null;
+	String sql= proFile.getProperty("query.order.selectOrderAllOrderByOrderId");
+	try {
+		con = DbUtil.getConnection();
+		ps = con.prepareStatement(sql);
+		ps.setInt(1, orderId);
+		rs = ps.executeQuery();
+		while(rs.next()) {
+			
+			orderDetail = 
+			new TransferJsonDTO(rs.getString(1),rs.getInt(2),rs.getInt(3));
+			
+			list.add(orderDetail);
+			
+		}
+		
+	}
 	
+	catch (Exception e) {
+		e.printStackTrace();
+	}
+	finally {
+		DbUtil.dbClose(rs, ps, con);
+	}
+	return list;
+}
+
 
 	}
 

@@ -1,4 +1,4 @@
-package dao.user;
+package dao.customer;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ public interface MenuDAO {
 	
 	public List<MenuDTO> selectAllMenu(int key);
 	
-	public MenuDTO selectMenuById();
+	public MenuDTO selectMenuById(int key);
+	public String menuListByCategory(int key);
 
 }

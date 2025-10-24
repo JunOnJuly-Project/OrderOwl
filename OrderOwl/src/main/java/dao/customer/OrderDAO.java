@@ -1,4 +1,4 @@
-package dao.user;
+package dao.customer;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -15,5 +15,6 @@ public interface OrderDAO {
 	public void insertNewOrder(int tableNo,int StoreId) throws SQLException ;
 	public int findOrderTotalPrice(int order_id) throws SQLException ;
 	public void updateOrderTotalPrice(int total_price,int order_id) throws SQLException ;
+	public List<TransferJsonDTO> selectOrderAllOrderByOrderId (int orderId) throws SQLException ;
 	
 }

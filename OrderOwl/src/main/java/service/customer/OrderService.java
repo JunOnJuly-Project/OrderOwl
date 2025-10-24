@@ -1,10 +1,11 @@
-package service.user;
+package service.customer;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import dao.user.OrderDAOImpl;
+import dao.customer.OrderDAOImpl;
+import dao.customer.TransferJsonDTO;
 import dto.OrderDetailDTO;
 import dto.StoreDTO;
 
@@ -33,29 +34,30 @@ public class OrderService {
 				
 				(int)(Float.parseFloat(parseList[3].replace("]", "").trim()))));
 		
-		totalPrice += (int)(Float.parseFloat(parseList[3].replace("]", "").trim()));
-			
+		totalPrice += (int)(Float.parseFloat(parseList[3].replace("]", "").trim()));	
 		}
-	
 		new OrderDAOImpl().insertOrderDetail(orderList,orderId);
 		totalPrice += new OrderDAOImpl().findOrderTotalPrice(orderId);
-		
 		new OrderDAOImpl().updateOrderTotalPrice(totalPrice, orderId);
-		
-	
 	}
 	
 	public int canOrderCheck(int tableNo,int storeId) throws SQLException {
 		 String checkCan = new OrderDAOImpl().canOrderCheck(tableNo);
 		 int orderTableNo = new OrderDAOImpl().findLastOrderId(tableNo);
-		 if(!checkCan.equals("Y")) {
-			 
+		 if(!checkCan.equals("Y")) {		 
 			 new OrderDAOImpl().insertNewOrder(tableNo,storeId);
 			 orderTableNo+= new OrderDAOImpl().findLastOrderId(tableNo);
 		 }
 	
 		
 		return orderTableNo;
+	}
+	
+	public List<TransferJsonDTO> requestOrderData(int orderId) throws SQLException {
+		
+		
+		return new OrderDAOImpl().selectOrderAllOrderByOrderId(orderId);
+		
 	}
 
 }

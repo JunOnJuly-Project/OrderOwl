@@ -16,6 +16,11 @@ public class MenuDTO {
 	    private LocalTime closeTime;
 	    private String soldOut;
 	    
+	    // 기본 생성자 추가
+	    public MenuDTO() {
+	        super();
+	    }
+	    
 		public MenuDTO(int menuId, int storeId, String menuName, int price, String description, String imgSrc,
 				int category1Code, int category2Code, String checkRec, String orderRequest, LocalTime closeTime,
 				String soldOut) {
