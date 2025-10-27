@@ -40,22 +40,34 @@ public interface AdminService {
      */
     boolean updateStoreInfo(StoreDTO store);
     
+    /**
+     * 업주 ID로 매장 목록 조회
+     */
+    List<StoreDTO> getStoreListByOwner(int ownerId);
+    
     // ==================== 메뉴 관리 ====================
     
     /**
      * 매장별 메뉴 목록 조회
      */
     List<MenuDTO> getStoreMenus(int storeId);
-
+    
     /**
-     * 메뉴 직접 수정 (요청 없이)
+     * 메뉴 추가
      */
-    boolean updateMenuDirect(MenuDTO menu);
+    boolean addMenu(MenuDTO menu);
 
+    boolean updateMenuDirect(MenuDTO menu);
+    
     /**
      * 메뉴 직접 삭제 (요청 없이)
      */
     boolean deleteMenuDirect(int menuId);
+    
+    /**
+     * 메뉴 상세 정보 조회
+     */
+    MenuDTO getMenuInfo(int menuId);
     
     // ==================== 유저 관리 ====================
     
@@ -87,19 +99,24 @@ public interface AdminService {
      * 매장 테이블 목록 조회
      */
     List<Map<String, Object>> getStoreTables(int storeId);
-
+    
     /**
      * 테이블별 QR 코드 생성/업데이트
      */
     boolean generateTableQRCode(int tableId);
-
+    
     /**
      * 테이블 정보 조회
      */
     Map<String, Object> getTableInfo(int tableId);
-
+    
     /**
      * 테이블별 QR 코드 조회
      */
     Map<String, Object> getQRCodeByTableId(int tableId);
+    
+    /**
+     * 테이블별 QR 코드 삭제
+     */
+    boolean deleteTableQRCode(int tableId);
 }

@@ -40,6 +40,9 @@
 					<button onclick="showTab('menus')"
 						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
 						🍽️ 메뉴 관리</button>
+					<button onclick="showTab('users')"
+						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
+						👥 유저 관리</button>
 					<button onclick="showTab('qr')"
 						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
 						📱 QR 관리</button>
@@ -78,7 +81,13 @@
 
 				<!-- 매장 관리 -->
 				<div id="stores" class="tab-content hidden">
-					<h2 class="text-2xl font-bold mb-6">매장 관리</h2>
+					<div class="flex justify-between items-center mb-6">
+						<h2 class="text-2xl font-bold">매장 관리</h2>
+						<button onclick="openAddStoreModal()"
+							class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+							➕ 매장 추가
+						</button>
+					</div>
 
 					<div class="bg-white rounded-xl shadow-sm overflow-hidden">
 						<table class="w-full">
@@ -93,6 +102,8 @@
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">지역</th>
 									<th
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">전화번호</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">등록일</th>
 									<th
 										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
 								</tr>
@@ -120,6 +131,7 @@
 						<div class="bg-white rounded-xl p-6 shadow-sm">
 							<div class="flex justify-between items-center mb-4">
 								<h3 class="text-lg font-semibold">메뉴 목록</h3>
+								
 							</div>
 
 							<div class="overflow-x-auto">
@@ -131,7 +143,11 @@
 											<th
 												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">가격</th>
 											<th
-												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">설명</th>
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">카테고리</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">추천</th>
+											<th
+												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">품절</th>
 											<th
 												class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
 										</tr>
@@ -140,6 +156,33 @@
 								</table>
 							</div>
 						</div>
+					</div>
+				</div>
+
+				<!-- 유저 관리 -->
+				<div id="users" class="tab-content hidden">
+					<h2 class="text-2xl font-bold mb-6">유저 관리</h2>
+
+					<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+						<table class="w-full">
+							<thead class="bg-gray-50">
+								<tr>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">유저ID</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">이름</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">이메일</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">권한</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">가입일</th>
+									<th
+										class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">액션</th>
+								</tr>
+							</thead>
+							<tbody id="userTable"></tbody>
+						</table>
 					</div>
 				</div>
 
@@ -235,10 +278,10 @@
 		</div>
 	</div>
 
-	<!-- 매장 수정 모달 -->
+	<!-- 매장 추가/수정 모달 -->
 	<div id="storeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
 		<div class="bg-white rounded-xl p-6 max-w-lg w-full mx-4">
-			<h3 class="text-xl font-bold mb-4" id="storeModalTitle">매장 수정</h3>
+			<h3 class="text-xl font-bold mb-4" id="storeModalTitle">매장 추가</h3>
 			<form id="storeForm">
 				<input type="hidden" id="storeId" name="storeId">
 				<input type="hidden" id="ownerId" name="ownerId">
@@ -247,6 +290,12 @@
 					<div>
 						<label class="block text-sm font-medium text-gray-700 mb-2">매장명 *</label>
 						<input type="text" id="storeName" name="storeName" required
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+					
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">업주 ID *</label>
+						<input type="number" id="ownerIdInput" name="ownerId" required
 							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
 					</div>
 					
@@ -322,6 +371,44 @@
 						<textarea id="menuDescription" name="description" rows="3"
 							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
 					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
+						<select id="menuCategory" name="category1Code"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+							<option value="0">카테고리 선택</option>
+							<option value="1">메인요리</option>
+							<option value="2">사이드</option>
+							<option value="3">음료</option>
+							<option value="4">디저트</option>
+							<option value="5">세트메뉴</option>
+						</select>
+					</div>
+
+					<div class="flex items-center gap-4">
+						<div class="flex items-center">
+							<input type="checkbox" id="menuCheckRec" name="checkRec" value="Y"
+								class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+							<label for="menuCheckRec" class="ml-2 text-sm text-gray-700">추천 메뉴</label>
+						</div>
+						<div class="flex items-center">
+							<input type="checkbox" id="menuSoldOut" name="soldOut" value="Y"
+								class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+							<label for="menuSoldOut" class="ml-2 text-sm text-gray-700">품절</label>
+						</div>
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">주문 요청사항</label>
+						<input type="text" id="menuOrderRequest" name="orderRequest"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
+
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">이미지 URL</label>
+						<input type="text" id="menuImgSrc" name="imgSrc"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+					</div>
 				</div>
 
 				<div class="flex gap-3 mt-6">
@@ -331,6 +418,42 @@
 					<button type="button" onclick="closeMenuModal()"
 						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
 						취소</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- 유저 강제 탈퇴 모달 -->
+	<div id="userDeleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+			<h3 class="text-xl font-bold mb-4 text-red-600">유저 강제 탈퇴</h3>
+			<form id="userDeleteForm">
+				<input type="hidden" id="deleteUserId" name="userId">
+				
+				<div class="space-y-4">
+					<div>
+						<label class="block text-sm font-medium text-gray-700 mb-2">탈퇴 사유 *</label>
+						<textarea id="deleteReason" name="reason" required rows="4"
+							class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
+							placeholder="탈퇴 사유를 입력해주세요"></textarea>
+					</div>
+					
+					<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+						<p class="text-sm text-yellow-800">
+							⚠️ 경고: 이 작업은 되돌릴 수 없습니다. 해당 유저의 모든 데이터가 삭제됩니다.
+						</p>
+					</div>
+				</div>
+				
+				<div class="flex gap-3 mt-6">
+					<button type="submit"
+						class="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">
+						탈퇴 처리
+					</button>
+					<button type="button" onclick="closeUserDeleteModal()"
+						class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+						취소
+					</button>
 				</div>
 			</form>
 		</div>
@@ -346,6 +469,7 @@ $(document).ready(function() {
     console.log('✅ 페이지 로드 완료');
     loadData();
     initDatePickers();
+    setupEventListeners();
 });
 
 function initDatePickers() {
@@ -353,6 +477,26 @@ function initDatePickers() {
     let monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     $('#startDate').val(monthAgo);
     $('#endDate').val(today);
+}
+
+function setupEventListeners() {
+    // 매장 폼 제출
+    $('#storeForm').on('submit', function(e) {
+        e.preventDefault();
+        submitStoreForm();
+    });
+    
+    // 메뉴 폼 제출
+    $('#menuForm').on('submit', function(e) {
+        e.preventDefault();
+        submitMenuForm();
+    });
+    
+    // 유저 탈퇴 폼 제출
+    $('#userDeleteForm').on('submit', function(e) {
+        e.preventDefault();
+        submitUserDelete();
+    });
 }
 
 // ==================== 탭 전환 ====================
@@ -365,12 +509,16 @@ function showTab(tab) {
     event.target.classList.add('bg-blue-50', 'text-blue-600');
     
     // 탭 전환 시 데이터 로드
-    if (tab === 'stores') {
+    if (tab === 'dashboard') {
+        loadDashboardStats();
+    } else if (tab === 'stores') {
         loadStoreList();
     } else if (tab === 'qr') {
         loadQRCodes();
     } else if (tab === 'menus') {
         loadStoreListForMenus();
+    } else if (tab === 'users') {
+        loadUserList();
     } else if (tab === 'sales') {
         loadStoreListForSales();
     }
@@ -452,14 +600,17 @@ function loadStoreList() {
             
             let html = '';
             if (stores.length === 0) {
-                html = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">등록된 매장이 없습니다</td></tr>';
+                html = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">등록된 매장이 없습니다</td></tr>';
             } else {
                 stores.forEach(function(store) {
+                    let createdAt = store.createdAt ? new Date(store.createdAt).toLocaleDateString() : '-';
+                    
                     html += '<tr class="border-b hover:bg-gray-50">';
                     html += '<td class="px-6 py-4 font-medium">' + store.storeName + '</td>';
                     html += '<td class="px-6 py-4">' + store.ownerId + '</td>';
                     html += '<td class="px-6 py-4">' + (store.region || '-') + '</td>';
                     html += '<td class="px-6 py-4">' + (store.phoneNumber || '-') + '</td>';
+                    html += '<td class="px-6 py-4">' + createdAt + '</td>';
                     html += '<td class="px-6 py-4">';
                     html += '<div class="flex gap-2">';
                     html += '<button onclick="editStore(' + store.storeId + ')" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">수정</button>';
@@ -476,6 +627,14 @@ function loadStoreList() {
     });
 }
 
+function openAddStoreModal() {
+    $('#storeModalTitle').text('매장 추가');
+    $('#storeForm')[0].reset();
+    $('#storeId').val('');
+    $('#ownerId').val('');
+    $('#storeModal').removeClass('hidden');
+}
+
 function editStore(storeId) {
     callAPI('getStoreForEdit', {storeId: storeId}, function(res) {
         if (res && res.success) {
@@ -484,6 +643,7 @@ function editStore(storeId) {
             $('#storeModalTitle').text('매장 수정');
             $('#storeId').val(store.storeId);
             $('#ownerId').val(store.ownerId);
+            $('#ownerIdInput').val(store.ownerId);
             $('#storeName').val(store.storeName || '');
             $('#address').val(store.address || '');
             $('#region').val(store.region || '');
@@ -503,13 +663,10 @@ function closeStoreModal() {
     $('#storeForm')[0].reset();
 }
 
-// 매장 폼 제출 처리
-$('#storeForm').on('submit', function(e) {
-    e.preventDefault();
-    
+function submitStoreForm() {
     let formData = {
         storeId: $('#storeId').val(),
-        ownerId: $('#ownerId').val(),
+        ownerId: $('#ownerIdInput').val(),
         storeName: $('#storeName').val(),
         address: $('#address').val(),
         region: $('#region').val(),
@@ -518,9 +675,14 @@ $('#storeForm').on('submit', function(e) {
         imgSrc: $('#imgSrc').val()
     };
     
-    if (!confirm('매장 정보를 수정하시겠습니까?')) return;
+    let isEdit = formData.storeId !== '';
+    let confirmMessage = isEdit ? '매장 정보를 수정하시겠습니까?' : '매장을 추가하시겠습니까?';
     
-    callAPI('updateStoreInfo', formData, function(res) {
+    if (!confirm(confirmMessage)) return;
+    
+    let apiMethod = isEdit ? 'updateStoreInfo' : 'addStore';
+    
+    callAPI(apiMethod, formData, function(res) {
         alert(res.message || '처리되었습니다.');
         if (res.success) {
             closeStoreModal();
@@ -528,7 +690,7 @@ $('#storeForm').on('submit', function(e) {
             loadDashboardStats();
         }
     });
-});
+}
 
 function deleteStore(storeId) {
     if (!confirm('이 매장을 삭제하시겠습니까?\n\n진행 중인 주문이 있는 매장은 삭제할 수 없습니다.')) return;
@@ -542,7 +704,7 @@ function deleteStore(storeId) {
     });
 }
 
-//==================== 메뉴 관리 ====================
+// ==================== 메뉴 관리 ====================
 function loadStoreListForMenus() {
     callAPI('getStoreList', {}, function(res) {
         if (res && res.success) {
@@ -571,16 +733,22 @@ function loadStoreMenus() {
             
             let html = '';
             if (menus.length === 0) {
-                html = '<tr><td colspan="4" class="px-6 py-8 text-center text-gray-500">등록된 메뉴가 없습니다</td></tr>';
+                html = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">등록된 메뉴가 없습니다</td></tr>';
             } else {
                 menus.forEach(function(menu) {
+                    let categoryName = getCategoryName(menu.category1Code);
+                    let checkRecBadge = menu.checkRec === 'Y' ? '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">추천</span>' : '';
+                    let soldOutBadge = menu.soldOut === 'Y' ? '<span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">품절</span>' : '';
+                    
                     html += '<tr class="border-t hover:bg-gray-50">';
                     html += '<td class="px-6 py-4 font-medium">' + (menu.menuName || '-') + '</td>';
                     html += '<td class="px-6 py-4">₩' + (menu.price || 0).toLocaleString() + '</td>';
-                    html += '<td class="px-6 py-4 text-sm text-gray-600">' + (menu.description || '-') + '</td>';
+                    html += '<td class="px-6 py-4">' + categoryName + '</td>';
+                    html += '<td class="px-6 py-4">' + checkRecBadge + '</td>';
+                    html += '<td class="px-6 py-4">' + soldOutBadge + '</td>';
                     html += '<td class="px-6 py-4">';
                     html += '<div class="flex gap-2">';
-                    html += '<button onclick="editMenu(' + menu.menuId + ')" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">수정</button>';
+                    // ✅ 수정 버튼 제거, 삭제 버튼만 남김
                     html += '<button onclick="deleteMenu(' + menu.menuId + ')" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">삭제</button>';
                     html += '</div>';
                     html += '</td>';
@@ -594,20 +762,147 @@ function loadStoreMenus() {
     });
 }
 
+function getCategoryName(categoryCode) {
+    const categories = {
+        1: '메인요리',
+        2: '사이드',
+        3: '음료',
+        4: '디저트',
+        5: '세트메뉴'
+    };
+    return categories[categoryCode] || '-';
+}
+
+
+//메뉴 수정 모달 열기
 function editMenu(menuId) {
     callAPI('getStoreMenus', {storeId: currentMenuStoreId}, function(res) {
         if (res && res.success) {
             let menu = res.data.find(m => m.menuId === menuId);
             if (menu) {
-                isEditMode = true;
                 $('#menuModalTitle').text('메뉴 수정');
                 $('#menuId').val(menu.menuId);
                 $('#menuStoreId').val(menu.storeId);
                 $('#menuName').val(menu.menuName);
                 $('#menuPrice').val(menu.price);
-                $('#menuDescription').val(menu.description);
+                $('#menuDescription').val(menu.description || '');
+                
+                // ✅ 수정: 0 대신 1로 기본값 설정
+                $('#menuCategory').val(menu.category1Code || 1);
+                
+                $('#menuCheckRec').prop('checked', menu.checkRec === 'Y');
+                $('#menuSoldOut').prop('checked', menu.soldOut === 'Y');
+                $('#menuOrderRequest').val(menu.orderRequest || '');
+                $('#menuImgSrc').val(menu.imgSrc || '');
                 $('#menuModal').removeClass('hidden');
             }
+        }
+    });
+}
+
+
+//메뉴 모달 닫기
+function closeMenuModal() {
+    $('#menuModal').addClass('hidden');
+    $('#menuForm')[0].reset();
+}
+
+//메뉴 폼 제출
+function submitMenuForm() {
+    // 폼 데이터 구성
+    let formData = {
+        menuId: $('#menuId').val(),
+        storeId: $('#menuStoreId').val(),
+        menuName: $('#menuName').val(),
+        price: $('#menuPrice').val(),
+        description: $('#menuDescription').val(),
+        category1Code: $('#menuCategory').val(),
+        checkRec: $('#menuCheckRec').is(':checked') ? 'Y' : 'N',
+        soldOut: $('#menuSoldOut').is(':checked') ? 'Y' : 'N',
+        orderRequest: $('#menuOrderRequest').val(),
+        imgSrc: $('#menuImgSrc').val()
+    };
+    
+    console.log('📝 전송할 메뉴 데이터:', formData);
+    
+    let menuId = $('#menuId').val();
+    let isEdit = menuId !== '';
+    
+    // 필수 필드 검증
+    if (!formData.menuName || formData.menuName.trim() === '') {
+        alert('메뉴명을 입력해주세요.');
+        return;
+    }
+    
+    if (!formData.price || formData.price <= 0) {
+        alert('유효한 가격을 입력해주세요.');
+        return;
+    }
+    
+    if (!formData.storeId) {
+        alert('매장 정보가 없습니다.');
+        return;
+    }
+    
+    let confirmMessage = '메뉴를 수정하시겠습니까?';
+    
+    if (!confirm(confirmMessage)) return;
+    
+    callAPI('updateMenuDirect', formData, function(res) {
+        if (res && res.success) {
+            alert('메뉴가 성공적으로 수정되었습니다.');
+            closeMenuModal();
+            loadStoreMenus(); // 메뉴 목록 새로고침
+        } else {
+            alert(res.message || '메뉴 수정에 실패했습니다.');
+            console.error('메뉴 수정 실패:', res);
+        }
+    });
+}
+
+//메뉴 목록에서 수정 버튼 표시 복구
+function loadStoreMenus() {
+    let storeId = $('#menuStoreSelect').val();
+    
+    if (!storeId) {
+        $('#menuListSection').addClass('hidden');
+        return;
+    }
+    
+    currentMenuStoreId = storeId;
+    
+    callAPI('getStoreMenus', {storeId: storeId}, function(res) {
+        if (res && res.success) {
+            let menus = res.data || [];
+            
+            let html = '';
+            if (menus.length === 0) {
+                html = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">등록된 메뉴가 없습니다</td></tr>';
+            } else {
+                menus.forEach(function(menu) {
+                    let categoryName = getCategoryName(menu.category1Code);
+                    let checkRecBadge = menu.checkRec === 'Y' ? '<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">추천</span>' : '';
+                    let soldOutBadge = menu.soldOut === 'Y' ? '<span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">품절</span>' : '';
+                    
+                    html += '<tr class="border-t hover:bg-gray-50">';
+                    html += '<td class="px-6 py-4 font-medium">' + (menu.menuName || '-') + '</td>';
+                    html += '<td class="px-6 py-4">₩' + (menu.price || 0).toLocaleString() + '</td>';
+                    html += '<td class="px-6 py-4">' + categoryName + '</td>';
+                    html += '<td class="px-6 py-4">' + checkRecBadge + '</td>';
+                    html += '<td class="px-6 py-4">' + soldOutBadge + '</td>';
+                    html += '<td class="px-6 py-4">';
+                    html += '<div class="flex gap-2">';
+                    // ✅ 수정 버튼 복구
+                    html += '<button onclick="editMenu(' + menu.menuId + ')" class="px-3 py-1.5 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">수정</button>';
+                    html += '<button onclick="deleteMenu(' + menu.menuId + ')" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">삭제</button>';
+                    html += '</div>';
+                    html += '</td>';
+                    html += '</tr>';
+                });
+            }
+            
+            $('#menuTableBody').html(html);
+            $('#menuListSection').removeClass('hidden');
         }
     });
 }
@@ -623,37 +918,70 @@ function deleteMenu(menuId) {
     });
 }
 
-function closeMenuModal() {
-    $('#menuModal').addClass('hidden');
-    $('#menuForm')[0].reset();
-}
-
-$('#menuForm').on('submit', function(e) {
-    e.preventDefault();
-    
-    let formData = {
-        storeId: $('#menuStoreId').val(),
-        menuName: $('#menuName').val(),
-        price: $('#menuPrice').val(),
-        description: $('#menuDescription').val()
-    };
-    
-    // 수정 모드만 남김
-    formData.menuId = $('#menuId').val();
-    
-    if (!confirm('메뉴를 수정하시겠습니까?')) return;
-    
-    callAPI('updateMenuDirect', formData, function(res) {
-        alert(res.message || '처리되었습니다.');
-        if (res.success) {
-            closeMenuModal();
-            loadStoreMenus();
+// ==================== 유저 관리 ====================
+function loadUserList() {
+    callAPI('getUserList', {}, function(res) {
+        if (res && res.success) {
+            let users = res.data || [];
+            
+            let html = '';
+            if (users.length === 0) {
+                html = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">등록된 유저가 없습니다</td></tr>';
+            } else {
+                users.forEach(function(user) {
+                    let createdAt = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-';
+                    
+                    html += '<tr class="border-b hover:bg-gray-50">';
+                    html += '<td class="px-6 py-4">' + user.userId + '</td>';
+                    html += '<td class="px-6 py-4 font-medium">' + user.username + '</td>';
+                    html += '<td class="px-6 py-4">' + user.email + '</td>';
+                    html += '<td class="px-6 py-4">';
+                    html += '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">' + user.role + '</span>';
+                    html += '</td>';
+                    html += '<td class="px-6 py-4">' + createdAt + '</td>';
+                    html += '<td class="px-6 py-4">';
+                    html += '<button onclick="openUserDeleteModal(' + user.userId + ', \'' + user.username + '\')" class="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600">강제 탈퇴</button>';
+                    html += '</td>';
+                    html += '</tr>';
+                });
+            }
+            $('#userTable').html(html);
         }
     });
-});
+}
 
-//==================== 테이블별 QR 관리 ====================
+function openUserDeleteModal(userId, username) {
+    $('#deleteUserId').val(userId);
+    $('#userDeleteModal').removeClass('hidden');
+}
 
+function closeUserDeleteModal() {
+    $('#userDeleteModal').addClass('hidden');
+    $('#userDeleteForm')[0].reset();
+}
+
+function submitUserDelete() {
+    let userId = $('#deleteUserId').val();
+    let reason = $('#deleteReason').val();
+    
+    if (!reason.trim()) {
+        alert('탈퇴 사유를 입력해주세요.');
+        return;
+    }
+    
+    if (!confirm('정말로 이 유저를 강제 탈퇴 처리하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
+    
+    callAPI('forceDeleteUser', {userId: userId, reason: reason}, function(res) {
+        alert(res.message || '처리되었습니다.');
+        if (res.success) {
+            closeUserDeleteModal();
+            loadUserList();
+            loadDashboardStats();
+        }
+    });
+}
+
+// ==================== 테이블별 QR 관리 ====================
 function loadQRCodes() {
     callAPI('getStoreList', {}, function(res) {
         if (res && res.success) {
@@ -727,7 +1055,7 @@ function loadStoreTables() {
                     let qrPath = hasQR ? table.qrcodeData : 
                                  ('https://yourapp.com/order?store=' + table.storeId + '&table=' + table.tableId);
                     
-                    // URL 인코딩 함수 (재귀 문제 해결)
+                    // URL 인코딩 함수
                     let encodedQRPath = encodeURIComponentSafe(qrPath);
                     let qrImageUrl = hasQR ? table.qrImgSrc : 
                                      ('https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodedQRPath);
@@ -766,6 +1094,10 @@ function loadStoreTables() {
                         html += '<button onclick="generateTableQR(' + table.tableId + ')" class="w-full px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 transition-colors">';
                         html += '🔄 QR 생성하기';
                         html += '</button>';
+                    } else {
+                        html += '<button onclick="deleteTableQR(' + table.tableId + ')" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 transition-colors">';
+                        html += '🗑️ QR 삭제하기';
+                        html += '</button>';
                     }
                     html += '<button onclick="downloadTableQR(' + table.tableId + ', \'' + escapeQuotes(table.storeName) + '\', \'' + escapeQuotes(table.tableNo) + '\', \'' + escapeQuotes(qrPath) + '\')" ';
                     html += 'class="w-full px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 transition-colors ' + (hasQR ? '' : 'opacity-50 cursor-not-allowed') + '" ';
@@ -782,6 +1114,22 @@ function loadStoreTables() {
             }
             
             $('#tableQRList').html(html);
+        }
+    });
+}
+
+// QR 코드 삭제 함수
+function deleteTableQR(tableId) {
+    if (!confirm('이 테이블의 QR 코드를 삭제하시겠습니까?\n\n삭제 후에는 다시 생성해야 합니다.')) return;
+    
+    callAPI('deleteTableQR', {tableId: tableId}, function(res) {
+        alert(res.message || '처리되었습니다.');
+        if (res.success) {
+            // 현재 선택된 매장의 테이블 목록 다시 로드
+            let storeId = $('#qrStoreSelect').val();
+            if (storeId) {
+                loadStoreTables();
+            }
         }
     });
 }
@@ -816,17 +1164,6 @@ function downloadTableQR(tableId, storeName, tableNo, qrPath) {
     document.body.removeChild(link);
     
     alert('QR 코드 다운로드가 시작되었습니다: ' + storeName + ' - 테이블 ' + tableNo);
-}
-
-// Helper functions
-function escapeQuotes(str) {
-    return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
-}
-
-// 재귀 문제를 해결한 URL 인코딩 함수
-function encodeURIComponentSafe(component) {
-    // 기본 encodeURIComponent 사용 (재귀 방지)
-    return encodeURIComponent(component);
 }
 
 // ==================== 매출 정보 ====================
@@ -903,6 +1240,15 @@ function loadStoreSales() {
             alert('매출 정보를 불러올 수 없습니다.');
         }
     });
+}
+
+// ==================== Helper Functions ====================
+function escapeQuotes(str) {
+    return (str || '').replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+function encodeURIComponentSafe(component) {
+    return encodeURIComponent(component);
 }
 </script>
 </body>
