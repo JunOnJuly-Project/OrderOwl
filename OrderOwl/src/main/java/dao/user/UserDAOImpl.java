@@ -268,7 +268,9 @@ public class UserDAOImpl implements UserDAO {
 						rs.getInt(12)
 					)
 				);
+				
 			}
+			list.add(curOrder);
 		}
 		
 		finally {

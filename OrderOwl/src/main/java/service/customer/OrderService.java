@@ -6,6 +6,7 @@ import java.util.List;
 
 import dao.customer.OrderDAOImpl;
 import dao.customer.TransferJsonDTO;
+import dto.CategoryDTO;
 import dto.OrderDetailDTO;
 import dto.StoreDTO;
 
@@ -59,5 +60,14 @@ public class OrderService {
 		return new OrderDAOImpl().selectOrderAllOrderByOrderId(orderId);
 		
 	}
+	
+	
+	public List<CategoryDTO> requestCategoryData(int orderId) throws SQLException{
+		
+		
+		System.out.println( new OrderDAOImpl().selectCategoryBytableNo(orderId));
+		return new OrderDAOImpl().selectCategoryBytableNo(orderId);
+	}
+	
 
 }

@@ -34,6 +34,7 @@ public class DispatcherServlet extends HttpServlet {
 		response.setContentType("application/json;charset=UTF-8");
 	String key = request.getParameter("key");
 	String methodName = request.getParameter("methodName");
+	request.setAttribute("categoryKey", request.getParameter("categoryKey"));
 	Object orderId = null;
 	if(key == null) {
 		
@@ -53,7 +54,7 @@ public class DispatcherServlet extends HttpServlet {
 	
 	}
 
-	if(methodName.equals("requestOrderData")) {
+	if(methodName.equals("requestOrderData") || methodName.equals("requestCategoryData")) {
 		try {
 			
 			Controller controller = classMap.get(key);
