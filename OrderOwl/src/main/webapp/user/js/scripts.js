@@ -73,7 +73,7 @@ addModal.forEach((button) => {
 	let menuId = clickedButton.dataset.menuid
     price = clickedButton.dataset.price;
     
-	orderid = clickedButton.dataset.orderid;
+	
     const modalHtml = `
       <h4>메뉴 : ${menuName}</h3>
       <br />
@@ -108,12 +108,12 @@ addModal.forEach((button) => {
       orderList.push([menuName, price, qua, qua * price,menuId]);
 	  sessionStorage.setItem("list", JSON.stringify(orderList));
       console.log(orderList);
+	  
      calCartNum();
       updateInfo();
-
       closeModal();
     });
-
+	
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
   });
@@ -216,7 +216,7 @@ orderModal.addEventListener("click", (e) => {
 		
 	sessionStorage.removeItem("list")
     orderList = [];
-
+	alert("주문 되었습니다!");
     closeModal();
     calCartNum();
 	
@@ -396,18 +396,20 @@ categoryView.addEventListener('click',async ()=>{
 	
 	let categoryContent = `
 	<form method = "get" action="http://${hostUrl}">
-	<select name="categoryKey">
+	<div class="select-wrapper">
+	<select name="categoryKey" class="custom-select">
 	<option value ="null"> 전체메뉴보기 </option>
 	`;
 	for(j = 0 ; j < categoryList.length ; j++){
 		categoryContent+=`<option value="${categoryList[j].categoryId}"> ${categoryList[j].categoryName} </option>`
 	}
 	categoryContent+=`</select>
-	
+	</div>
 	<input type="hidden" name="key" value = "cusOrder" />
 	<input type="hidden" name="methodName" value = "selectByModelNum" /> 
 	<input type="hidden" name="tableNo" value=${orderid}>
-	<button> 조회하기 </button>
+	</br>
+	<button class="selMenu"> 조회하기 </button>
 	</form>
 	`
 	
