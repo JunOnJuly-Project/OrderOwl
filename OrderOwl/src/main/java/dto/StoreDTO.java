@@ -13,6 +13,10 @@ public class StoreDTO {
 	    private String description;
 	    private String imgSrc;
 	    private LocalDateTime createdAt;
+	    
+	    // 기본 생성자 추가
+	    public StoreDTO() {
+	    }
 	    List<MenuDTO> menu;
 		public StoreDTO(int storeId, int ownerId, String storeName, String address, String region, String phoneNumber,
 				String description, String imgSrc, LocalDateTime createdAt, List<MenuDTO> menu) {

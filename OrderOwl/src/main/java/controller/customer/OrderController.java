@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import controller.common.Controller;
 import controller.common.ModelAndView;
 import dao.customer.TransferJsonDTO;
+import dto.CategoryDTO;
 import dto.OrderDetailDTO;
 import dto.StoreDTO;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,10 +29,25 @@ public class OrderController implements Controller {
 			int storeId = store.getStoreId();
 
 			int orderId = os.canOrderCheck(tableNo, storeId);
-//			System.out.println(ss.selectMenuByCategory(3));
+			if(!(request.getAttribute("categoryKey").equals("null"))) {
+				System.out.println(ss.selectMenuByCategory(
+						
+					
+					Integer.parseInt((String)request.getAttribute("categoryKey"))));
+				
+				request.setAttribute("menu", ss.selectMenuByCategory(
+						
+					
+					Integer.parseInt((String)request.getAttribute("categoryKey"))));
+				
+			}
+			else {
+				
+				request.setAttribute("menu", ss.selectMenuByStoreId(tableNo));
+			}
+			System.out.println(request.getAttribute("categoryKey"));
 			request.setAttribute("cusOrderId", orderId);
 			request.setAttribute("store", store);
-			request.setAttribute("menu", ss.selectMenuByStoreId(tableNo));
 			request.setAttribute("orderid", os.selectStoreByStoreId(tableNo));
 			return new ModelAndView("/user/order_page.jsp");
 		} catch (Exception e) {
@@ -67,5 +83,21 @@ public class OrderController implements Controller {
 		return list;
 
 	}
+	
+	
+	public Object requestCategoryData(HttpServletRequest request, HttpServletResponse response) {
+
+		int orderId = Integer.parseInt(request.getAttribute("orderId").toString());
+		List<CategoryDTO> list = null;
+		try {
+			list = os.requestCategoryData(orderId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return list;
+
+	}
+	
 
 }

@@ -270,6 +270,7 @@ public class UserDAOImpl implements UserDAO {
 						rs.getInt(12)
 					)
 				);
+				
 			}
 			if (curOrder != null) {
 				list.add(curOrder);				
