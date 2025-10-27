@@ -8,9 +8,11 @@
 <body>
 <h1>Index Page</h1>
 
-	<form class="form-horizontal" method="post" action="${pageContext.request.contextPath}/front">
+	<form class="form-horizontal" method="get" action="${pageContext.request.contextPath}/front">
 			<input type="hidden" name="key" value = "cusOrder" /> <!-- Controller를 찾는 정보 -->
 			<input type="hidden" name="methodName" value = "selectByModelNum" />  <!-- 메소드이름 -->
+			<input type="hidden" name="categoryKey" value = "null" />
+			
 			<input type="text" name="tableNo"/>
 			<br>
 			<button type ="submit">테스트하기</button>

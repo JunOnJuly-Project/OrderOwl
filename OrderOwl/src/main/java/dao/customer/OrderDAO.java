@@ -3,6 +3,7 @@ package dao.customer;
 import java.sql.SQLException;
 import java.util.List;
 
+import dto.CategoryDTO;
 import dto.OrderDetailDTO;
 import dto.StoreDTO;
 
@@ -16,5 +17,6 @@ public interface OrderDAO {
 	public int findOrderTotalPrice(int order_id) throws SQLException ;
 	public void updateOrderTotalPrice(int total_price,int order_id) throws SQLException ;
 	public List<TransferJsonDTO> selectOrderAllOrderByOrderId (int orderId) throws SQLException ;
+	public List<CategoryDTO> selectCategoryBytableNo(int orderId) throws SQLException;
 	
 }

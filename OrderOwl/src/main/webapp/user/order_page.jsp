@@ -20,8 +20,8 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
-                <a class="navbar-brand" href="#!">${store.storeName}
-                </a>
+                <p class="navbar-brand">${store.storeName}
+                </p>
               
                     <form class="d-flex">
                         <button class="btn btn-outline-dark orderModal" type="submit" id="testId">
@@ -52,6 +52,10 @@
         </header>
         <!-- Section-->
         <section class="py-5">
+        <a class="btn btn-outline-dark mt-auto categoryView" 
+                       href="#"
+                       data-orderid="${cusOrderId}"
+                   >추가하기</a>
             <div class="container px-4 px-lg-5 mt-5">
                 <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
                 
