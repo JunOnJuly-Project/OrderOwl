@@ -1,5 +1,7 @@
 package service.user;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -10,7 +12,9 @@ import dao.user.UserDAO;
 import dao.user.UserDAOImpl;
 import dto.MenuDTO;
 import dto.OrderDTO;
+import dto.QrcodeDTO;
 import dto.StoreDTO;
+import dto.StoreTableDTO;
 import dto.UserDTO;
 
 public class UserServiceImpl implements UserService {
@@ -165,6 +169,42 @@ public class UserServiceImpl implements UserService {
 		System.out.println("?");
 		return userDao.selectStore(ownerId);
 	}
-	
-	
+
+	@Override
+	public int updateOrderState(int orderId) throws SQLException {
+		return userDao.updateOrderStatus(orderId);
+	}
+
+	@Override
+	public List<StoreTableDTO> selectTableAll(int storeId) throws SQLException {
+		return userDao.selectTableAll(storeId);
+	}
+
+	@Override
+	public StoreTableDTO selectTable(int storeId) throws SQLException {
+		return userDao.selectTable(storeId);
+	}
+
+	@Override
+	public List<QrcodeDTO> selectAllQr(int storeId) throws SQLException {
+		return userDao.selectAllQr(storeId);
+	}
+
+	@Override
+	public QrcodeDTO selectQr(int qrcodeId) throws SQLException {
+		return userDao.selectQr(qrcodeId);
+	}
+
+	@Override
+	public void createTable(int storeId, String tableNo) throws SQLException {
+		StoreTableDTO table = userDao.createTable(storeId, tableNo);
+		System.out.println(table);
+		// TODO
+//		String qrcodeData = "http://localhost:8080/OrderOwl/front?key=cusOrder&methodName=selectByModelNum&tableNo=" + table.getTableId();
+		String qrcodeData = "http://192.168.137.1:8080/OrderOwl/front?key=cusOrder&methodName=selectByModelNum&tableNo=" + table.getTableId();
+		String encoded = URLEncoder.encode(qrcodeData, StandardCharsets.UTF_8);
+		
+		String qrImgSrc = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encoded;
+		userDao.createQr(table.getTableId(), qrcodeData, qrImgSrc);
+	}
 }
