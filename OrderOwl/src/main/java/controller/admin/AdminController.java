@@ -11,13 +11,17 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSerializer;
 import com.google.gson.JsonDeserializer;
-import dao.AdminDAO;
-import service.AdminServiceImpl;
+import com.google.gson.JsonSerializer;
+
+import controller.common.Controller;
+import controller.common.ModelAndView;
+import dto.MenuDTO;
 import dto.StoreDTO;
 import dto.UserDTO;
-import dto.MenuDTO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import service.AdminServiceImpl;
 
 /**
  * 관리자 Controller - DispatcherServlet 방식
@@ -26,12 +30,10 @@ import dto.MenuDTO;
 public class AdminController implements Controller {
     
     private AdminServiceImpl adminService;
-    private AdminDAO adminDAO;
     private Gson gson;
 
     public AdminController() {
         this.adminService = new AdminServiceImpl();
-        this.adminDAO = new AdminDAO();
         
         // LocalDate, LocalDateTime, LocalTime을 지원하는 Gson 생성
         this.gson = new GsonBuilder()
@@ -87,7 +89,7 @@ public class AdminController implements Controller {
         out.print(gson.toJson(result));
         out.flush();
         
-        return null;
+        return null; // JSON 응답이므로 null 반환
     }
     
     /**
@@ -164,17 +166,24 @@ public class AdminController implements Controller {
         Map<String, Object> result = new HashMap<>();
         
         try {
+            int ownerId = Integer.parseInt(request.getParameter("ownerId"));
+            String storeName = request.getParameter("storeName");
+            String address = request.getParameter("address");
+            String region = request.getParameter("region");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String description = request.getParameter("description");
+            String imgSrc = request.getParameter("imgSrc");
+            
+            // boolean type 파라미터를 사용하는 생성자 사용
             StoreDTO store = new StoreDTO(
-                0,
-                Integer.parseInt(request.getParameter("ownerId")),
-                request.getParameter("storeName"),
-                request.getParameter("address"),
-                request.getParameter("region"),
-                request.getParameter("phoneNumber"),
-                request.getParameter("description"),
-                request.getParameter("imgSrc"),
-                null,
-                null
+                ownerId,
+                storeName,
+                address,
+                region,
+                phoneNumber,
+                description,
+                imgSrc,
+                true // type 파라미터 - 새로 추가하는 매장임을 나타냄
             );
             
             boolean success = adminService.addStore(store);
@@ -203,18 +212,25 @@ public class AdminController implements Controller {
         Map<String, Object> result = new HashMap<>();
         
         try {
+            int storeId = Integer.parseInt(request.getParameter("storeId"));
+            int ownerId = Integer.parseInt(request.getParameter("ownerId"));
+            String storeName = request.getParameter("storeName");
+            String address = request.getParameter("address");
+            String region = request.getParameter("region");
+            String phoneNumber = request.getParameter("phoneNumber");
+            String description = request.getParameter("description");
+            String imgSrc = request.getParameter("imgSrc");
+            
             StoreDTO store = new StoreDTO(
-                Integer.parseInt(request.getParameter("storeId")),
-                Integer.parseInt(request.getParameter("ownerId")),
-                request.getParameter("storeName"),
-                request.getParameter("address"),
-                request.getParameter("region"),
-                request.getParameter("phoneNumber"),
-                request.getParameter("description"),
-                request.getParameter("imgSrc"),
-                null,
-                null
+                storeId,
+                storeName,
+                address,
+                region,
+                phoneNumber,
+                description,
+                imgSrc
             );
+            store.setOwnerId(ownerId);
             
             boolean success = adminService.updateStoreInfo(store);
             
@@ -250,7 +266,7 @@ public class AdminController implements Controller {
         } catch (Exception e) {
             e.printStackTrace();
             result.put("success", false);
-            result.put("message", "매장 삭제 중 오류가 발생했습니다.");
+            result.put("message", "매장 삭제 중 오류가 발생했습니다: " + e.getMessage());
         }
         
         out.print(gson.toJson(result));
@@ -288,10 +304,82 @@ public class AdminController implements Controller {
         return null;
     }
     
+    /**
+     * 메뉴 추가
+     */
+    public ModelAndView addMenu(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            int storeId = Integer.parseInt(request.getParameter("storeId"));
+            String menuName = request.getParameter("menuName");
+            int price = Integer.parseInt(request.getParameter("price"));
+            String description = request.getParameter("description");
+            String imgSrc = request.getParameter("imgSrc");
+            
+            // 카테고리 파싱
+            int category1Code = 0;
+            String category = request.getParameter("category1Code");
+            if (category != null && !category.isEmpty()) {
+                try {
+                    category1Code = Integer.parseInt(category);
+                } catch (NumberFormatException e) {
+                    category1Code = 0;
+                }
+            }
+            
+            // 체크박스 값 처리
+            String checkRec = request.getParameter("checkRec");
+            if (checkRec == null || checkRec.isEmpty()) {
+                checkRec = "N";
+            }
+            
+            String soldOut = request.getParameter("soldOut");
+            if (soldOut == null || soldOut.isEmpty()) {
+                soldOut = "N";
+            }
+            
+            String orderRequest = request.getParameter("orderRequest");
+            
+            // closeTime은 null로 설정 (기본값)
+            LocalTime closeTime = null;
+            
+            // MenuDTO 생성 - category1Code만 사용하는 생성자
+            MenuDTO menu = new MenuDTO(
+                0, // menuId - 새로 추가하므로 0
+                storeId,
+                menuName,
+                price,
+                description,
+                imgSrc,
+                category1Code,
+                checkRec,
+                orderRequest,
+                closeTime,
+                soldOut
+            );
+            
+            boolean success = adminService.addMenu(menu);
+            
+            result.put("success", success);
+            result.put("message", success ? "메뉴가 추가되었습니다." : "메뉴 추가에 실패했습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "메뉴 추가 중 오류가 발생했습니다: " + e.getMessage());
+        }
+        
+        out.print(gson.toJson(result));
+        out.flush();
+        
+        return null;
+    }
 
     /**
-     * 메뉴 직접 수정 (요청 없이)
-     * JSP에서 전달하는 파라미터: menuId, storeId, menuName, category, price, description
+     * 메뉴 직접 수정
      */
     public ModelAndView updateMenuDirect(HttpServletRequest request, HttpServletResponse response) throws Exception {
         response.setContentType("application/json;charset=UTF-8");
@@ -300,11 +388,59 @@ public class AdminController implements Controller {
         Map<String, Object> result = new HashMap<>();
         
         try {
+            // 디버깅: 모든 파라미터 로그 출력
+            System.out.println("=== 메뉴 수정 요청 파라미터 ===");
+            java.util.Enumeration<String> paramNames = request.getParameterNames();
+            while (paramNames.hasMoreElements()) {
+                String paramName = paramNames.nextElement();
+                String paramValue = request.getParameter(paramName);
+                System.out.println(paramName + ": " + paramValue);
+            }
+            System.out.println("==========================");
+            
+            // 필수 파라미터 null 체크
+            String menuIdStr = request.getParameter("menuId");
+            String storeIdStr = request.getParameter("storeId");
+            String priceStr = request.getParameter("price");
+            String menuName = request.getParameter("menuName");
+            
+            if (menuIdStr == null || menuIdStr.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "메뉴 ID가 누락되었습니다.");
+                out.print(gson.toJson(result));
+                out.flush();
+                return null;
+            }
+            
+            if (storeIdStr == null || storeIdStr.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "매장 ID가 누락되었습니다.");
+                out.print(gson.toJson(result));
+                out.flush();
+                return null;
+            }
+            
+            if (priceStr == null || priceStr.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "가격이 누락되었습니다.");
+                out.print(gson.toJson(result));
+                out.flush();
+                return null;
+            }
+            
+            if (menuName == null || menuName.isEmpty()) {
+                result.put("success", false);
+                result.put("message", "메뉴명이 누락되었습니다.");
+                out.print(gson.toJson(result));
+                out.flush();
+                return null;
+            }
+            
             MenuDTO menu = new MenuDTO();
-            menu.setMenuId(Integer.parseInt(request.getParameter("menuId")));
-            menu.setStoreId(Integer.parseInt(request.getParameter("storeId")));
-            menu.setMenuName(request.getParameter("menuName"));
-            menu.setPrice(Integer.parseInt(request.getParameter("price")));
+            menu.setMenuId(Integer.parseInt(menuIdStr));
+            menu.setStoreId(Integer.parseInt(storeIdStr));
+            menu.setMenuName(menuName);
+            menu.setPrice(Integer.parseInt(priceStr));
             menu.setDescription(request.getParameter("description"));
             
             // imgSrc는 선택사항
@@ -313,26 +449,25 @@ public class AdminController implements Controller {
                 menu.setImgSrc(imgSrc);
             }
             
-            // category는 선택사항 (JSP에서 'category'로 전달)
-            // 기본값 0으로 설정 (데이터베이스에서 0은 유효하지 않은 카테고리로 처리)
-            String category = request.getParameter("category");
-            if (category != null && !category.isEmpty()) {
+            // ✅ category1Code 처리 - 문제 해결: 0 대신 1로 기본값 설정
+            String category1Code = request.getParameter("category1Code");
+            if (category1Code != null && !category1Code.isEmpty()) {
                 try {
-                    int categoryCode = Integer.parseInt(category);
+                    int categoryCode = Integer.parseInt(category1Code);
                     // 유효한 카테고리인지 확인 (1~5 사이 값만 허용)
                     if (categoryCode >= 1 && categoryCode <= 5) {
                         menu.setCategory1Code(categoryCode);
                     } else {
-                        // 유효하지 않으면 0 설정
-                        menu.setCategory1Code(0);
+                        // 유효하지 않으면 1(메인요리)로 설정
+                        menu.setCategory1Code(1);
                     }
                 } catch (NumberFormatException e) {
-                    // category가 숫자가 아닐 경우 0 설정
-                    menu.setCategory1Code(0);
+                    // category가 숫자가 아닐 경우 1로 설정
+                    menu.setCategory1Code(1);
                 }
             } else {
-                // category가 없을 경우 0 설정
-                menu.setCategory1Code(0);
+                // category가 없을 경우 1로 설정
+                menu.setCategory1Code(1);
             }
             
             // category2_code는 항상 0으로 설정 (사용하지 않음)
@@ -340,18 +475,24 @@ public class AdminController implements Controller {
             
             // checkRec, orderRequest, soldOut 기본값 설정
             String checkRec = request.getParameter("checkRec");
-            menu.setCheckRec(checkRec != null ? checkRec : "N");
+            menu.setCheckRec(checkRec != null && checkRec.equals("Y") ? "Y" : "N");
             
             String orderRequest = request.getParameter("orderRequest");
             menu.setOrderRequest(orderRequest);
             
             String soldOut = request.getParameter("soldOut");
-            menu.setSoldOut(soldOut != null ? soldOut : "N");
+            menu.setSoldOut(soldOut != null && soldOut.equals("Y") ? "Y" : "N");
+            
+            System.out.println("✅ 수정할 메뉴 정보: " + menu);
             
             boolean success = adminService.updateMenuDirect(menu);
             
             result.put("success", success);
             result.put("message", success ? "메뉴가 수정되었습니다." : "수정에 실패했습니다.");
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "숫자 형식이 올바르지 않습니다: " + e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             result.put("success", false);
@@ -363,7 +504,6 @@ public class AdminController implements Controller {
         
         return null;
     }
-   
     
     /**
      * 메뉴 직접 삭제 (요청 없이)
@@ -384,7 +524,7 @@ public class AdminController implements Controller {
             // 진행 중인 주문에 포함된 메뉴 삭제 시도 시
             e.printStackTrace();
             result.put("success", false);
-            result.put("message", e.getMessage()); // "진행 중인 주문에 포함된 메뉴는 삭제할 수 없습니다."
+            result.put("message", e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             result.put("success", false);
@@ -637,6 +777,33 @@ public class AdminController implements Controller {
             e.printStackTrace();
             result.put("success", false);
             result.put("message", "QR 코드 정보를 불러오는데 실패했습니다.");
+        }
+        
+        out.print(gson.toJson(result));
+        out.flush();
+        
+        return null;
+    }
+
+    /**
+     * 테이블별 QR 코드 삭제
+     */
+    public ModelAndView deleteTableQR(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        response.setContentType("application/json;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            int tableId = Integer.parseInt(request.getParameter("tableId"));
+            boolean success = adminService.deleteTableQRCode(tableId);
+            
+            result.put("success", success);
+            result.put("message", success ? "QR 코드가 삭제되었습니다." : "QR 코드 삭제에 실패했습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("success", false);
+            result.put("message", "QR 코드 삭제 중 오류가 발생했습니다.");
         }
         
         out.print(gson.toJson(result));

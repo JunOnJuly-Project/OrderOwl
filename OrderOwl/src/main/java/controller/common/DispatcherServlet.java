@@ -86,6 +86,11 @@ public class DispatcherServlet extends HttpServlet {
 		Method method = className.getMethod(methodName, HttpServletRequest.class,HttpServletResponse.class);
 		ModelAndView mv = (ModelAndView)method.invoke(con, request,response);
 		
+	/*	// ✅✅✅ 핵심 수정 부분: mv가 null이거나 viewName이 없으면 JSON 응답으로 간주하고 종료
+		if(mv == null || mv.getViewName() == null || mv.getViewName().isEmpty()) {
+			return; // JSON 응답이 이미 완료됨
+		}*/
+		
 		if(mv.isRedirect()) {
 			response.sendRedirect(mv.getViewName());
 		}else {
@@ -98,4 +103,3 @@ public class DispatcherServlet extends HttpServlet {
 	}
 	}
 }
-
