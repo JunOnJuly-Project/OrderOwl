@@ -10,7 +10,9 @@ import controller.common.Controller;
 import controller.common.ModelAndView;
 import dto.MenuDTO;
 import dto.OrderDTO;
+import dto.QrcodeDTO;
 import dto.StoreDTO;
+import dto.StoreTableDTO;
 import dto.UserDTO;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -163,6 +165,10 @@ public class UserController extends HttpServlet implements Controller {
 			request.getParameter("state")
 		);
     	
+    	userService.updateOrderState(
+			Integer.parseInt(request.getParameter("orderId"))
+		);
+    	
     	return selectAllOrder(request, response);
     }
     
@@ -284,5 +290,29 @@ public class UserController extends HttpServlet implements Controller {
     	return new ModelAndView("user/auth/login/login.jsp");
     }
     
+    public ModelAndView selectAllQr(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	List<QrcodeDTO> qrs = userService.selectAllQr(
+    		Integer.parseInt(request.getParameter("storeId"))
+		);
+    	
+    	List<StoreTableDTO> tables = userService.selectTableAll(
+			Integer.parseInt(request.getParameter("storeId"))
+		);
+    	
+    	request.setAttribute("qrs", qrs);
+    	request.setAttribute("tables", tables);
+    	
+    	System.out.println(qrs);
+    	System.out.println(tables);
+    	return new ModelAndView("user/qr/qr/qr.jsp");
+    }
     
+    public ModelAndView createTable(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	userService.createTable(
+			Integer.parseInt(request.getParameter("storeId")), 
+			request.getParameter("tableNo")
+		);
+    	
+    	return selectAllQr(request, response);
+    }
 }
