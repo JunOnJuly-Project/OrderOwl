@@ -20,25 +20,31 @@ nav a {
   background-color: rgba(0, 0, 0, 0.6); /* 반투명 검은색 */
   display: none; /* 평소에는 숨김 */
   z-index: 10; /* 다른 요소들보다 위에 오도록 설정 */
+
+   
 }
 
-/* 콘텐츠가 보일 창 */
+
 #modal-window {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* 정확히 중앙에 위치 */
+  transform: translate(-50%, -50%);
   width: 80%;
   max-width: 600px;
   background-color: white;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  display: none; /* 평소에는 숨김 */
-  z-index: 20; /* 오버레이보다 더 위에 오도록 설정 */
+  display: none;
+  z-index: 20;
+
+
+  max-height: 80vh; 
+  overflow-y: auto; 
 }
 
-/* 닫기 버튼 */
+
 #close-button {
   position: absolute;
   top: 10px;
@@ -49,7 +55,71 @@ nav a {
   cursor: pointer;
 }
 
-/* 모달을 보여주기 위한 클래스 */
+
 .show {
-  display: block !important; /* 다른 display 속성을 무시하고 보여줌 */
+  display: block !important; 
+}
+
+.pbtn , .mbtn , .abtn , .addModal ,.delMenu ,.obtn ,.selMenu , .categoryView{
+  background-color: #000000; 
+  color: #FFFFFF;            
+  
+
+  border: none;                
+  padding: 10px 15px;         
+  border-radius: 5px;          
+  cursor: pointer;             
+}
+.categoryView {
+  margin-left: 90%;
+}
+
+
+
+.select-wrapper {
+  position: relative; 
+  width: 500px; 
+}
+
+
+.custom-select {
+
+  -webkit-appearance: none;  
+  -moz-appearance: none; 
+  appearance: none;        
+  
+
+  width: 100%; 
+  padding: 10px 40px 10px 15px; 
+
+  
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;      
+  background-color: #ffffff; 
+  cursor: pointer;          
+}
+
+
+.select-wrapper::after {
+  content: '▼'; 
+  font-size: 14px;
+  color: #000000;
+  
+  position: absolute;  
+  top: 50%;            
+  right: 15px;         
+  
+
+  transform: translateY(-50%); 
+  
+
+  pointer-events: none; 
+}
+
+
+.custom-select:focus {
+  border-color: #000000;
+  outline: none; 
+
 }
