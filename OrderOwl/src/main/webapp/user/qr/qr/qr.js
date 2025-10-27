@@ -41,4 +41,3 @@ modals.forEach((m) => {
 })
 
 document.querySelector("html").addEventListener("click", closeModal)
-document.querySelector("#insert").addEventListener("click", openModal)

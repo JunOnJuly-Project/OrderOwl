@@ -7,6 +7,7 @@ import java.util.Map;
 import dto.UserDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
+import dto.QrcodeDTO;
 import dto.StoreDTO;
 import dto.StoreTableDTO;
 
@@ -32,6 +33,8 @@ public interface UserDAO {
 	List<OrderDTO> selectOrderByState(int ownerId, String state) throws SQLException;
 	
 	int updateOrder(int orderId, String state) throws SQLException;
+	
+	int updateOrderStatus(int orderId) throws SQLException;
 	
 	/*
 	 * 매장 관련
@@ -60,7 +63,20 @@ public interface UserDAO {
 	/*
 	 * 테이블 관련
 	 */
-	int createTable(int store_id, int table_no) throws SQLException;
+	StoreTableDTO createTable(int storeId, String tableNo) throws SQLException;
 	
-	int countTable(int store_id) throws SQLException;
+	int countTable(int storeId) throws SQLException;
+	
+	List<StoreTableDTO> selectTableAll(int storeId) throws SQLException;
+	
+	StoreTableDTO selectTable(int tableId) throws SQLException;
+	
+	/*
+	 * qr 관련
+	 */
+	int createQr(int tableId, String qrcodeData, String qrImgSrc) throws SQLException;
+	
+	List<QrcodeDTO> selectAllQr(int storeId) throws SQLException;
+	
+	QrcodeDTO selectQr(int qrcodeId) throws SQLException;
 }

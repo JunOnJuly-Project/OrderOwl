@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.Properties;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.OrderDetailDTO;
+import dto.QrcodeDTO;
 import dto.StoreDTO;
 import dto.StoreTableDTO;
 import dto.UserDTO;
@@ -268,6 +270,9 @@ public class UserDAOImpl implements UserDAO {
 						rs.getInt(12)
 					)
 				);
+			}
+			if (curOrder != null) {
+				list.add(curOrder);				
 			}
 		}
 		
@@ -624,10 +629,10 @@ public class UserDAOImpl implements UserDAO {
 	}
 
 	@Override
-	public int createTable(int store_id, int table_no) throws SQLException {
+	public StoreTableDTO createTable(int storeId, String tableNo) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
-		int result = 0;
+		ResultSet rs=null;
 		StoreTableDTO table = null;
 		
 		String sql= proFile.getProperty("user.table.create");
@@ -635,22 +640,30 @@ public class UserDAOImpl implements UserDAO {
 		try {
 			con = DbUtil.getConnection();
 			
-			ps = con.prepareStatement(sql);
-			ps.setInt(1, store_id);
-			ps.setInt(2, table_no);
+			ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			ps.setInt(1, storeId);
+			ps.setString(2, tableNo);
 			
-			result = ps.executeUpdate();
+			ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			
+			System.out.println(rs.toString());
+			if (rs.next()) {
+				System.out.println(rs.getInt(1));
+				table = selectTable(rs.getInt(1));				
+			}
 		}
 		
 		finally {
 			DbUtil.dbClose(ps, con);
 		}
 		
-		return result;
+		System.out.println(table);
+		return table;
 	}
 
 	@Override
-	public int countTable(int store_id) throws SQLException {
+	public int countTable(int storeId) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -662,7 +675,7 @@ public class UserDAOImpl implements UserDAO {
 			con = DbUtil.getConnection();
 			
 			ps = con.prepareStatement(sql);
-			ps.setInt(1, store_id);
+			ps.setInt(1, storeId);
 			
 			rs = ps.executeQuery();
 			
@@ -676,5 +689,196 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public int updateOrderStatus(int orderId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		int result = 0;
+		
+		String sql= proFile.getProperty("user.order.updateTable");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, orderId);
+			
+			result = ps.executeUpdate();
+		}
+		
+		finally {
+			DbUtil.dbClose(ps, con);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public List<StoreTableDTO> selectTableAll(int storeId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		List<StoreTableDTO> list = new ArrayList<>();
+		
+		String sql= proFile.getProperty("user.table.selectAll");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, storeId);
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				StoreTableDTO store = new StoreTableDTO(
+					rs.getInt(1), 
+					rs.getInt(2),
+					rs.getString(3)
+				);
+				
+				list.add(store);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public StoreTableDTO selectTable(int tableId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		StoreTableDTO table = null;
+		
+		String sql= proFile.getProperty("user.table.select");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, tableId);
+			
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				table = new StoreTableDTO(
+					rs.getInt(1), 
+					rs.getInt(2),
+					rs.getString(3)
+				);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		System.out.println(table.toString());
+		return table;
+	}
+
+	@Override
+	public int createQr(int tableId, String qrcodeData, String qrImgSrc) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		int result = 0;
+		
+		String sql= proFile.getProperty("user.qr.create");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, tableId);
+			ps.setString(2, qrcodeData);
+			ps.setString(3,  qrImgSrc);
+			
+			result = ps.executeUpdate();
+		}
+		
+		finally {
+			DbUtil.dbClose(ps, con);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public List<QrcodeDTO> selectAllQr(int storeId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		List<QrcodeDTO> list = new ArrayList<>();
+		
+		String sql= proFile.getProperty("user.qr.selectAll");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, storeId);
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				QrcodeDTO qr = new QrcodeDTO(
+					rs.getInt(2), 
+					rs.getInt(1),
+					rs.getString(3),
+					rs.getString(4),
+					rs.getTimestamp(5).toLocalDateTime()
+				);
+				
+				System.out.println(qr);
+				list.add(qr);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public QrcodeDTO selectQr(int qrcodeId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		QrcodeDTO qr = null;
+		
+		String sql= proFile.getProperty("user.qr.select");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, qrcodeId);
+			
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				qr = new QrcodeDTO(
+					rs.getInt(1), 
+					rs.getInt(2),
+					rs.getString(3),
+					rs.getString(4),
+					rs.getTimestamp(5).toLocalDateTime()
+				);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return qr;
 	}
 }

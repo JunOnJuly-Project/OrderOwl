@@ -25,6 +25,21 @@
   		</div>
 	</c:forEach>-->
 	
+	<div id="modalcreate" class="modal">
+		<form action="${pageContext.request.contextPath}/front">
+			<input type="hidden" name="storeId" value="${store.storeId}">
+			<input type="hidden" value="createTable" name="methodName">
+			<input type="hidden" value="user" name="key">
+			
+			<div class="formDiv">
+				<label for="tableNo">테이블 이름 : </label>
+				<input type="text" name="tableNo" id="tableNo">
+			</div>
+			
+			<button>테이블 추가</button>
+		</form>
+	</div>
+	
     <div id="background">
     	<div id="header">
     		<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=logout'" id="logOut" class="selectBtn">로그아웃</button>
@@ -33,27 +48,26 @@
 	    <div id="select">
 	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu'" id="menu" class="selectBtn">메뉴</button>
 	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectSales&state=hour'" id="inform" class="selectBtn">정보</button>
-	    	<button id="qr" class="selectBtn">QR</button>
+	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllQr&storeId=${store.storeId}'" id="qr" class="selectBtn">QR</button>
 	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllOrder'" id="order" class="selectBtn">주문</button>
 	    </div>
 
+		<div id="subselect">
+			<h2>
+				<button id="create" class="modalBtn selectBtn">추가</button>
+			</h2>	
+		</div>
 	    <div id="list">
 			<div id="qrMain">
-				<!--<c:forEach var="q" items="${qr}" varStatus="status">
-			  		<div id="modal${q.qrcodeId}" class="modal">
-			  			<p>메뉴명 : ${q.qrImgSrc}</p>
-			  			<p>메뉴명 : ${q.tableId}</p>
-			  			<p>메뉴명 : ${q.qrcodeData}</p>
-			  			<p>메뉴명 : ${q.createdAt}</p>
+				<c:forEach var="q" items="${qrs}" varStatus="status">
+			  		<div id="modal${q.qrcodeId}" class="qrDiv">
+			  			<img alt="${q.qrcodeId}" src="${q.qrImgSrc}">
+			  			<c:forEach var="table" items="${tables}" varStatus="status">
+			  				<c:if test="${q.tableId == table.tableId}">
+					        	<p>${table.tableNo}</p>
+					    	</c:if>
+			  			</c:forEach>
 			  		</div>
-				</c:forEach>-->
-				<c:forEach var="i" begin="1" end="8">
-					<div id="div${i}">
-						<div id="imageDiv">
-						
-						</div>
-						<p>${i}</p>
-					</div>
 				</c:forEach>
 			</div>
 	    </div>

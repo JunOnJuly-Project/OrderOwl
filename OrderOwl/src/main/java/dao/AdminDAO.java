@@ -1,5 +1,6 @@
 package dao;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -11,11 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.io.InputStream;
 
+import dto.MenuDTO;
 import dto.StoreDTO;
 import dto.UserDTO;
-import dto.MenuDTO;
 import util.DbUtil;
 
 /**
@@ -83,7 +83,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -110,7 +110,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -131,7 +131,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -168,7 +168,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return null;
     }
@@ -207,7 +207,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return stores;
     }
@@ -247,7 +247,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return stores;
     }
@@ -280,7 +280,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -323,7 +323,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -344,7 +344,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -384,7 +384,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return null;
     }
@@ -426,7 +426,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return menus;
     }
@@ -452,7 +452,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return false;
     }
@@ -476,7 +476,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -509,7 +509,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return null;
     }
@@ -544,7 +544,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return users;
     }
@@ -572,7 +572,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return 0;
     }
@@ -600,7 +600,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return 0;
     }
@@ -628,7 +628,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return 0;
     }
@@ -660,7 +660,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return dailySales;
     }
@@ -693,7 +693,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return menuSales;
     }
@@ -730,7 +730,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return tables;
     }
@@ -755,7 +755,7 @@ public class AdminDAO {
             e.printStackTrace();
             return 0;
         } finally {
-            DbUtil.dbClose(conn, pstmt);
+            DbUtil.dbClose(pstmt, conn);
         }
     }
     
@@ -785,7 +785,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return null;
     }
@@ -820,7 +820,7 @@ public class AdminDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            DbUtil.dbClose(conn, pstmt, rs);
+            DbUtil.dbClose(rs, pstmt, conn);
         }
         return null;
     }
