@@ -1,10 +1,12 @@
 package service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import dao.AdminDAO;
 import dto.MenuDTO;
@@ -292,27 +294,90 @@ public class AdminServiceImpl implements AdminService {
         }
     }
 
-    // ==================== 매출 정보 ====================
+    
+ // ==================== 매출 정보 ====================
 
     @Override
     public Map<String, Object> getStoreSalesInfo(int storeId, LocalDate startDate, LocalDate endDate) {
         try {
             Map<String, Object> salesReport = new HashMap<>();
             
-            // 총 매출 조회
+            // 1. 총 매출 조회 (주문 테이블의 실제 결제 금액)
             long totalSales = adminDAO.sumStoreSales(storeId, startDate, endDate);
             
-            // 총 주문 수 조회
+            // 2. 총 주문 수 조회
             int totalOrders = adminDAO.countStoreOrders(storeId, startDate, endDate);
             
-            // 평균 주문 금액 계산
-            long averageOrderAmount = totalOrders > 0 ? totalSales / totalOrders : 0;
+            // 3. 평균 주문 금액 계산 (소수점 이하 처리 개선)
+            long averageOrderAmount = totalOrders > 0 ? Math.round((double) totalSales / totalOrders) : 0;
             
-            // 일별 매출 조회
+            // 4. 일별 매출 조회
             List<Map<String, Object>> dailySales = adminDAO.selectDailySales(storeId, startDate, endDate);
+            if (dailySales == null) {
+                dailySales = new ArrayList<>();
+            }
             
-            // 메뉴별 매출 조회
+            // 5. 메뉴별 매출 조회 (주문상세 기준 - 메뉴 단가 * 수량)
             List<Map<String, Object>> menuSales = adminDAO.selectMenuSales(storeId, startDate, endDate);
+            if (menuSales == null) {
+                menuSales = new ArrayList<>();
+            }
+            
+            // 6. 메뉴별 매출 합계 계산 (순수 메뉴 가격 합계)
+            long menuSalesTotal = 0L;
+            for (Map<String, Object> menu : menuSales) {
+                Object salesObj = menu.get("total_sales"); // 컬럼명 확인 필요 (totalSales vs total_sales)
+                if (salesObj != null) {
+                    if (salesObj instanceof Long) {
+                        menuSalesTotal += (Long) salesObj;
+                    } else if (salesObj instanceof Integer) {
+                        menuSalesTotal += ((Integer) salesObj).longValue();
+                    } else if (salesObj instanceof BigDecimal) {
+                        menuSalesTotal += ((BigDecimal) salesObj).longValue();
+                    } else if (salesObj instanceof Double) {
+                        menuSalesTotal += Math.round((Double) salesObj);
+                    }
+                }
+            }
+            
+            // 7. 차이 분석 및 설명 추가 (비율 계산 추가)
+            long difference = totalSales - menuSalesTotal;
+            double differenceRate = menuSalesTotal > 0 ? (double) difference / menuSalesTotal * 100 : 0;
+            String differenceExplanation = "";
+            
+            if (Math.abs(difference) > 0) {
+                if (difference < 0) {
+                    differenceExplanation = String.format(
+                        "할인 또는 취소로 인해 실제 결제금액이 메뉴금액 합계보다 %,d원(%.1f%%) 적습니다.", 
+                        Math.abs(difference), Math.abs(differenceRate)
+                    );
+                } else {
+                    differenceExplanation = String.format(
+                        "배달비 또는 추가요금으로 인해 실제 결제금액이 메뉴금액 합계보다 %,d원(%.1f%%) 많습니다.", 
+                        difference, differenceRate
+                    );
+                }
+                
+                System.out.println("ℹ️ 매출 차이 분석:");
+                System.out.println("   - 메뉴금액 합계: ₩" + String.format("%,d", menuSalesTotal));
+                System.out.println("   - 실제 결제금액: ₩" + String.format("%,d", totalSales));
+                System.out.println("   - 차이: ₩" + String.format("%,d", difference));
+                System.out.println("   - 차이율: " + String.format("%.1f%%", differenceRate));
+                System.out.println("   - 설명: " + differenceExplanation);
+            } else {
+                differenceExplanation = "메뉴금액 합계와 실제 결제금액이 일치합니다.";
+                System.out.println("✅ 매출 차이 없음: 메뉴금액 합계와 실제 결제금액이 일치합니다.");
+            }
+            
+            // 8. 인기 메뉴 TOP 3 계산
+            List<Map<String, Object>> popularMenus = menuSales.stream()
+                .sorted((m1, m2) -> {
+                    long sales1 = getSalesValue(m1.get("total_sales"));
+                    long sales2 = getSalesValue(m2.get("total_sales"));
+                    return Long.compare(sales2, sales1);
+                })
+                .limit(3)
+                .collect(Collectors.toList());
             
             salesReport.put("storeId", storeId);
             salesReport.put("startDate", startDate);
@@ -322,14 +387,53 @@ public class AdminServiceImpl implements AdminService {
             salesReport.put("averageOrderAmount", averageOrderAmount);
             salesReport.put("dailySales", dailySales);
             salesReport.put("menuSales", menuSales);
+            salesReport.put("menuSalesTotal", menuSalesTotal);
+            salesReport.put("difference", difference);
+            salesReport.put("differenceRate", Math.round(differenceRate * 10) / 10.0); // 소수점 1자리
+            salesReport.put("differenceExplanation", differenceExplanation);
+            salesReport.put("popularMenus", popularMenus); // 인기 메뉴 TOP3 추가
+            
+            System.out.println("✅ 매출 리포트 생성 완료:");
+            System.out.println("   - 총매출(실제결제): ₩" + String.format("%,d", totalSales));
+            System.out.println("   - 메뉴금액합계: ₩" + String.format("%,d", menuSalesTotal));
+            System.out.println("   - 총주문수: " + String.format("%,d", totalOrders));
+            System.out.println("   - 평균주문금액: ₩" + String.format("%,d", averageOrderAmount));
+            System.out.println("   - 분석기간: " + startDate + " ~ " + endDate);
             
             return salesReport;
+            
         } catch (Exception e) {
+            System.err.println("❌ 매출 정보 조회 중 오류 발생:");
             e.printStackTrace();
-            return null;
+            
+            // 오류 발생 시 기본값 반환
+            Map<String, Object> errorReport = new HashMap<>();
+            errorReport.put("storeId", storeId);
+            errorReport.put("startDate", startDate);
+            errorReport.put("endDate", endDate);
+            errorReport.put("totalSales", 0L);
+            errorReport.put("totalOrders", 0);
+            errorReport.put("averageOrderAmount", 0L);
+            errorReport.put("dailySales", new ArrayList<>());
+            errorReport.put("menuSales", new ArrayList<>());
+            errorReport.put("menuSalesTotal", 0L);
+            errorReport.put("difference", 0L);
+            errorReport.put("differenceRate", 0.0);
+            errorReport.put("differenceExplanation", "데이터 조회 중 오류 발생: " + e.getMessage());
+            errorReport.put("popularMenus", new ArrayList<>());
+            return errorReport;
         }
     }
 
+    // 매출 값 변환 헬퍼 메소드
+    private long getSalesValue(Object salesObj) {
+        if (salesObj == null) return 0L;
+        if (salesObj instanceof Long) return (Long) salesObj;
+        if (salesObj instanceof Integer) return ((Integer) salesObj).longValue();
+        if (salesObj instanceof BigDecimal) return ((BigDecimal) salesObj).longValue();
+        if (salesObj instanceof Double) return Math.round((Double) salesObj);
+        return 0L;
+    }
     // ==================== 테이블별 QR 관리 ====================
 
     @Override
