@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import dto.CategoryDTO;
 import dto.OrderDetailDTO;
 import dto.StoreDTO;
 import util.DbUtil;
@@ -289,6 +290,41 @@ public List<TransferJsonDTO> selectOrderAllOrderByOrderId(int orderId) throws SQ
 	return list;
 }
 
+
+
+@Override
+public List<CategoryDTO> selectCategoryBytableNo(int orderId) throws SQLException {
+
+	Connection con=null;
+	PreparedStatement ps=null;
+	ResultSet rs=null;
+	List<CategoryDTO> list = new ArrayList<CategoryDTO>();
+	CategoryDTO categoty = null;
+	String sql= proFile.getProperty("query.order.selectCategoryBytableNo");
+	try {
+		con = DbUtil.getConnection();
+		ps = con.prepareStatement(sql);
+		ps.setInt(1, orderId);
+		rs = ps.executeQuery();
+		while(rs.next()) {
+			
+			categoty = 
+			new CategoryDTO(rs.getInt(1),rs.getString(2),rs.getInt(3),null);
+			
+			list.add(categoty);
+			
+		}
+		
+	}
+	
+	catch (Exception e) {
+		e.printStackTrace();
+	}
+	finally {
+		DbUtil.dbClose(rs, ps, con);
+	}
+	return list;
+}
 
 	}
 

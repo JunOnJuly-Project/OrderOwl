@@ -264,7 +264,7 @@ public class UserController extends HttpServlet implements Controller {
     	}
     	
     	StoreDTO store = userService.selectStore(user.getUserId());
-    	
+    	System.out.println(store);
     	HttpSession session = request.getSession();
     	session.setAttribute("user", user);
     	session.setAttribute("store", store);

@@ -14,10 +14,18 @@ const closeButton = document.getElementById("close-button");
 const addModal = document.querySelectorAll(".addModal");
 const orderModal = document.querySelector(".orderModal");
 const listModal = document.querySelector(".listModal");
+const categoryView = document.querySelector(".categoryView");
 let no = 0;
-
+let hostUrl ='';
 window.onload = () =>{
 	
+	let query = window.location.search;
+	let param = new URLSearchParams(query);
+	let id = param.get('tableNo');
+	orderid=id;
+	hostUrl=
+		window.location.host+
+		window.location.pathname;
 	calCartNum();
 	updateInfo();
 }
@@ -65,7 +73,7 @@ addModal.forEach((button) => {
 	let menuId = clickedButton.dataset.menuid
     price = clickedButton.dataset.price;
     
-	orderid = clickedButton.dataset.orderid;
+	
     const modalHtml = `
       <h4>메뉴 : ${menuName}</h3>
       <br />
@@ -100,12 +108,12 @@ addModal.forEach((button) => {
       orderList.push([menuName, price, qua, qua * price,menuId]);
 	  sessionStorage.setItem("list", JSON.stringify(orderList));
       console.log(orderList);
+	  
      calCartNum();
       updateInfo();
-
       closeModal();
     });
-
+	
     modalOverlay.classList.add("show");
     modalWindow.classList.add("show");
   });
@@ -208,7 +216,7 @@ orderModal.addEventListener("click", (e) => {
 		
 	sessionStorage.removeItem("list")
     orderList = [];
-
+	alert("주문 되었습니다!");
     closeModal();
     calCartNum();
 	
@@ -356,3 +364,59 @@ window.addEventListener("keydown", (e) => {
     closeModal();
   }
 });
+
+categoryView.addEventListener('click',async ()=>{
+	console.log(orderid);
+	let categoryList
+	const postData = {
+		      key: "cusOrder",
+		      methodName: "requestCategoryData",
+			  orderid:orderid,
+		    };
+			try {
+			     const response =  await fetch("http://localhost:8080/OrderOwl/front", {
+			        method: "POST",
+			        headers: {
+			   
+			          "Content-Type": "application/json", 
+			        },
+			 
+			        body: JSON.stringify(postData), 
+			      })
+			  
+			  categoryList = await response.json();
+
+			  }
+			catch (error) {
+				        console.error("네트워크 오류:", error);
+				        alert("주문 전송에 실패했습니다. (네트워크 문제)");
+				      }
+	
+	
+	
+	let categoryContent = `
+	<form method = "get" action="http://${hostUrl}">
+	<div class="select-wrapper">
+	<select name="categoryKey" class="custom-select">
+	<option value ="null"> 전체메뉴보기 </option>
+	`;
+	for(j = 0 ; j < categoryList.length ; j++){
+		categoryContent+=`<option value="${categoryList[j].categoryId}"> ${categoryList[j].categoryName} </option>`
+	}
+	categoryContent+=`</select>
+	</div>
+	<input type="hidden" name="key" value = "cusOrder" />
+	<input type="hidden" name="methodName" value = "selectByModelNum" /> 
+	<input type="hidden" name="tableNo" value=${orderid}>
+	</br>
+	<button class="selMenu"> 조회하기 </button>
+	</form>
+	`
+	
+	modalContent.innerHTML = categoryContent;
+	modalOverlay.classList.add("show");
+	 modalWindow.classList.add("show");
+	
+	
+})
+

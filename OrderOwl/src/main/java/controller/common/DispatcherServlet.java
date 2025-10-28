@@ -36,6 +36,7 @@ public class DispatcherServlet extends HttpServlet {
 		response.setContentType("application/json;charset=UTF-8");
 	String key = request.getParameter("key");
 	String methodName = request.getParameter("methodName");
+	request.setAttribute("categoryKey", request.getParameter("categoryKey"));
 	Object orderId = null;
 	if(key == null) {
 		
@@ -55,7 +56,7 @@ public class DispatcherServlet extends HttpServlet {
 	
 	}
 
-	if(methodName.equals("requestOrderData")) {
+	if(methodName.equals("requestOrderData") || methodName.equals("requestCategoryData")) {
 		try {
 			
 			Controller controller = classMap.get(key);
@@ -87,6 +88,11 @@ public class DispatcherServlet extends HttpServlet {
 		Class<?> className = con.getClass();
 		Method method = className.getMethod(methodName, HttpServletRequest.class,HttpServletResponse.class);
 		ModelAndView mv = (ModelAndView)method.invoke(con, request,response);
+		/*
+		// ✅✅✅ 핵심 수정 부분: mv가 null이거나 viewName이 없으면 JSON 응답으로 간주하고 종료
+		if(mv == null || mv.getViewName() == null || mv.getViewName().isEmpty()) {
+			return; // JSON 응답이 이미 완료됨
+		}*/
 		
 		if(mv.isRedirect()) {
 			response.sendRedirect(mv.getViewName());
@@ -100,4 +106,3 @@ public class DispatcherServlet extends HttpServlet {
 	}
 	}
 }
-
