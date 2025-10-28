@@ -21,10 +21,10 @@
 
 =======
     <h3>옵션 : </h3>
->>>>>>> parent of a9ccdcc (#16)
+>> parent of a9ccdcc (#16)
 =======
     <h3>옵션 : </h3>
->>>>>>> parent of a9ccdcc (#16)
+>> parent of a9ccdcc (#16)
     <br />
     <button>주문하기</button>
   </body>

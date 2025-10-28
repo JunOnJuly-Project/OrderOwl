@@ -45,10 +45,12 @@ public class OrderService {
 	public int canOrderCheck(int tableNo,int storeId) throws SQLException {
 		 String checkCan = new OrderDAOImpl().canOrderCheck(tableNo);
 		 int orderTableNo = new OrderDAOImpl().findLastOrderId(tableNo);
+		 
 		 if(!checkCan.equals("Y")) {		 
 			 new OrderDAOImpl().insertNewOrder(tableNo,storeId);
 			 orderTableNo+= new OrderDAOImpl().findLastOrderId(tableNo);
 		 }
+		 System.out.println(orderTableNo);
 	
 		
 		return orderTableNo;
