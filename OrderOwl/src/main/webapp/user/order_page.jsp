@@ -20,7 +20,7 @@
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container px-4 px-lg-5">
-                <p class="navbar-brand">${store.storeName}
+                <p class="navbar-brand">${store.storeName} 
                 </p>
               
                     <form class="d-flex">

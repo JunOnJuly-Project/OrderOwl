@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 
 import controller.common.Controller;
 import controller.common.ModelAndView;
+import dao.customer.OrderDAOImpl;
 import dao.customer.TransferJsonDTO;
 import dto.CategoryDTO;
 import dto.OrderDetailDTO;
@@ -61,8 +62,9 @@ public class OrderController implements Controller {
 		try {
 			int orderId = Integer.parseInt(request.getAttribute("orderId").toString());
 			List list = (List) request.getAttribute("jsonData");
+			orderId = new OrderDAOImpl().findLastOrderId(orderId);
 			os.requestOrder(list, orderId);
-
+			
 			return new ModelAndView("/user/order_page.jsp");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -75,6 +77,7 @@ public class OrderController implements Controller {
 		int orderId = Integer.parseInt(request.getAttribute("orderId").toString());
 		List<TransferJsonDTO> list = null;
 		try {
+			orderId = new OrderDAOImpl().findLastOrderId(orderId);
 			list = os.requestOrderData(orderId);
 		} catch (SQLException e) {
 			e.printStackTrace();
