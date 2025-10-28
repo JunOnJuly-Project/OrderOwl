@@ -1,5 +1,6 @@
 package controller.user;
 
+import java.nio.file.Paths;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -14,6 +15,8 @@ import dto.QrcodeDTO;
 import dto.StoreDTO;
 import dto.StoreTableDTO;
 import dto.UserDTO;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,30 +24,52 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import service.user.UserService;
 import service.user.UserServiceImpl;
+import jakarta.servlet.http.Part;
 
 /**
  * Servlet implementation class UserController
  */
-@WebServlet("/user")
+@WebServlet(urlPatterns = "/user")
+@MultipartConfig( //어노테이션을 통해  서블릿이 파일 업로드 기능을 할 수 있도록 웹 컨테이너에 지시
+	maxFileSize = 1024 * 1024 * 5, //5M - 한 번에 업로드 할 수 있는 파일 크기 제한
+	maxRequestSize = 1024 * 1024 * 50 //50M -전체 요청의 크기 제한. 기본값은 무제한 
+)
 public class UserController extends HttpServlet implements Controller {
 	private UserService userService = new UserServiceImpl();
+	private String saveDir;
+
+	@Override
+	public void init() throws ServletException {
+		saveDir = (String) super.getServletContext().getAttribute("saveDir");
+	}
 	
-    public UserController() {}
-    
+	public UserController() {}
+	
     public ModelAndView insertMenu(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	request.setCharacterEncoding("UTF-8");
     	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     	
     	String closeTime = request.getParameter("closeTime");
     	LocalTime closeLocalTime = closeTime.equals("") ? 
-    				LocalTime.parse("24:00", formatter) : 
+    				LocalTime.parse("23:59", formatter) : 
     				LocalTime.parse(closeTime, formatter);
+    	
+//    	Part part = request.getPart("src");
+//    	String fileName = part.getSubmittedFileName();
+//    	fileName = Paths.get(fileName).getFileName().toString();
+//    	String path = "";
+//    	if (fileName!=null) {
+//    		path = saveDir + "/" + fileName;
+//            part.write(path);
+//        }
     	
     	MenuDTO menu = userService.createMenu(
     			((StoreDTO) request.getSession().getAttribute("store")).getStoreId(),
     			request.getParameter("name"), 
     			Integer.parseInt(request.getParameter("price")), 
     			request.getParameter("description"), 
-    			request.getParameter("src"), 
+//    			path, 
+    			request.getParameter("src"),
     			Optional.ofNullable(request.getParameter("category1Code"))
     			.map(Integer::parseInt)
     			.orElse(1),

@@ -11,12 +11,14 @@ import com.google.gson.Gson;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/front")
+@MultipartConfig
 public class DispatcherServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Map<String,Controller> classMap;

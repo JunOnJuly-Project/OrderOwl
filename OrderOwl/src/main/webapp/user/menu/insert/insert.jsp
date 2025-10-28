@@ -30,7 +30,7 @@
 	    </div>
 	    
 	    <div id="list">	
-			<form id="writeForm" name="writeForm" method="post" action="${pageContext.request.contextPath}/front">
+			<form id="writeForm" name="writeForm" method="post" action="${pageContext.request.contextPath}/front" enctype="multipart/form-data">
 				<input type="hidden" name="key" value = "user" />
 				<input type="hidden" name="methodName" value = "insertMenu" /> 
 				 
@@ -51,7 +51,8 @@
 		 		
 		 		<div class="inputDiv">
 			 		<label for="src">이미지</label>
-			 		<input type="url" name="src" id="src">
+			 		<!-- <input type="file" name="src" id="src">-->
+			 		<input type="text" name="src" id="src">
 		 		</div>
 		 		
 		 		<div class="inputDiv">

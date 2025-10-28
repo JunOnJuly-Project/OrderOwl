@@ -142,3 +142,7 @@ button {
 #order {
 	border: #BB86FC 3px solid;
 }
+
+.pay {
+	height: auto;
+}
