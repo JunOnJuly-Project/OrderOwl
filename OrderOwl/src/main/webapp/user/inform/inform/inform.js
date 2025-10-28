@@ -8,8 +8,8 @@ const mainChart = new Chart(ctxMain, {
         datasets: [{
             label: '수익',
             data: dataValues != null ? dataValues : null,
-            backgroundColor: '#03DAC650',
-            borderColor: '#BB86FC',
+            backgroundColor: '#00000060',
+            borderColor: 'gray',
             borderWidth: 1
         }]
     },
@@ -34,8 +34,8 @@ const subChart = new Chart(ctxSub, {
           datasets: [{
               label: '수익',
               data: dataValues != null ? dataValues : null,
-              backgroundColor: '#03DAC650',
-              borderColor: '#BB86FC',
+              backgroundColor: '#00000060',
+              borderColor: 'gray',
           }]
       },
   options: {
@@ -51,7 +51,7 @@ const subChart = new Chart(ctxSub, {
 const selectBtns = document.querySelectorAll(".selectBtn")
 selectBtns.forEach(btn => {
 	if (btn.id == state) {
-		btn.style.border = "#BB86FC 3px solid"
+		btn.style.border = "gray 3px solid"
 	}
 	
 	else {

@@ -10,36 +10,35 @@
 <body>
 	<div id="background">
 		<div id="header">
-			<h1>header</h1>
+			
 		</div>
 		
 		<div id="main">
-			<h1>
+			<div id="formsDiv">
+				<h1 id="headerH1">OrderOwl</h1>
 				<form id="loginForm" action="${pageContext.request.contextPath}/front">
 					<input type="hidden" value="login" name="methodName">
 					<input type="hidden" value="user" name="key">
 					
 					<div class="formDiv">
-						<label for="userEmail">email</label>
+						<label for="userEmail"><h1>Email</h1></label>
 						<input type="text" id="userEmail" name="userEmail">
 					 </div>
 					 
 					 <div class="formDiv">
-						<label for="password">password</label>
+						<label for="password"><h1>Password</h1></label>
 						<input type="password" id="password" name="password">
 					</div>
 					
 					<div id="buttonDiv">
-						<button>Login</button>
-						<button onclick="location.href='${pageContext.request.contextPath}/user/auth/account/account.jsp'" id="account" class="accountBtn" type="button" >Account</button>
+						<button class="authBtn">Login</button>
+						<button class="authBtn" onclick="location.href='${pageContext.request.contextPath}/user/auth/account/account.jsp'" id="account" class="accountBtn" type="button" >Account</button>
 					</div>
 				</form>
-			
-			</h1>
+			</div>
 		</div>
 		
 		<div id="footer">
-			<p>footer</p>
 		</div>
 	</div>
 </body>

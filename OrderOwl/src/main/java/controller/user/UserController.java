@@ -77,7 +77,7 @@ public class UserController extends HttpServlet implements Controller {
     			.map(Integer::parseInt)
     			.orElse(1),
     			request.getParameter("checkRec"), 
-    			request.getParameter("orderRequest"), 
+    			null,
     			closeLocalTime,
     			request.getParameter("soldOut")
 		);
@@ -125,7 +125,8 @@ public class UserController extends HttpServlet implements Controller {
     			.map(Integer::parseInt)
     			.orElse(1),
     			request.getParameter("checkRec"), 
-    			request.getParameter("orderRequest"), 
+//    			request.getParameter("orderRequest"), 
+    			null,
     			closeLocalTime,
     			request.getParameter("soldOut")
 		);

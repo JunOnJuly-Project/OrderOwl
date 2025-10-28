@@ -1,5 +1,10 @@
 @charset "UTF-8";
 
+button:hover {
+	border: gray 2px solid;
+	transition: 0.2s;
+}
+
 * {
 	box-sizing: border-box;
 }
@@ -11,7 +16,7 @@ html {
 
 body {
 	margin: 0;
-	background-color: black;
+	background-color: white;
 }
 
 #background {
@@ -24,11 +29,21 @@ body {
 	    "footer footer footer footer";
 }
 
+.informRightBtn {
+	height: 5vh;
+	width: 4vw;
+		
+}
+
 #header {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: center;
 	align-items: center;
+	
+	padding-left: 2rem;
+	padding-right: 2rem;
 	
 	grid-area: header;
 }
@@ -71,7 +86,7 @@ body {
 
 h1, p, h2, th, td{
 	margin:0;
-	color: white;
+	color: black;
 }
 
 #informMain {
@@ -84,7 +99,7 @@ h1, p, h2, th, td{
 	height: 80vh;
 	margin-top: 1vh;
 	
-	border: #BB86FC solid 2px;
+	border: black solid 2px;
 	border-radius: 15px;
 	border-collapse: collapse;
 }
@@ -95,7 +110,7 @@ button {
 	align-items: center;
 	text-align: center;
 	
-	background-color: #03DAC6;
+	background-color: black;
 	border: None;
 	border-radius: 5px;
 	color: white;
@@ -116,7 +131,7 @@ button {
 }
 
 #inform {
-	border: #BB86FC 3px solid;
+	border: gray 3px solid !important;
 }
 
 #informs {
@@ -127,6 +142,19 @@ button {
 #informText {
 	margin-left: 5%;
 	margin-top: 2%;
+}
+
+#header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: center;
+	align-items: center;
+	
+	padding-left: 2rem;
+	padding-right: 2rem;
+	
+	grid-area: header;
 }
 
 #informBtn {
@@ -146,7 +174,7 @@ button {
 	width: 50%;
 	margin: 1%;
 	
-	border: #BB86FC 3px solid;
+	border: black 3px solid;
 	border-radius: 2%;
 }
 
@@ -154,7 +182,7 @@ button {
 	margin: 1%;
 	width: 25%;
 	padding: 2%;
-	border: #BB86FC 3px solid;
+	border: black 3px solid;
 	border-radius: 2%;
 }
 
@@ -171,5 +199,6 @@ button {
 }
 
 #hour {
-	border: #BB86FC 3px solid;
+	border: gray 3px solid;
 }
+

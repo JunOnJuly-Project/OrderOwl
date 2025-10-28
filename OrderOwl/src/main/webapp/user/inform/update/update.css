@@ -11,7 +11,7 @@ html {
 
 body {
 	margin: 0;
-	background-color: black;
+	background-color: white;
 }
 
 #background {
@@ -55,7 +55,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: start;
-	align-items: center;
+	align-items: start;
 	
 	grid-area: list;
 }
@@ -71,7 +71,7 @@ body {
 
 h1, p, h2, th, td{
 	margin:0;
-	color: white;
+	color: black;
 }
 
 #informMain {
@@ -84,7 +84,7 @@ h1, p, h2, th, td{
 	height: 80vh;
 	margin-top: 1vh;
 	
-	border: #BB86FC solid 2px;
+	border: black solid 2px;
 	border-radius: 15px;
 	border-collapse: collapse;
 }
@@ -95,7 +95,7 @@ button {
 	align-items: center;
 	text-align: center;
 	
-	background-color: #03DAC6;
+	background-color: black;
 	border: None;
 	border-radius: 5px;
 	color: white;
@@ -108,6 +108,15 @@ button {
 	width: 8vw;
 }
 
+#updateMain {
+	padding: 3rem;
+	padding-bottom: 0;
+	
+	margin-top: 3rem;
+	margin-left: 20rem;
+	border: black 3px solid;
+}
+
 .process {
 	display: flex;
 	justify-content: center;
@@ -116,7 +125,7 @@ button {
 }
 
 #inform, #informUpdate {
-	border: #BB86FC 3px solid;
+	border: black 3px solid;
 }
 
 #informs {
@@ -129,16 +138,34 @@ button {
 	margin-top: 2%;
 }
 
+#header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: center;
+	align-items: center;
+	
+	padding-left: 2rem;
+	padding-right: 2rem;
+	
+	grid-area: header;
+}
+
 #informBtn {
 	display: flex;
-	justify-content: space-between;
+	justify-content: center;
+	
+	margin-top: 2rem;
 	height: 20%;
 }
 
-.mainText {
-	font-size: 300%;
+.mainText, .subText {
+	display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }
 
-.subText {
-	font-size: 100%;
+button:hover {
+	border: gray 2px solid;
+	transition: 0.2s;
 }

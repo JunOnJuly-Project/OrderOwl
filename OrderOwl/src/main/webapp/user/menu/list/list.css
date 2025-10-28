@@ -5,13 +5,24 @@
 }
 
 html {
-	overflow-y: hidden;
 	overflow-x: hidden;
+}
+
+html::-webkit-scrollbar{
+	background-color: gray;
+}
+
+html::-webkit-scrollbar-thumb{
+	background-color: black;
+}
+
+html::-webkit-scrollbar-track{
+	
 }
 
 body {
 	margin: 0;
-	background-color: black;
+	background-color: white;
 }
 
 #background {
@@ -26,9 +37,13 @@ body {
 
 #header {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: center;
 	align-items: center;
+	
+	padding-left: 2rem;
+	padding-right: 2rem;
 	
 	grid-area: header;
 }
@@ -55,7 +70,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: start;
-	align-items: center;
+	align-items: start;
 	
 	grid-area: list;
 }
@@ -71,26 +86,26 @@ body {
 
 h1, p, h2, th, td{
 	margin:0;
-	color: white;
+	color: black;
 }
 
 table {
-	width: 75vw;
+	width: 70vw;
 	margin-top: 1vh;
 	
-	border: #BB86FC solid 2px;
+	border: black solid 2px;
 	border-radius: 15px;
 	border-collapse: collapse;
 }
 
 th {
-	border-left: #BB86FC solid 2px;
-	border-right: #BB86FC solid 2px;
+	border-left: black solid 2px;
+	border-right: black solid 2px;
 }
 
 tr {
-	border-bottom: #BB86FC solid 2px;
-	border-top: #BB86FC solid 2px;
+	border-bottom: black solid 2px;
+	border-top: black solid 2px;
 }
 
 td, th {
@@ -103,7 +118,7 @@ button {
 	align-items: center;
 	text-align: center;
 	
-	background-color: #03DAC6;
+	background-color: black;
 	border: None;
 	border-radius: 5px;
 	color: white;
@@ -111,12 +126,12 @@ button {
 	margin: 1vh;
 }
 
-.selectBtn {
+button {
 	height: 5vh;
 	width: 8vw;
 }
 
-.process {
+.process, .modelProcess{
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -129,16 +144,24 @@ button {
 	width: 60vw;
 	height: 60vh;
 	
-	background-color: #00000080;
-	border: #BB86FC 3px solid;
+	padding-left: 3rem;
+	padding-top: 3rem;
+	background-color: white;
+	border: gray 3px solid;
 	
 	
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%);	
+	transform: translate(-50%, -50%);
+	
 }
 
 #menu, #menus {
-	border: #BB86FC 3px solid;
+	border: gray 3px solid;
+}
+
+button:hover {
+	border: gray 2px solid;
+	transition: 0.2s;
 }

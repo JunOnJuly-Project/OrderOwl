@@ -25,9 +25,13 @@ body {
 
 #header {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: center;
 	align-items: center;
+	
+	padding-left: 2rem;
+	padding-right: 2rem;
 	
 	grid-area: header;
 }
@@ -98,4 +102,9 @@ button {
 .selectBtn {
 	height: 5vh;
 	width: 8vw;
+}
+
+button:hover {
+	border: gray 2px solid;
+	transition: 0.2s;
 }

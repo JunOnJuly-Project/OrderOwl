@@ -11,7 +11,7 @@ html {
 
 body {
 	margin: 0;
-	background-color: black;
+	background-color: white;
 }
 
 #background {
@@ -28,6 +28,8 @@ body {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	
+	background-color: white;
 	
 	grid-area: header;
 }
@@ -54,9 +56,11 @@ body {
 .formDiv {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: space-between;
 	align-items: center;
+	align-self: start;
 	
+	width: 28vw;
 	grid-area: footer;
 }
 
@@ -65,20 +69,37 @@ body {
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
-	align-self: flex-start;
+	
+	width: 17vw;
 }
+
 #footer {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	
+	background-color: white;
+	
 	grid-area: footer;
 }
 
 h1, p, h2, th, td{
 	margin:0;
-	color: white;
+	color: black;
+}
+
+input {
+	border: none;
+	border-bottom:1px ridge black;	
+}
+
+input:focus {
+	border: none;
+	border-bottom:2px ridge black;	
+	outline: none;
+	
+	transition: 0.2s;
 }
 
 button {
@@ -87,7 +108,7 @@ button {
 	align-items: center;
 	text-align: center;
 	
-	background-color: #03DAC6;
+	background-color: black;
 	border: None;
 	border-radius: 5px;
 	color: white;
@@ -95,7 +116,27 @@ button {
 	margin: 1vh;
 }
 
-.selectBtn {
+.authBtn {
 	height: 5vh;
 	width: 8vw;
+}
+
+#formsDiv {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    margin-right: 10vw;
+}
+
+#headerH1 {
+	align-self: center;
+	font-size: 3rem;
+	margin-left: 8rem;
+	margin-bottom: 1rem;
+}
+
+button:hover {
+	border: gray 2px solid;
+	transition: 0.2s;
 }

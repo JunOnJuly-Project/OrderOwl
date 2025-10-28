@@ -1,25 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>OrderOwl</title>
 <link rel="stylesheet" href="${pageContext.request.contextPath}/user/menu/list/list.css">
 </head>
 <body>
 	<c:forEach var="menu" items="${menus}" varStatus="status">
   		<div id="modal${menu.menuId}" class="modal">
-  			<p>메뉴명 : ${menu.menuName}</p>
+  			<h1>${menu.menuName}</h1>
   			<p>가격 : ${menu.price}</p>
   			<p>설명 : ${menu.description}</p>
-  			<p>이미지 : ${menu.imgSrc}</p>
-  			<p>분류1 : ${menu.category1Code}</p>
-  			<p>분류2 : ${menu.category2Code}</p>
+  			<!-- <p>이미지 : ${menu.imgSrc}</p> -->
   			<p>추천 여부 : ${menu.checkRec}</p>
-  			<p>옵션 : ${menu.orderRequest}</p>
+  			<!--<p>옵션 : ${menu.orderRequest}</p> -->
   			<p>마감 시간 : ${menu.closeTime}</p>
   			<p>마감 여부 : ${menu.soldOut}</p>
   		</div>
@@ -27,6 +25,7 @@
 	
     <div id="background">
     	<div id="header">
+    		<h1>${store.storeName}</h1>
     		<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=logout'" id="logOut" class="selectBtn">로그아웃</button>
     	</div>
     	
@@ -55,7 +54,7 @@
 
 	    		<c:forEach var="menu" items="${menus}" varStatus="status">
 	    			<tr>
-					    <td><button id="${menu.menuId}" class="modalBtn">${menu.menuName}</button></td>
+					    <td class="modelProcess"><button id="${menu.menuId}" class="modalBtn">${menu.menuName}</button></td>
 					    <td>${menu.price}</td>
 					    <td>${menu.description}</td>
 						<td class="process">
@@ -63,14 +62,14 @@
 								<input type="hidden" value="${menu.menuId}" name="menuId">
 								<input type="hidden" value="user" name="key">
 								<input type="hidden" value="deleteMenu" name="methodName">
-								<button>삭제</button>
+								<button class="innerBtn">삭제</button>
 							</form>
 							
 							<form action="${pageContext.request.contextPath}/front">
 								<input type="hidden" value="user" name="key">
 								<input type="hidden" value="selectById" name="methodName">
 								<input type="hidden" value="${menu.menuId}" name="menuId">
-								<button>수정</button>
+								<button class="innerBtn">수정</button>
 							</form>
 						</td>
 					</tr>
@@ -79,7 +78,7 @@
 	    </div>
 	    
 	    <div id="footer">
-	    	<h2>footer</h2>	
+
 	    </div>
     </div>
     

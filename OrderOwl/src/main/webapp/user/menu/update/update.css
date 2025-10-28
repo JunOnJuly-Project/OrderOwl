@@ -11,7 +11,7 @@ html {
 
 body {
 	margin: 0;
-	background-color: black;
+	background-color: white;
 }
 
 #background {
@@ -26,9 +26,13 @@ body {
 
 #header {
 	display: flex;
-	flex-direction: column;
-	justify-content: center;
+	flex-direction: row;
+	justify-content: space-between;
+	align-content: center;
 	align-items: center;
+	
+	padding-left: 2rem;
+	padding-right: 2rem;
 	
 	grid-area: header;
 }
@@ -54,10 +58,18 @@ body {
 #list {
 	display: flex;
 	flex-direction: row;
-	justify-content: center;
+	justify-content: start;
 	align-items: start;
 	
+	
 	grid-area: list;
+}
+
+#listInner {
+	margin-top: 2vh;
+	margin-left: 17vw;
+	padding: 3rem;
+	border: black solid 2px;
 }
 
 #footer {
@@ -71,26 +83,26 @@ body {
 
 h1, p, h2, th, td{
 	margin:0;
-	color: white;
+	color: black;
 }
 
 table {
 	width: 75vw;
 	margin-top: 1vh;
 	
-	border: #BB86FC solid 2px;
+	border: black solid 2px;
 	border-radius: 15px;
 	border-collapse: collapse;
 }
 
 th {
-	border-left: #BB86FC solid 2px;
-	border-right: #BB86FC solid 2px;
+	border-left: gray solid 2px;
+	border-right: black solid 2px;
 }
 
 tr {
-	border-bottom: #BB86FC solid 2px;
-	border-top: #BB86FC solid 2px;
+	border-bottom: black solid 2px;
+	border-top: black solid 2px;
 }
 
 td, th {
@@ -103,7 +115,7 @@ button {
 	align-items: center;
 	text-align: center;
 	
-	background-color: #03DAC6;
+	background-color: black;
 	border: None;
 	border-radius: 5px;
 	color: white;
@@ -130,7 +142,7 @@ button {
 	height: 60vh;
 	
 	background-color: #00000080;
-	border: #BB86FC 3px solid;
+	border: gray 3px solid;
 	
 	
 	position: absolute;
@@ -139,23 +151,66 @@ button {
 	transform: translate(-50%, -50%);	
 }
 
-#menu, #insert {
-	border: #BB86FC 3px solid;
+#menu, #menus {
+	border: gray 3px solid;
 }
 
 #writeForm {
 	display: flex;
 	flex-direction: column;
 	justify-content: start;
-	align-items: start;
+	align-content: space-between;
 	text-align: start;
 	
-	color: white;
+	color: black;
+	
+	width: 19vw;
 }
 
 .inputDiv {
 	display: flex;
 	flex-direction: row;
+	justify-content: space-between;
+	
+	margin-bottom: 1.5rem;
+}
+
+input[type=text], input[type=number], input[type=time] {
+	border: none;
+	border-bottom:1px ridge black;	
+}
+
+input[type=text]:focus, input[type=number]:focus, input[type=time]:focus {
+	border: none;
+	border-bottom:2px ridge black;	
+	outline: none;
+	
+	transition: 0.2s;
+}
+
+legend {
+	text-align: center;
+}
+
+.centerDiv {
+	align-self: center;
+}
+
+input[type=submit] {
+	display: flex;
 	justify-content: center;
-	align-content: space-around;
+	align-items: center;
+	text-align: center;
+	
+	background-color: black;
+	border: None;
+	border-radius: 5px;
+	color: white;
+	
+	margin: 1vh;
+}
+
+button:hover {
+	border: gray 2px solid;
+	transition: 0.2s;
 }

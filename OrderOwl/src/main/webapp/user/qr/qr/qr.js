@@ -3,14 +3,14 @@ const openModal = (e) => {
 	
 	const targetId = "modal" + e.target.id
 	let modal = document.querySelector("#" + targetId)
-	
+
 	console.log(targetId)
 	
 	modalBtns.forEach(btn => {
 		console.log(e.target.id)
 		console.log(btn.id)
 		if (btn.id == e.target.id) {
-			modal.style.display = "block"		
+			modal.style.display = "flex"		
 			openedModal = "#" + targetId
 		}
 		
