@@ -7,6 +7,82 @@
 <title>관리자 대시보드</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+/* 사이드바 고정 - 위치와 크기 모두 고정 */
+.sidebar-fixed {
+    width: 256px;
+    min-width: 256px;
+    max-width: 256px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 2rem;
+    align-self: flex-start;
+    min-height: 400px;
+}
+
+.nav-fixed {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* 버튼 완전 고정 - 모든 버튼에 동일한 border */
+.tab-btn {
+    width: 224px;
+    min-width: 224px;
+    max-width: 224px;
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    padding: 0 16px;
+    margin: 0;
+    border: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    text-align: left;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: normal;
+    color: #374151;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    font-family: inherit;
+    position: relative;
+}
+
+.tab-btn:hover {
+    background-color: #f3f4f6;
+    border-color: transparent;
+}
+
+.tab-btn.active {
+    background-color: #eff6ff;
+    color: #2563eb;
+    border-color: transparent;
+}
+
+.tab-btn.active:hover {
+    background-color: #eff6ff;
+    border-color: transparent;
+}
+
+/* 버튼 내부 요소는 클릭 이벤트 무시 */
+.tab-icon {
+    display: inline-block;
+    width: 24px;
+    min-width: 24px;
+    margin-right: 8px;
+    text-align: center;
+    flex-shrink: 0;
+    pointer-events: none;
+    user-select: none;
+}
+</style>
 </head>
 <body class="bg-gray-50">
 	<!-- 로딩 -->
@@ -27,30 +103,32 @@
 	</nav>
 
 	<div class="max-w-7xl mx-auto px-4 py-8">
-		<div class="flex gap-6">
+		<div class="flex gap-6 items-start">
 			<!-- 사이드바 -->
-			<aside class="w-64 bg-white rounded-xl p-4 shadow-sm">
-				<nav class="space-y-2">
-					<button onclick="showTab('dashboard')"
-						class="tab-btn w-full text-left px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium">
-						📊 대시보드</button>
-					<button onclick="showTab('stores')"
-						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-						🏪 매장 관리</button>
-					<button onclick="showTab('menus')"
-						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-						🍽️ 메뉴 관리</button>
-					<button onclick="showTab('users')"
-						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-						👥 유저 관리</button>
-					<button onclick="showTab('qr')"
-						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-						📱 QR 관리</button>
-					<button onclick="showTab('sales')"
-						class="tab-btn w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium">
-						💰 매출 정보</button>
+			<!-- 사이드바 -->
+			<aside class="sidebar-fixed bg-white rounded-xl p-4 shadow-sm">
+				<nav class="nav-fixed">
+					<button class="tab-btn active" data-tab="dashboard">
+						<span class="tab-icon">📊</span>대시보드
+					</button>
+					<button class="tab-btn" data-tab="stores">
+						<span class="tab-icon">🏪</span>매장 관리
+					</button>
+					<button class="tab-btn" data-tab="menus">
+						<span class="tab-icon">🍽️</span>메뉴 관리
+					</button>
+					<button class="tab-btn" data-tab="users">
+						<span class="tab-icon">👥</span>유저 관리
+					</button>
+					<button class="tab-btn" data-tab="qr">
+						<span class="tab-icon">📱</span>QR 관리
+					</button>
+					<button class="tab-btn" data-tab="sales">
+						<span class="tab-icon">💰</span>매출 정보
+					</button>
 				</nav>
 			</aside>
+
 
 			<!-- 메인 컨텐츠 -->
 			<main class="flex-1">
@@ -480,6 +558,39 @@ function initDatePickers() {
 }
 
 function setupEventListeners() {
+    // 탭 버튼 클릭 이벤트 - jQuery로 완전히 제어
+    $('.tab-btn').off('click').on('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        var tab = $(this).attr('data-tab');
+        
+        // 모든 버튼에서 active 제거
+        $('.tab-btn').removeClass('active');
+        
+        // 현재 버튼에만 active 추가
+        $(this).addClass('active');
+        
+        // 탭 컨텐츠 전환
+        $('.tab-content').addClass('hidden');
+        $('#' + tab).removeClass('hidden');
+        
+        // 데이터 로드
+        if (tab === 'dashboard') {
+            loadDashboardStats();
+        } else if (tab === 'stores') {
+            loadStoreList();
+        } else if (tab === 'qr') {
+            loadQRCodes();
+        } else if (tab === 'menus') {
+            loadStoreListForMenus();
+        } else if (tab === 'users') {
+            loadUserList();
+        } else if (tab === 'sales') {
+            loadStoreListForSales();
+        }
+    });
+    
     // 매장 폼 제출
     $('#storeForm').on('submit', function(e) {
         e.preventDefault();
@@ -500,13 +611,20 @@ function setupEventListeners() {
 }
 
 // ==================== 탭 전환 ====================
-function showTab(tab) {
+function showTab(tab, event) {
+    // 이벤트 전파 방지
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    // 탭 컨텐츠 전환
     $('.tab-content').addClass('hidden');
     $('#' + tab).removeClass('hidden');
     
-    $('.tab-btn').removeClass('bg-blue-50 text-blue-600').addClass('text-gray-700');
-    event.target.classList.remove('text-gray-700');
-    event.target.classList.add('bg-blue-50', 'text-blue-600');
+    // 버튼 active 상태 전환 - data-tab 속성으로 정확하게 선택
+    $('.tab-btn').removeClass('active');
+    $('.tab-btn[data-tab="' + tab + '"]').addClass('active');
     
     // 탭 전환 시 데이터 로드
     if (tab === 'dashboard') {
