@@ -23,9 +23,7 @@ window.onload = () =>{
 	let param = new URLSearchParams(query);
 	let id = param.get('tableNo');
 	orderid=id;
-	hostUrl=
-		window.location.host+
-		window.location.pathname;
+	hostUrl=window.location.host+window.location.pathname;
 	calCartNum();
 	updateInfo();
 }
@@ -100,6 +98,7 @@ addModal.forEach((button) => {
     });
 
     document.querySelector(".pbtn").addEventListener("click", () => {
+	
       qua++;
       updatePrice();
     });
@@ -200,7 +199,7 @@ orderModal.addEventListener("click", (e) => {
 	    };
 	
 		try {
-		      await fetch("http://localhost:8080/OrderOwl/front", {
+		      await fetch(`http://${hostUrl}`, {
 		        method: "POST",
 		        headers: {
 		   
@@ -278,7 +277,7 @@ listModal.addEventListener("click", async (e) => {
   	    };
   	    let orderDetailList=[];
   		try {
-  		     const response =  await fetch("http://localhost:8080/OrderOwl/front", {
+  		     const response =  await fetch(`http://${hostUrl}`, {
   		        method: "POST",
   		        headers: {
   		   
@@ -374,7 +373,7 @@ categoryView.addEventListener('click',async ()=>{
 			  orderid:orderid,
 		    };
 			try {
-			     const response =  await fetch("http://localhost:8080/OrderOwl/front", {
+			     const response =  await fetch(`http://${hostUrl}`, {
 			        method: "POST",
 			        headers: {
 			   
