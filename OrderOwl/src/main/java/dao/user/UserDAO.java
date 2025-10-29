@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import dto.UserDTO;
+import dto.CategoryDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.QrcodeDTO;
@@ -79,4 +80,12 @@ public interface UserDAO {
 	List<QrcodeDTO> selectAllQr(int storeId) throws SQLException;
 	
 	QrcodeDTO selectQr(int qrcodeId) throws SQLException;
+	
+	List<CategoryDTO> selectAllCategory (int storeId) throws SQLException;
+	
+	CategoryDTO selectCategory (int categoryId) throws SQLException;
+	
+	int insertCategory(String categoryName, int storeId, String hasMenuId) throws SQLException;
+	
+	int updateCategory(String hasMenuId, int categoryId) throws SQLException;
 }

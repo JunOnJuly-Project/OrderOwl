@@ -6,9 +6,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Locale.Category;
 
 import controller.common.Controller;
 import controller.common.ModelAndView;
+import dto.CategoryDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.QrcodeDTO;
@@ -80,11 +82,25 @@ public class UserController extends HttpServlet implements Controller {
     			null,
     			closeLocalTime,
     			request.getParameter("soldOut")
-		);
+		);	
     	
-    	System.out.println(menu);
-    	userService.insertMenu(menu);
+    	int result = userService.insertMenu(menu);
+    	
+    	userService.updateCategory(
+			result, 
+			Integer.parseInt(request.getParameter("category"))
+		);
     	return new ModelAndView("/front?key=user&methodName=selectAllMenu");
+    }
+   
+    public ModelAndView preInsert(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	List<CategoryDTO> categories = userService.selectAllCategory(
+			((StoreDTO) request.getSession().getAttribute("store")).getStoreId()
+		);
+        	
+    	request.setAttribute("categories", categories);
+    	
+    	return new ModelAndView("user/menu/insert/insert.jsp");
     }
     
     public ModelAndView selectById(HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -184,6 +200,11 @@ public class UserController extends HttpServlet implements Controller {
     	
     	return new ModelAndView("user/order/order/order.jsp");
     }
+    
+    public ModelAndView selectAllOrderSuccess(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	return updateOrder(request, response);
+    }
+
     
     public ModelAndView updateOrder(HttpServletRequest request, HttpServletResponse response) throws Exception {
     	userService.updateOrder(

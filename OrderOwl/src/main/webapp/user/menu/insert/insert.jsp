@@ -19,14 +19,15 @@
 	    <div id="select">
 	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu'" id="menu" class="selectBtn">메뉴</button>
 	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectSales&state=hour'" id="inform" class="selectBtn">정보</button>
-	    	<button id="qr" class="selectBtn">QR</button>
+	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllQr&storeId=${store.storeId}'" id="qr" class="selectBtn">QR</button>
 	    	<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllOrder'" id="order" class="selectBtn">주문</button>
 	    </div>
 	    
 	    <div id="subselect">
 	    	<h2>
 				<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu'"id="menus" class="selectBtn">목록</button>
-				<button onclick="location.href='${pageContext.request.contextPath}/user/menu/insert/insert.jsp'" id="insert" class="selectBtn">추가</button>
+				<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=preInsert'" id="insert" class="selectBtn">메뉴 추가</button>
+				<button onclick="location.href='${pageContext.request.contextPath}/user/menu/category/category.jsp'" id="category" class="selectBtn">카테고리 추가</button>
 			</h2>	    
 	    </div>
 	    
@@ -89,13 +90,11 @@
 				 		<input type="time" name="closeTime" id="closeTime"><br>
 			 		</div>
 			 		<div class="inputDiv">
-				 		<fieldset>
-				 			<legend>추천 여부</legend>
-					 		<label for="추천">추천</label>
-					 		<input type="radio" name="checkRec" id="추천" value="Y">
-					 		<label for="일반">일반</label>
-					 		<input type="radio" name="checkRec" id="일반" value="N"><br>
-				 		</fieldset>
+			 			<select name=category class="select">
+			 				<c:forEach var="cat" items="${categories}" varStatus="status">
+			 					<option value="${cat.categoryId}">${cat.categoryName}</option>
+			 				</c:forEach>
+			 			</select>
 			 		</div>
 			 		<!--  
 			 		<div class="inputDiv">

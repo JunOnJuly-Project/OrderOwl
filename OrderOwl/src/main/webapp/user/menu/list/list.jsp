@@ -39,7 +39,8 @@
 	    <div id="subselect">
 	    	<h2>
 				<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=selectAllMenu'" id="menus" class="selectBtn">목록</button>
-				<button onclick="location.href='${pageContext.request.contextPath}/user/menu/insert/insert.jsp'" id="insert" class="selectBtn">추가</button>
+				<button onclick="location.href='${pageContext.request.contextPath}/front?key=user&methodName=preInsert'" id="insert" class="selectBtn">메뉴 추가</button>
+				<button onclick="location.href='${pageContext.request.contextPath}/user/menu/category/category.jsp'" id="category" class="selectBtn">카테고리 추가</button>
 			</h2>	    
 	    </div>
 	    

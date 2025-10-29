@@ -162,7 +162,7 @@ button {
 	transform: translate(-50%, -50%);	
 }
 
-#menu, #insert {
+#menu, #category {
 	border: gray 3px solid;
 }
 
@@ -181,7 +181,7 @@ button {
 .inputDiv {
 	display: flex;
 	flex-direction: row;
-	justify-content: space-around;
+	justify-content: space-between;
 	
 	margin-bottom: 1.5rem;
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import dao.user.UserDAO;
 import dao.user.UserDAOImpl;
+import dto.CategoryDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.QrcodeDTO;
@@ -207,4 +208,29 @@ public class UserServiceImpl implements UserService {
 		String qrImgSrc = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encoded;
 		userDao.createQr(table.getTableId(), qrcodeData, qrImgSrc);
 	}
+
+	@Override
+	public List<CategoryDTO> selectAllCategory(int storeId) throws SQLException {
+		return userDao.selectAllCategory(storeId);
+		
+	}
+
+	@Override
+	public int insertCategory(String categoryName, int storeId) throws SQLException {
+		return userDao.insertCategory(categoryName, storeId, String.valueOf(storeId));
+	}
+
+	@Override
+	public int updateCategory(int menuId, int categoryId) throws SQLException {
+		CategoryDTO category = selectCategory(categoryId);
+		
+		return userDao.updateCategory(category.getHasMenuId() + "," + menuId, categoryId);
+	}
+
+	@Override
+	public CategoryDTO selectCategory(int categoryId) throws SQLException {
+		return userDao.selectCategory(categoryId);
+	}
+	
+	
 }

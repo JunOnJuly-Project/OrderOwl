@@ -32,7 +32,6 @@
 					        <p class="ordersText">메뉴 : ${menu.menuName}</p>
 					    </c:if>
 		  			</c:forEach>
-		  			<p class="ordersText">id : ${orderDetail.orderId}</p>
 		  			<p class="ordersText">수량 : ${orderDetail.quantity}</p>
 		  			<p class="ordersText">가격 : ${orderDetail.price}</p>
 		  			<P class="ordersText">---</P>
@@ -72,7 +71,7 @@
 					    <td>${order.tableId}</td>
 						<td class="process">
 		 					<button id="${order.orderId}" class="modalBtn">확인</button>
-							<button class="modalBtn" id="pay" data-value="${order.totalPrice}">결제</button>
+							<button class="modalBtn" id="pay" data-value="${order.totalPrice}" data-id="${order.orderId}">결제</button>
 
 							<form action="${pageContext.request.contextPath}/front">
 								<input type="hidden" value="user" name="key">
@@ -107,7 +106,7 @@
 <script>
   let value = 0;
   let pay = document.querySelector("#pay");
-
+  let orderId = "";
   
   main();
 
@@ -129,6 +128,7 @@
     
     pay.addEventListener("click", (e) => {
   	  value = e.target.getAttribute("data-value")
+  	  orderId = e.target.getAttribute("data-id")
   	  console.log(value)
   	  widgets.setAmount({
         currency: "KRW",
@@ -153,7 +153,7 @@
       await widgets.requestPayment({
         orderId: "tDOsevySY3uhR3C8GM5u6",
         orderName: e.target.getAttribute("data-name"),
-        successUrl: window.location.origin + `${pageContext.request.contextPath}/front?key=user&methodName=selectAllOrder`,
+        successUrl: window.location.origin + `${pageContext.request.contextPath}/front?key=user&methodName=selectAllOrderSuccess&state=completed&orderId=` + orderId,
         failUrl: window.location.origin + `${pageContext.request.contextPath}/front?key=user&methodName=selectAllOrder`,
         customerEmail: "customer123@gmail.com",
         customerName: "김토스",

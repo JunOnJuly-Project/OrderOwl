@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
+import dto.CategoryDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.QrcodeDTO;
@@ -89,4 +90,12 @@ public interface UserService {
 	QrcodeDTO selectQr(int qrcodeId) throws SQLException;
 	
 	void createTable(int storeId, String tableNo) throws SQLException;
+	
+	List<CategoryDTO> selectAllCategory(int storeId) throws SQLException;
+	
+	CategoryDTO selectCategory(int categoryId) throws SQLException;
+	
+	int insertCategory(String categoryName, int storeId) throws SQLException;
+	
+	int updateCategory(int menuId, int categoryId) throws SQLException;
 }

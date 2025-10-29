@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
+import dto.CategoryDTO;
 import dto.MenuDTO;
 import dto.OrderDTO;
 import dto.OrderDetailDTO;
@@ -41,6 +42,7 @@ public class UserDAOImpl implements UserDAO {
 	public int insertMenu(MenuDTO menuDto) throws SQLException {
 		Connection con=null;
 		PreparedStatement ps=null;
+		ResultSet rs = null;
 		int result = 0;
 		
 		String sql= proFile.getProperty("user.menu.insert");
@@ -48,7 +50,7 @@ public class UserDAOImpl implements UserDAO {
 		try {
 			con = DbUtil.getConnection();
 			
-			ps = con.prepareStatement(sql);
+			ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			ps.setInt(1, menuDto.getStoreId());
 			ps.setString(2, menuDto.getMenuName());
 			ps.setInt(3, menuDto.getPrice());
@@ -62,6 +64,10 @@ public class UserDAOImpl implements UserDAO {
 			ps.setString(11, menuDto.getSoldOut());
 			
 			result = ps.executeUpdate();
+			rs = ps.getGeneratedKeys();
+			if(rs.next()) {
+				result = rs.getInt(1);
+			}
 		}
 		
 		finally {
@@ -881,5 +887,124 @@ public class UserDAOImpl implements UserDAO {
 		}
 		
 		return qr;
+	}
+
+	@Override
+	public List<CategoryDTO> selectAllCategory(int storeId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		List<CategoryDTO> list = new ArrayList<>();
+		
+		String sql= proFile.getProperty("user.category.selectAll");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, storeId);
+			
+			rs = ps.executeQuery();
+			
+			while (rs.next()) {
+				list.add(new CategoryDTO(
+					rs.getInt(1),
+					rs.getString(2),
+					rs.getInt(3),
+					rs.getString(4)
+				));
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public int insertCategory(String categoryName, int storeId, String hasMenuId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		int result = 0;
+		
+		String sql= proFile.getProperty("user.category.insert");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setString(1, categoryName);
+			ps.setInt(2, storeId);
+			ps.setString(3, hasMenuId);
+			
+			result = ps.executeUpdate();
+		}
+		
+		finally {
+			DbUtil.dbClose(ps, con);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public int updateCategory(String hasMenuId, int categoryId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		int result = 0;
+		
+		String sql= proFile.getProperty("user.category.update");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setString(1, hasMenuId);
+			ps.setInt(2, categoryId);
+			
+			result = ps.executeUpdate();
+		}
+		
+		finally {
+			DbUtil.dbClose(ps, con);
+		}
+		
+		return result;
+	}
+
+	@Override
+	public CategoryDTO selectCategory(int categoryId) throws SQLException {
+		Connection con=null;
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		CategoryDTO category = null;
+		
+		String sql= proFile.getProperty("user.category.select");
+		
+		try {
+			con = DbUtil.getConnection();
+			
+			ps = con.prepareStatement(sql);
+			ps.setInt(1, categoryId);
+			
+			rs = ps.executeQuery();
+			
+			if (rs.next()) {
+				category = new CategoryDTO(
+					rs.getInt(1),
+					rs.getString(2),
+					rs.getInt(3),
+					rs.getString(4)
+				);
+			}
+		}
+		
+		finally {
+			DbUtil.dbClose(rs, ps, con);
+		}
+		
+		return category;
 	}
 }
