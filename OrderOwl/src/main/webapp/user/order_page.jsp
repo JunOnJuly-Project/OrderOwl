@@ -81,6 +81,7 @@
                        href="#"
                        data-menuname="${item.menuName}"
                        data-menuid="${item.menuId}"
+                       data-desciption="${item.description}"
                        data-orderid="${cusOrderId}"
                        data-price="${item.price}">추가하기</a></div>
                             </div>
