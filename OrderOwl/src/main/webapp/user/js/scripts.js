@@ -70,12 +70,13 @@ addModal.forEach((button) => {
     const menuName = clickedButton.dataset.menuname;
 	let menuId = clickedButton.dataset.menuid
     price = clickedButton.dataset.price;
+	let description = clickedButton.dataset.desciption;
     
 	
     const modalHtml = `
       <h4>메뉴 : ${menuName}</h3>
       <br />
-      <h6>설명 : 맛있는 메뉴입니다.</h3>
+      <h6>설명 : ${description}</h3>
       <br />
       <h6>가격 : ${price}원</h3>
       <br />
